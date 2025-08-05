@@ -2,6 +2,7 @@
 
 import base64
 import logging
+import os
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -47,6 +48,16 @@ class GitHubAPISync:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         elif ca_bundle:
             self.session.verify = ca_bundle
+            
+        # Configure proxy from environment if set
+        proxies = {}
+        if os.environ.get('HTTP_PROXY'):
+            proxies['http'] = os.environ.get('HTTP_PROXY')
+        if os.environ.get('HTTPS_PROXY'):
+            proxies['https'] = os.environ.get('HTTPS_PROXY')
+        if proxies:
+            self.session.proxies.update(proxies)
+            logger.info(f"Using proxy configuration: {proxies}")
 
         # Set up authentication if token provided
         if self.token:

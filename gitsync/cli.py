@@ -30,6 +30,7 @@ def cli():
 @click.option("--method", type=click.Choice(["api", "browser"]), default="api", help="Sync method")
 @click.option("--no-progress", is_flag=True, help="Disable progress bar")
 @click.option("--verbose", "-v", is_flag=True, help="Enable verbose logging")
+@click.option("--no-ssl-verify", is_flag=True, help="Disable SSL verification (use with caution)")
 def sync(
     repo: Optional[str],
     local: Optional[str],
@@ -39,6 +40,7 @@ def sync(
     method: str,
     no_progress: bool,
     verbose: bool,
+    no_ssl_verify: bool,
 ):
     """Synchronize a GitHub repository to local directory."""
 
@@ -77,8 +79,20 @@ def sync(
     ref = cfg.get("repository.ref", "main")
     token = cfg.get("auth.token")
     method = cfg.get("sync.method", "api")
-    verify_ssl = cfg.get("sync.verify_ssl", True)
-    ca_bundle = cfg.get("sync.ca_bundle")
+    
+    # Handle SSL verification
+    if no_ssl_verify:
+        verify_ssl = False
+        ca_bundle = None
+    else:
+        verify_ssl = cfg.get("sync.verify_ssl", True)
+        ca_bundle = cfg.get("sync.ca_bundle")
+    
+    # Log SSL configuration in verbose mode
+    if verbose and ca_bundle:
+        click.echo(f"Using CA bundle: {ca_bundle}")
+    elif verbose and not verify_ssl:
+        click.echo("WARNING: SSL verification disabled")
 
     # Perform sync based on method
     if method == "api":
