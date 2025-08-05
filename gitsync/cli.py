@@ -77,10 +77,12 @@ def sync(
     ref = cfg.get("repository.ref", "main")
     token = cfg.get("auth.token")
     method = cfg.get("sync.method", "api")
+    verify_ssl = cfg.get("sync.verify_ssl", True)
+    ca_bundle = cfg.get("sync.ca_bundle")
 
     # Perform sync based on method
     if method == "api":
-        syncer = GitHubAPISync(repo_url, local_path, token)
+        syncer = GitHubAPISync(repo_url, local_path, token, verify_ssl=verify_ssl, ca_bundle=ca_bundle)
         success = syncer.sync(ref=ref, show_progress=not no_progress)
     else:
         click.echo("Browser method not yet implemented", err=True)

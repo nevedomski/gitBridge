@@ -33,7 +33,12 @@ sync:
   incremental: true
   
   # Verify SSL certificates (default: true)
+  # Set to false to disable SSL verification (not recommended)
   verify_ssl: true
+  
+  # Path to CA bundle file for corporate certificates (optional)
+  # Use this if your company uses custom certificates
+  # ca_bundle: /path/to/ca_bundle.crt
 
 # Logging settings
 logging:

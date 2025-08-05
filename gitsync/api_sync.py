@@ -23,19 +23,30 @@ logger = logging.getLogger(__name__)
 class GitHubAPISync:
     """Synchronize repository using GitHub REST API."""
 
-    def __init__(self, repo_url: str, local_path: str, token: Optional[str] = None):
+    def __init__(self, repo_url: str, local_path: str, token: Optional[str] = None, verify_ssl: bool = True, ca_bundle: Optional[str] = None):
         """Initialize GitHub API sync.
 
         Args:
             repo_url: GitHub repository URL
             local_path: Local directory path
             token: GitHub personal access token (optional)
+            verify_ssl: Whether to verify SSL certificates
+            ca_bundle: Path to CA bundle file for corporate certificates
         """
         self.owner, self.repo = parse_github_url(repo_url)
         self.local_path = Path(local_path)
         self.token = token
         self.base_url = "https://api.github.com"
         self.session = requests.Session()
+        
+        # Configure SSL verification
+        if not verify_ssl:
+            self.session.verify = False
+            # Suppress SSL warnings when disabled
+            import urllib3
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        elif ca_bundle:
+            self.session.verify = ca_bundle
 
         # Set up authentication if token provided
         if self.token:
