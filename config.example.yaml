@@ -39,6 +39,14 @@ sync:
   # Path to CA bundle file for corporate certificates (optional)
   # Use this if your company uses custom certificates
   # ca_bundle: /path/to/ca_bundle.crt
+  
+  # Auto-detect proxy from Windows/Chrome PAC script (default: false)
+  # Enable this to automatically use proxy settings from your browser
+  auto_proxy: false
+  
+  # Auto-detect certificates from Windows certificate store (default: false)
+  # Enable this to automatically use corporate certificates from Windows
+  auto_cert: false
 
 # Logging settings
 logging:

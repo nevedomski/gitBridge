@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 class GitHubAPISync:
     """Synchronize repository using GitHub REST API."""
 
-    def __init__(self, repo_url: str, local_path: str, token: Optional[str] = None, verify_ssl: bool = True, ca_bundle: Optional[str] = None):
+    def __init__(self, repo_url: str, local_path: str, token: Optional[str] = None, verify_ssl: bool = True, ca_bundle: Optional[str] = None, auto_proxy: bool = False, auto_cert: bool = False):
         """Initialize GitHub API sync.
 
         Args:
@@ -33,6 +33,8 @@ class GitHubAPISync:
             token: GitHub personal access token (optional)
             verify_ssl: Whether to verify SSL certificates
             ca_bundle: Path to CA bundle file for corporate certificates
+            auto_proxy: Whether to auto-detect proxy from Windows/Chrome PAC
+            auto_cert: Whether to auto-detect certificates from Windows store
         """
         self.owner, self.repo = parse_github_url(repo_url)
         self.local_path = Path(local_path)
@@ -40,24 +42,54 @@ class GitHubAPISync:
         self.base_url = "https://api.github.com"
         self.session = requests.Session()
         
+        # Configure certificates
+        cert_bundle = ca_bundle  # Start with explicit ca_bundle if provided
+        
+        # Auto-detect certificates from Windows store if enabled
+        if auto_cert and not ca_bundle:
+            try:
+                from .cert_support import get_combined_cert_bundle
+                detected_bundle = get_combined_cert_bundle()
+                if detected_bundle:
+                    cert_bundle = detected_bundle
+                    logger.info(f"Auto-detected certificate bundle: {cert_bundle}")
+            except Exception as e:
+                logger.warning(f"Failed to auto-detect certificates: {e}")
+        
         # Configure SSL verification
         if not verify_ssl:
             self.session.verify = False
             # Suppress SSL warnings when disabled
             import urllib3
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-        elif ca_bundle:
-            self.session.verify = ca_bundle
+        elif cert_bundle:
+            self.session.verify = cert_bundle
+            logger.info(f"Using certificate bundle: {cert_bundle}")
             
-        # Configure proxy from environment if set
+        # Configure proxy
         proxies = {}
+        
+        # First try auto-detection if enabled
+        if auto_proxy:
+            try:
+                from .pac_support import detect_and_configure_proxy
+                detected_proxies = detect_and_configure_proxy()
+                if detected_proxies.get('http') or detected_proxies.get('https'):
+                    proxies.update(detected_proxies)
+                    logger.info(f"Auto-detected proxy configuration: {proxies}")
+            except Exception as e:
+                logger.warning(f"Failed to auto-detect proxy: {e}")
+        
+        # Environment variables override auto-detection
         if os.environ.get('HTTP_PROXY'):
             proxies['http'] = os.environ.get('HTTP_PROXY')
         if os.environ.get('HTTPS_PROXY'):
             proxies['https'] = os.environ.get('HTTPS_PROXY')
+            
         if proxies:
             self.session.proxies.update(proxies)
-            logger.info(f"Using proxy configuration: {proxies}")
+            if not auto_proxy or os.environ.get('HTTP_PROXY') or os.environ.get('HTTPS_PROXY'):
+                logger.info(f"Using proxy configuration: {proxies}")
 
         # Set up authentication if token provided
         if self.token:

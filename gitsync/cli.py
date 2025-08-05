@@ -31,6 +31,8 @@ def cli():
 @click.option("--no-progress", is_flag=True, help="Disable progress bar")
 @click.option("--verbose", "-v", is_flag=True, help="Enable verbose logging")
 @click.option("--no-ssl-verify", is_flag=True, help="Disable SSL verification (use with caution)")
+@click.option("--auto-proxy", is_flag=True, help="Auto-detect proxy from Windows/Chrome PAC")
+@click.option("--auto-cert", is_flag=True, help="Auto-detect certificates from Windows certificate store")
 def sync(
     repo: Optional[str],
     local: Optional[str],
@@ -41,6 +43,8 @@ def sync(
     no_progress: bool,
     verbose: bool,
     no_ssl_verify: bool,
+    auto_proxy: bool,
+    auto_cert: bool,
 ):
     """Synchronize a GitHub repository to local directory."""
 
@@ -88,6 +92,14 @@ def sync(
         verify_ssl = cfg.get("sync.verify_ssl", True)
         ca_bundle = cfg.get("sync.ca_bundle")
     
+    # Handle auto proxy detection
+    if not auto_proxy:
+        auto_proxy = cfg.get("sync.auto_proxy", False)
+    
+    # Handle auto certificate detection
+    if not auto_cert:
+        auto_cert = cfg.get("sync.auto_cert", False)
+    
     # Log SSL configuration in verbose mode
     if verbose and ca_bundle:
         click.echo(f"Using CA bundle: {ca_bundle}")
@@ -96,7 +108,7 @@ def sync(
 
     # Perform sync based on method
     if method == "api":
-        syncer = GitHubAPISync(repo_url, local_path, token, verify_ssl=verify_ssl, ca_bundle=ca_bundle)
+        syncer = GitHubAPISync(repo_url, local_path, token, verify_ssl=verify_ssl, ca_bundle=ca_bundle, auto_proxy=auto_proxy, auto_cert=auto_cert)
         success = syncer.sync(ref=ref, show_progress=not no_progress)
     else:
         click.echo("Browser method not yet implemented", err=True)

@@ -10,6 +10,8 @@ A Python tool to synchronize GitHub repositories to local folders when direct gi
 - **Configuration Support**: Flexible configuration via YAML files
 - **Command-Line Interface**: Easy-to-use CLI for various sync operations
 - **Progress Tracking**: Visual progress bars and detailed logging
+- **Automatic Proxy Detection**: Auto-detects proxy settings from Windows/Chrome PAC scripts
+- **Corporate Environment Support**: Works with SSL certificates and proxy configurations
 
 ## Installation
 
@@ -24,6 +26,9 @@ uv pip install -e .
 
 # Or install with development dependencies
 uv pip install -e ".[dev]"
+
+# Install with PAC proxy support (Windows)
+uv pip install -e ".[pac]"
 ```
 
 ## Quick Start
@@ -73,6 +78,39 @@ gitsync sync --repo https://github.com/username/repo --local /path/to/local --me
 ```bash
 gitsync status --config config.yaml
 ```
+
+### Corporate Environment Support
+
+For Windows users in corporate environments:
+
+```bash
+# Auto-detect proxy from Chrome/Windows settings
+gitsync sync --repo https://github.com/username/repo --local /path/to/local --auto-proxy
+
+# Auto-detect certificates from Windows certificate store
+gitsync sync --repo https://github.com/username/repo --local /path/to/local --auto-cert
+
+# Use both auto-detection features together
+gitsync sync --config config.yaml --auto-proxy --auto-cert
+
+# Last resort: disable SSL verification
+gitsync sync --config config.yaml --auto-proxy --no-ssl-verify
+```
+
+Or add to your configuration file:
+
+```yaml
+sync:
+  auto_proxy: true   # Auto-detect proxy from PAC
+  auto_cert: true    # Auto-detect certificates from Windows
+  # verify_ssl: false  # Only if absolutely necessary
+```
+
+The tool will automatically:
+- Extract proxy settings from Windows/Chrome PAC scripts
+- Export trusted certificates from Windows certificate store
+- Combine them with certifi's default bundle
+- Configure requests to use both proxy and certificates
 
 ## Configuration
 

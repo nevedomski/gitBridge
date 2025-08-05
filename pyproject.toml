@@ -24,6 +24,7 @@ dependencies = [
     "click>=8.1.0",
     "python-dotenv>=1.0.0",
     "tqdm>=4.66.0",
+    "certifi>=2023.0.0",
 ]
 
 [project.scripts]
@@ -39,6 +40,8 @@ dev = [
     "types-pyyaml>=6.0",
     "types-tqdm>=4.66.0",
 ]
+pac = ["pypac>=0.16.0"]
+win = ["wincertstore>=0.2.0", "pywin32>=300"]
 
 [tool.ruff]
 line-length = 120
