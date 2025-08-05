@@ -1,0 +1,44 @@
+# GitSync Configuration Example
+
+# Repository settings
+repository:
+  # GitHub repository URL (required)
+  url: https://github.com/username/repository
+  
+  # Branch, tag, or commit SHA to sync (default: main)
+  # Examples:
+  # - Branch: main, master, develop
+  # - Tag: v1.0.0, release-2023
+  # - Commit SHA: abc123def456 (full or short SHA)
+  ref: main
+
+# Local settings
+local:
+  # Local directory path where files will be synced (required)
+  path: /path/to/local/repository
+
+# Authentication settings
+auth:
+  # GitHub personal access token (optional for public repos)
+  # Can also be set via GITHUB_TOKEN environment variable
+  # Create at: https://github.com/settings/tokens
+  token: ghp_xxxxxxxxxxxxxxxxxxxx
+
+# Sync settings
+sync:
+  # Sync method: 'api' or 'browser' (default: api)
+  method: api
+  
+  # Enable incremental sync (only download changed files)
+  incremental: true
+  
+  # Verify SSL certificates (default: true)
+  verify_ssl: true
+
+# Logging settings
+logging:
+  # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL (default: INFO)
+  level: INFO
+  
+  # Log file path (optional, logs to console by default)
+  file: /var/log/gitsync.log

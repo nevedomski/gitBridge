@@ -1,0 +1,41 @@
+.PHONY: help install install-dev format lint type-check test clean run
+
+help:
+	@echo "Available commands:"
+	@echo "  make install      Install the package"
+	@echo "  make install-dev  Install with development dependencies"
+	@echo "  make format       Format code with ruff"
+	@echo "  make lint         Lint code with ruff"
+	@echo "  make type-check   Type check with mypy"
+	@echo "  make test         Run tests with pytest"
+	@echo "  make clean        Clean build artifacts"
+	@echo "  make run ARGS=... Run gitsync CLI with arguments"
+
+install:
+	uv pip install -e .
+
+install-dev:
+	uv pip install -e ".[dev]"
+
+format:
+	uv run ruff format .
+
+lint:
+	uv run ruff check . --fix
+
+type-check:
+	uv run mypy gitsync
+
+test:
+	uv run pytest
+
+clean:
+	rm -rf build/
+	rm -rf dist/
+	rm -rf *.egg-info
+	find . -type d -name __pycache__ -exec rm -rf {} +
+	find . -type f -name "*.pyc" -delete
+
+# Usage: make run ARGS="sync --config config.yaml"
+run:
+	uv run gitsync $(ARGS)
