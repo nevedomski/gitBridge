@@ -1,57 +1,244 @@
 # GitSync Configuration Example
+# Complete reference for all available configuration options
 
 # Repository settings
 repository:
   # GitHub repository URL (required)
+  # Supports both HTTPS and SSH-style URLs
+  # Examples:
+  # - https://github.com/username/repository
+  # - https://github.com/username/repository.git
+  # - git@github.com:username/repository.git (converted to HTTPS)
   url: https://github.com/username/repository
   
   # Branch, tag, or commit SHA to sync (default: main)
   # Examples:
-  # - Branch: main, master, develop
-  # - Tag: v1.0.0, release-2023
+  # - Branch: main, master, develop, feature/new-feature
+  # - Tag: v1.0.0, release-2023, v2.5.1-beta
   # - Commit SHA: abc123def456 (full or short SHA)
+  # - Special: HEAD (latest commit on default branch)
   ref: main
 
 # Local settings
 local:
   # Local directory path where files will be synced (required)
+  # Supports:
+  # - Absolute paths: /home/user/repos/project
+  # - Relative paths: ./local-repo
+  # - Home directory expansion: ~/repos/project
+  # - Environment variables: ${HOME}/repos/project
   path: /path/to/local/repository
+  
+  # Hash cache file name (default: .gitsync_hashes.json)
+  # Stores file hashes for incremental sync
+  # Set to null to disable hash caching
+  hash_cache: .gitsync_hashes.json
 
 # Authentication settings
 auth:
   # GitHub personal access token (optional for public repos)
   # Can also be set via GITHUB_TOKEN environment variable
   # Create at: https://github.com/settings/tokens
+  # Required scopes for private repos: repo (full control)
+  # Required scopes for public repos: none (but rate limits apply)
   token: ghp_xxxxxxxxxxxxxxxxxxxx
+  
+  # Alternative: Use username/password (not recommended)
+  # username: your_github_username
+  # password: your_github_password
 
 # Sync settings
 sync:
   # Sync method: 'api' or 'browser' (default: api)
+  # - api: Uses GitHub REST API (faster, requires token for private repos)
+  # - browser: Uses browser automation (slower, works without API access)
   method: api
   
-  # Enable incremental sync (only download changed files)
+  # Enable incremental sync (default: true)
+  # Only downloads files that have changed since last sync
+  # Set to false to always download all files
   incremental: true
+  
+  # Show progress bar during sync (default: true)
+  # Set to false for cleaner output in scripts/CI
+  show_progress: true
   
   # Verify SSL certificates (default: true)
   # Set to false to disable SSL verification (not recommended)
+  # Use only in trusted networks or for testing
   verify_ssl: true
   
   # Path to CA bundle file for corporate certificates (optional)
   # Use this if your company uses custom certificates
+  # Can be a single file or directory containing certificates
   # ca_bundle: /path/to/ca_bundle.crt
   
   # Auto-detect proxy from Windows/Chrome PAC script (default: false)
   # Enable this to automatically use proxy settings from your browser
+  # Works on Windows, reads from registry and Chrome settings
   auto_proxy: false
   
   # Auto-detect certificates from Windows certificate store (default: false)
   # Enable this to automatically use corporate certificates from Windows
+  # Exports certificates from Windows ROOT and CA stores
   auto_cert: false
+  
+  # Maximum file size to download via API in MB (default: 100)
+  # Files larger than this will use blob API or fail
+  max_file_size: 100
+  
+  # Number of retries for failed downloads (default: 3)
+  retry_count: 3
+  
+  # Delay between retries in seconds (default: 1)
+  retry_delay: 1
+  
+  # Timeout for HTTP requests in seconds (default: 30)
+  timeout: 30
+
+# Proxy settings (optional)
+# Used when auto_proxy is false but you need manual proxy configuration
+proxy:
+  # HTTP proxy URL
+  http: http://proxy.company.com:8080
+  
+  # HTTPS proxy URL
+  https: http://proxy.company.com:8080
+  
+  # Proxy authentication (optional)
+  # username: proxy_user
+  # password: proxy_password
+  
+  # List of hosts to bypass proxy (optional)
+  # no_proxy: localhost,127.0.0.1,.company.com
+
+# Browser settings (for browser sync method)
+browser:
+  # Browser to use: chrome, chromium, firefox, edge (default: chrome)
+  # Note: Only Chrome/Chromium fully supported with Playwright
+  type: chrome
+  
+  # Path to browser executable (optional)
+  # Auto-detected if not specified
+  # executable: /usr/bin/google-chrome
+  
+  # Run in headless mode (default: true)
+  # Set to false to see browser window during sync
+  headless: true
+  
+  # Browser window size (optional)
+  # width: 1280
+  # height: 720
+  
+  # Additional browser arguments (optional)
+  # args:
+  #   - --disable-gpu
+  #   - --no-sandbox
+  #   - --disable-dev-shm-usage
+  
+  # Wait timeout for page loads in seconds (default: 30)
+  timeout: 30
+  
+  # Download directory for browser (default: temp directory)
+  # download_dir: /tmp/gitsync_downloads
+
+# Cache settings
+cache:
+  # Enable caching (default: true)
+  enabled: true
+  
+  # Cache directory (default: ~/.cache/gitsync)
+  # directory: ~/.cache/gitsync
+  
+  # Cache expiration in seconds (default: 3600)
+  # Set to 0 to never expire
+  ttl: 3600
+  
+  # Maximum cache size in MB (default: 100)
+  # Older entries removed when exceeded
+  max_size: 100
 
 # Logging settings
 logging:
   # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL (default: INFO)
+  # - DEBUG: Detailed information for debugging
+  # - INFO: General information about sync progress
+  # - WARNING: Warning messages for potential issues
+  # - ERROR: Error messages for failures
+  # - CRITICAL: Critical failures that stop execution
   level: INFO
   
   # Log file path (optional, logs to console by default)
-  file: /var/log/gitsync.log
+  # Supports absolute and relative paths
+  # file: /var/log/gitsync.log
+  
+  # Log format (default: '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+  # format: '%(asctime)s - %(levelname)s - %(message)s'
+  
+  # Maximum log file size in MB before rotation (default: 10)
+  # max_size: 10
+  
+  # Number of backup log files to keep (default: 3)
+  # backup_count: 3
+  
+  # Enable colored output for console logs (default: true)
+  # colored: true
+
+# Performance settings
+performance:
+  # Number of parallel downloads (default: 1)
+  # Increase for faster sync of many small files
+  # Note: Currently not fully implemented
+  parallel_downloads: 1
+  
+  # Chunk size for file downloads in KB (default: 1024)
+  # Larger chunks = fewer requests but more memory
+  chunk_size: 1024
+  
+  # Enable compression for API requests (default: true)
+  # Reduces bandwidth but increases CPU usage
+  compression: true
+
+# Filter settings (optional)
+# Control which files are synced
+filters:
+  # Include patterns (glob format)
+  # Only files matching these patterns will be synced
+  # include:
+  #   - "*.py"
+  #   - "*.md"
+  #   - "src/**/*.js"
+  
+  # Exclude patterns (glob format)
+  # Files matching these patterns will be skipped
+  # exclude:
+  #   - "*.pyc"
+  #   - "__pycache__/**"
+  #   - ".git/**"
+  #   - "node_modules/**"
+  
+  # Include hidden files (default: true)
+  # Set to false to skip files/folders starting with .
+  include_hidden: true
+  
+  # Maximum directory depth to sync (optional)
+  # Useful for shallow syncs of large repositories
+  # max_depth: 5
+
+# Advanced settings
+advanced:
+  # GitHub API base URL (default: https://api.github.com)
+  # Change for GitHub Enterprise Server
+  # api_url: https://github.company.com/api/v3
+  
+  # User agent string for HTTP requests
+  # user_agent: GitSync/0.1.0
+  
+  # Enable debug mode (very verbose output)
+  # debug: false
+  
+  # Validate configuration on load (default: true)
+  # validate_config: true
+  
+  # Strict mode - fail on any warning (default: false)
+  # strict: false

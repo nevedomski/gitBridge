@@ -8,6 +8,8 @@ from typing import Any, Dict, Optional
 import yaml
 from dotenv import load_dotenv
 
+from .exceptions import ConfigurationError
+
 logger = logging.getLogger(__name__)
 
 # Default configuration
@@ -57,7 +59,11 @@ class Config:
         self.load_env()
 
     def load_file(self, config_file: str) -> None:
-        """Load configuration from YAML file."""
+        """Load configuration from YAML file.
+
+        Raises:
+            ConfigurationError: If configuration file cannot be loaded or parsed
+        """
         try:
             path = Path(config_file)
             if not path.exists():
@@ -72,8 +78,18 @@ class Config:
 
             logger.info(f"Loaded configuration from {config_file}")
 
+        except yaml.YAMLError as e:
+            raise ConfigurationError(
+                f"Invalid YAML syntax in configuration file: {e}", config_file=config_file, original_error=e
+            ) from e
+        except OSError as e:
+            raise ConfigurationError(
+                f"Failed to read configuration file: {e}", config_file=config_file, original_error=e
+            ) from e
         except Exception as e:
-            logger.error(f"Failed to load configuration file: {e}")
+            raise ConfigurationError(
+                f"Failed to load configuration file: {e}", config_file=config_file, original_error=e
+            ) from e
 
     def load_env(self) -> None:
         """Load configuration from environment variables."""
@@ -135,8 +151,9 @@ class Config:
 
         # Expand paths for local.path
         if key == "local.path" and value and isinstance(value, str):
-            value = os.path.expanduser(value)
-            value = os.path.expandvars(value)
+            from .utils import expand_path
+
+            value = expand_path(value)
 
         return value
 
@@ -161,28 +178,37 @@ class Config:
         """Validate configuration.
 
         Returns:
-            True if valid, False otherwise
+            True if valid
+
+        Raises:
+            ConfigurationError: If configuration is invalid
         """
         # Check required fields
         if not self.get("repository.url"):
-            logger.error("Repository URL is required")
-            return False
+            raise ConfigurationError(
+                "Repository URL is required", config_file=self.config_file, invalid_key="repository.url"
+            )
 
         if not self.get("local.path"):
-            logger.error("Local path is required")
-            return False
+            raise ConfigurationError("Local path is required", config_file=self.config_file, invalid_key="local.path")
 
         # Validate sync method
         method = self.get("sync.method", "api")
         if method not in ["api", "browser"]:
-            logger.error(f"Invalid sync method: {method}")
-            return False
+            raise ConfigurationError(
+                f"Invalid sync method: {method}. Must be 'api' or 'browser'",
+                config_file=self.config_file,
+                invalid_key="sync.method",
+            )
 
         # Validate log level
         log_level = self.get("logging.level", "INFO")
         if log_level not in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]:
-            logger.error(f"Invalid log level: {log_level}")
-            return False
+            raise ConfigurationError(
+                f"Invalid log level: {log_level}. Must be one of: DEBUG, INFO, WARNING, ERROR, CRITICAL",
+                config_file=self.config_file,
+                invalid_key="logging.level",
+            )
 
         return True
 

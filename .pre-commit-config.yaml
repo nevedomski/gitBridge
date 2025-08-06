@@ -1,0 +1,100 @@
+# Pre-commit configuration for gitSync project
+# Run `pre-commit install` to set up the git hooks
+# Run `pre-commit run --all-files` to run hooks on all files
+
+repos:
+  # Ruff for formatting and linting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.1
+    hooks:
+      # Run the linter
+      - id: ruff
+        name: ruff check
+        args: [--fix]
+        types_or: [python, pyi, jupyter]
+      # Run the formatter
+      - id: ruff-format
+        name: ruff format
+        types_or: [python, pyi, jupyter]
+
+  # MyPy for type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.13.0
+    hooks:
+      - id: mypy
+        name: mypy type check
+        additional_dependencies:
+          - types-requests
+          - types-pyyaml
+          - types-tqdm
+        args: [--config-file=pyproject.toml]
+
+  # Standard pre-commit hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      # Remove trailing whitespace
+      - id: trailing-whitespace
+        name: trim trailing whitespace
+        exclude: '\.md$|\.txt$'  # Don't modify markdown or text files
+      
+      # Ensure files end with newline
+      - id: end-of-file-fixer
+        name: fix end of files
+        exclude: '\.md$|\.txt$'
+      
+      # Check for merge conflicts
+      - id: check-merge-conflict
+        name: check for merge conflicts
+      
+      # Check YAML files
+      - id: check-yaml
+        name: check yaml files
+        args: [--unsafe]  # Allow custom YAML tags if needed
+      
+      # Check JSON files
+      - id: check-json
+        name: check json files
+      
+      # Check for large files
+      - id: check-added-large-files
+        name: check for large files
+        args: [--maxkb=1000]  # 1MB limit
+      
+      # Check for broken symlinks
+      - id: check-symlinks
+        name: check for broken symlinks
+      
+      # Check that executables have shebangs
+      - id: check-executables-have-shebangs
+        name: check executables have shebangs
+      
+      # Check for private keys
+      - id: detect-private-key
+        name: detect private keys
+      
+      # Check Python AST
+      - id: check-ast
+        name: check python ast
+
+  # Additional YAML validation
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        name: yaml lint
+        args: [-d, relaxed]
+        files: \.(yaml|yml)$
+
+# Global configuration
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false

@@ -1,5 +1,14 @@
 # GitSync - GitHub Repository Synchronization Tool
 
+[![CI](https://github.com/nevedomski/gitSync/workflows/CI/badge.svg)](https://github.com/nevedomski/gitSync/actions)
+[![codecov](https://codecov.io/gh/user/gitSync/branch/main/graph/badge.svg)](https://codecov.io/gh/user/gitSync)
+[![Ruff](https://img.shields.io/badge/linter-ruff-informational?style=flat&color=orange)](https://github.com/astral-sh/ruff)
+[![Format](https://img.shields.io/badge/code%20style-ruff-black)](https://github.com/astral-sh/ruff)
+[![Type](https://img.shields.io/badge/type%20checker-mypy-blue)](https://mypy.readthedocs.io/)
+[![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![Docs](https://img.shields.io/badge/docs-github%20pages-blue)](https://user.github.io/gitSync/)
+
 A Python tool to synchronize GitHub repositories to local folders when direct git access is blocked.
 
 ## Features

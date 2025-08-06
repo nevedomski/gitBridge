@@ -3,11 +3,42 @@
 import hashlib
 import json
 import logging
+import os
 from pathlib import Path
 from typing import Any, Dict
 from urllib.parse import urlparse
 
+from .exceptions import ConfigurationError
+
 logger = logging.getLogger(__name__)
+
+
+def expand_path(path: str) -> str:
+    """Expand user home directory and environment variables in a path.
+
+    This function handles both user home directory expansion (~ characters)
+    and environment variable expansion ($VAR or ${VAR} patterns).
+
+    Args:
+        path: The path string to expand
+
+    Returns:
+        The expanded path string
+
+    Example:
+        >>> expand_path("~/Documents/$USER/files")
+        "/home/username/Documents/username/files"
+    """
+    if not path or not isinstance(path, str):
+        return path
+
+    # First expand user home directory (~)
+    expanded = os.path.expanduser(path)
+
+    # Then expand environment variables
+    expanded = os.path.expandvars(expanded)
+
+    return expanded
 
 
 def parse_github_url(url: str) -> tuple[str, str]:
@@ -20,25 +51,38 @@ def parse_github_url(url: str) -> tuple[str, str]:
         Tuple of (owner, repo)
 
     Raises:
-        ValueError: If URL is not a valid GitHub repository URL
+        ConfigurationError: If URL is not a valid GitHub repository URL
     """
-    parsed = urlparse(url)
+    try:
+        parsed = urlparse(url)
 
-    if parsed.netloc not in ["github.com", "www.github.com"]:
-        raise ValueError(f"Not a GitHub URL: {url}")
+        if parsed.netloc not in ["github.com", "www.github.com"]:
+            raise ConfigurationError(
+                f"Not a GitHub URL: {url}. Must be a github.com URL.", invalid_key="repository.url"
+            )
 
-    path_parts = parsed.path.strip("/").split("/")
+        path_parts = parsed.path.strip("/").split("/")
 
-    if len(path_parts) < 2:
-        raise ValueError(f"Invalid GitHub repository URL: {url}")
+        if len(path_parts) < 2:
+            raise ConfigurationError(
+                f"Invalid GitHub repository URL: {url}. Must be in format https://github.com/owner/repo",
+                invalid_key="repository.url",
+            )
 
-    owner, repo = path_parts[0], path_parts[1]
+        owner, repo = path_parts[0], path_parts[1]
 
-    # Remove .git suffix if present
-    if repo.endswith(".git"):
-        repo = repo[:-4]
+        # Remove .git suffix if present
+        if repo.endswith(".git"):
+            repo = repo[:-4]
 
-    return owner, repo
+        return owner, repo
+    except ConfigurationError:
+        # Re-raise our custom exceptions
+        raise
+    except Exception as e:
+        raise ConfigurationError(
+            f"Failed to parse GitHub URL: {url}", invalid_key="repository.url", original_error=e
+        ) from e
 
 
 def calculate_file_hash(content: bytes) -> str:

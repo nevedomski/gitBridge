@@ -9,7 +9,18 @@ import click
 import yaml
 
 from .api_sync import GitHubAPISync
+from .browser_sync import GitHubBrowserSync
 from .config import Config
+from .exceptions import (
+    AuthenticationError,
+    BrowserError,
+    ConfigurationError,
+    FileSystemError,
+    GitSyncError,
+    NetworkError,
+    RateLimitError,
+    RepositoryNotFoundError,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -56,9 +67,9 @@ def sync(
         cfg.set("repository.url", repo)
     if local:
         # Expand path before setting
-        import os
-        expanded_path = os.path.expanduser(local)
-        expanded_path = os.path.expandvars(expanded_path)
+        from .utils import expand_path
+
+        expanded_path = expand_path(local)
         cfg.set("local.path", expanded_path)
     if ref:
         cfg.set("repository.ref", ref)
@@ -73,8 +84,12 @@ def sync(
     cfg.setup_logging()
 
     # Validate configuration
-    if not cfg.validate():
-        click.echo("Configuration validation failed", err=True)
+    try:
+        cfg.validate()
+    except ConfigurationError as e:
+        click.echo(f"Configuration validation failed: {e}", err=True)
+        if verbose:
+            click.echo(f"Error details: {e.get_context()}", err=True)
         sys.exit(1)
 
     # Get configuration values
@@ -83,7 +98,7 @@ def sync(
     ref = cfg.get("repository.ref", "main")
     token = cfg.get("auth.token")
     method = cfg.get("sync.method", "api")
-    
+
     # Handle SSL verification
     if no_ssl_verify:
         verify_ssl = False
@@ -91,15 +106,15 @@ def sync(
     else:
         verify_ssl = cfg.get("sync.verify_ssl", True)
         ca_bundle = cfg.get("sync.ca_bundle")
-    
+
     # Handle auto proxy detection
     if not auto_proxy:
         auto_proxy = cfg.get("sync.auto_proxy", False)
-    
+
     # Handle auto certificate detection
     if not auto_cert:
         auto_cert = cfg.get("sync.auto_cert", False)
-    
+
     # Log SSL configuration in verbose mode
     if verbose and ca_bundle:
         click.echo(f"Using CA bundle: {ca_bundle}")
@@ -107,17 +122,97 @@ def sync(
         click.echo("WARNING: SSL verification disabled")
 
     # Perform sync based on method
-    if method == "api":
-        syncer = GitHubAPISync(repo_url, local_path, token, verify_ssl=verify_ssl, ca_bundle=ca_bundle, auto_proxy=auto_proxy, auto_cert=auto_cert)
-        success = syncer.sync(ref=ref, show_progress=not no_progress)
-    else:
-        click.echo("Browser method not yet implemented", err=True)
-        sys.exit(1)
+    try:
+        if method == "api":
+            syncer = GitHubAPISync(
+                repo_url,
+                local_path,
+                token,
+                verify_ssl=verify_ssl,
+                ca_bundle=ca_bundle,
+                auto_proxy=auto_proxy,
+                auto_cert=auto_cert,
+            )
+            success = syncer.sync(ref=ref, show_progress=not no_progress)
+        elif method == "browser":
+            syncer = GitHubBrowserSync(
+                repo_url,
+                local_path,
+                token,
+                verify_ssl=verify_ssl,
+                ca_bundle=ca_bundle,
+                auto_proxy=auto_proxy,
+                auto_cert=auto_cert,
+            )
+            success = syncer.sync(ref=ref, show_progress=not no_progress)
+        else:
+            click.echo(f"Unknown sync method: {method}", err=True)
+            sys.exit(1)
 
-    if success:
-        click.echo("✓ Sync completed successfully")
-    else:
-        click.echo("✗ Sync failed", err=True)
+        if success:
+            click.echo("✓ Sync completed successfully")
+        else:
+            click.echo("✗ Sync failed", err=True)
+            sys.exit(1)
+
+    except AuthenticationError as e:
+        click.echo(f"✗ Authentication failed: {e}", err=True)
+        if not e.details.get("token_provided"):
+            click.echo("Hint: Provide a GitHub token with --token or GITHUB_TOKEN environment variable", err=True)
+        if verbose:
+            click.echo(f"Error details: {e.get_context()}", err=True)
+        sys.exit(1)
+    except RepositoryNotFoundError as e:
+        click.echo(f"✗ Repository not found: {e}", err=True)
+        if e.details.get("is_private"):
+            click.echo("Hint: This might be a private repository. Check your token permissions.", err=True)
+        if verbose:
+            click.echo(f"Error details: {e.get_context()}", err=True)
+        sys.exit(1)
+    except RateLimitError as e:
+        click.echo(f"✗ Rate limit exceeded: {e}", err=True)
+        if e.details.get("reset_time"):
+            import time
+
+            reset_time = time.strftime("%H:%M:%S", time.localtime(e.details["reset_time"]))
+            click.echo(f"Rate limit resets at: {reset_time}", err=True)
+        click.echo("Hint: Wait for rate limit to reset or use a GitHub token for higher limits", err=True)
+        if verbose:
+            click.echo(f"Error details: {e.get_context()}", err=True)
+        sys.exit(1)
+    except NetworkError as e:
+        click.echo(f"✗ Network error: {e}", err=True)
+        if e.details.get("status_code"):
+            click.echo(f"HTTP Status: {e.details['status_code']}", err=True)
+        click.echo("Hint: Check your internet connection and proxy settings", err=True)
+        if verbose:
+            click.echo(f"Error details: {e.get_context()}", err=True)
+        sys.exit(1)
+    except BrowserError as e:
+        click.echo(f"✗ Browser automation error: {e}", err=True)
+        click.echo("Hint: Try using --method api instead of browser automation", err=True)
+        if verbose:
+            click.echo(f"Error details: {e.get_context()}", err=True)
+        sys.exit(1)
+    except FileSystemError as e:
+        click.echo(f"✗ File system error: {e}", err=True)
+        click.echo("Hint: Check directory permissions and available disk space", err=True)
+        if verbose:
+            click.echo(f"Error details: {e.get_context()}", err=True)
+        sys.exit(1)
+    except GitSyncError as e:
+        click.echo(f"✗ Sync error: {e}", err=True)
+        if verbose:
+            click.echo(f"Error details: {e.get_context()}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"✗ Unexpected error: {e}", err=True)
+        if verbose:
+            import traceback
+
+            click.echo("Full traceback:", err=True)
+            click.echo(traceback.format_exc(), err=True)
+        click.echo("This is an unexpected error. Please report it as a bug.", err=True)
         sys.exit(1)
 
 
@@ -126,7 +221,20 @@ def sync(
 @click.option("--repo", "-r", help="GitHub repository URL")
 @click.option("--local", "-l", help="Local directory path")
 @click.option("--token", "-t", help="GitHub personal access token")
-def status(config: Optional[str], repo: Optional[str], local: Optional[str], token: Optional[str]):
+@click.option("--verbose", "-v", is_flag=True, help="Enable verbose logging")
+@click.option("--no-ssl-verify", is_flag=True, help="Disable SSL verification (use with caution)")
+@click.option("--auto-proxy", is_flag=True, help="Auto-detect proxy from Windows/Chrome PAC")
+@click.option("--auto-cert", is_flag=True, help="Auto-detect certificates from Windows certificate store")
+def status(
+    config: Optional[str],
+    repo: Optional[str],
+    local: Optional[str],
+    token: Optional[str],
+    verbose: bool,
+    no_ssl_verify: bool,
+    auto_proxy: bool,
+    auto_cert: bool,
+):
     """Check sync status and repository information."""
 
     # Load configuration
@@ -137,14 +245,16 @@ def status(config: Optional[str], repo: Optional[str], local: Optional[str], tok
         cfg.set("repository.url", repo)
     if local:
         # Expand path before setting
-        import os
-        expanded_path = os.path.expanduser(local)
-        expanded_path = os.path.expandvars(expanded_path)
+        from .utils import expand_path
+
+        expanded_path = expand_path(local)
         cfg.set("local.path", expanded_path)
     if token:
         cfg.set("auth.token", token)
 
-    # Setup logging
+    # Set up logging
+    if verbose:
+        cfg.set("logging.level", "DEBUG")
     cfg.setup_logging()
 
     # Validate required fields
@@ -161,8 +271,38 @@ def status(config: Optional[str], repo: Optional[str], local: Optional[str], tok
 
     token = cfg.get("auth.token")
 
-    # Create syncer
-    syncer = GitHubAPISync(repo_url, local_path, token)
+    # Handle SSL verification
+    if no_ssl_verify:
+        verify_ssl = False
+        ca_bundle = None
+    else:
+        verify_ssl = cfg.get("sync.verify_ssl", True)
+        ca_bundle = cfg.get("sync.ca_bundle")
+
+    # Handle auto proxy detection
+    if not auto_proxy:
+        auto_proxy = cfg.get("sync.auto_proxy", False)
+
+    # Handle auto certificate detection
+    if not auto_cert:
+        auto_cert = cfg.get("sync.auto_cert", False)
+
+    # Log SSL configuration in verbose mode
+    if verbose and ca_bundle:
+        click.echo(f"Using CA bundle: {ca_bundle}")
+    elif verbose and not verify_ssl:
+        click.echo("WARNING: SSL verification disabled")
+
+    # Create syncer with SSL and proxy configuration
+    syncer = GitHubAPISync(
+        repo_url,
+        local_path,
+        token,
+        verify_ssl=verify_ssl,
+        ca_bundle=ca_bundle,
+        auto_proxy=auto_proxy,
+        auto_cert=auto_cert,
+    )
 
     click.echo(f"Repository: {repo_url}")
     click.echo(f"Local path: {local_path}")
@@ -221,9 +361,9 @@ def init(output: str, repo: str, local: str, ref: str, token: Optional[str], met
     cfg.set("repository.url", repo)
     cfg.set("repository.ref", ref)
     # Expand path before setting
-    import os
-    expanded_path = os.path.expanduser(local)
-    expanded_path = os.path.expandvars(expanded_path)
+    from .utils import expand_path
+
+    expanded_path = expand_path(local)
     cfg.set("local.path", expanded_path)
     cfg.set("sync.method", method)
 
@@ -253,14 +393,16 @@ def validate(config_file: str):
 
     click.echo(f"Validating {config_file}...")
 
-    if cfg.validate():
+    try:
+        cfg.validate()
         click.echo("✓ Configuration is valid")
 
         # Display configuration
         click.echo("\nConfiguration:")
         click.echo(yaml.dump(cfg.to_dict(), default_flow_style=False, sort_keys=False))
-    else:
-        click.echo("✗ Configuration is invalid", err=True)
+    except ConfigurationError as e:
+        click.echo(f"✗ Configuration is invalid: {e}", err=True)
+        click.echo(f"Error details: {e.get_context()}", err=True)
         sys.exit(1)
 
 

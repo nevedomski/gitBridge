@@ -1,0 +1,214 @@
+site_name: GitSync Documentation
+site_description: GitHub Repository Synchronization Tool - Documentation
+site_author: GitSync Team
+site_url: https://gitsync.readthedocs.io
+repo_url: https://github.com/nevedomski/gitsync
+repo_name: gitsync
+edit_uri: edit/main/docs/
+copyright: Copyright &copy; 2025 GitSync Team
+
+theme:
+  name: material
+  language: en
+  
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.prune
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+    - search.share
+    - header.autohide
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+    - content.action.edit
+    - content.action.view
+  
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil
+    view: material/eye
+
+plugins:
+  - search:
+      separator: '[\s\-\.]'
+      lang: en
+  - minify:
+      minify_html: true
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_root_heading: true
+            show_root_toc_entry: true
+            show_signature_annotations: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            docstring_style: google
+            merge_init_into_class: true
+            separate_signature: true
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: timeago
+
+markdown_extensions:
+  # Python Markdown
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 3
+  
+  # Python Markdown Extensions
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+  - pymdownx.snippets
+
+extra:
+  version:
+    provider: mike
+    default: stable
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/nevedomski/gitsync
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/gitsync/
+  analytics:
+    provider: google
+    property: G-XXXXXXXXXX
+  consent:
+    title: Cookie consent
+    description: >-
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation and whether users
+      find what they're searching for. With your consent, you're helping us to
+      make our documentation better.
+
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - Home:
+    - index.md
+    - changelog.md
+    - license.md
+  
+  - Getting Started:
+    - getting-started/index.md
+    - getting-started/installation.md
+    - getting-started/quick-start.md
+    - getting-started/first-sync.md
+    - getting-started/configuration-basics.md
+  
+  - User Guide:
+    - user-guide/index.md
+    - user-guide/sync-methods.md
+    - user-guide/configuration.md
+    - user-guide/authentication.md
+    - user-guide/incremental-sync.md
+    - user-guide/branch-management.md
+    - user-guide/corporate-setup.md
+    - user-guide/proxy-configuration.md
+    - user-guide/ssl-certificates.md
+  
+  - CLI Reference:
+    - cli/index.md
+    - cli/sync-command.md
+    - cli/status-command.md
+    - cli/options.md
+    - cli/environment-variables.md
+  
+  - Architecture:
+    - architecture/index.md
+    - architecture/overview.md
+    - architecture/api-sync.md
+    - architecture/browser-sync.md
+    - architecture/configuration-system.md
+    - architecture/proxy-detection.md
+    - architecture/certificate-handling.md
+  
+  - API Reference:
+    - api/index.md
+    - api/gitsync.md
+    - api/api_sync.md
+    - api/browser_sync.md
+    - api/config.md
+    - api/utils.md
+    - api/pac_support.md
+    - api/cert_support.md
+  
+  - Troubleshooting:
+    - troubleshooting/index.md
+    - troubleshooting/common-issues.md
+    - troubleshooting/network-errors.md
+    - troubleshooting/authentication-errors.md
+    - troubleshooting/proxy-issues.md
+    - troubleshooting/ssl-errors.md
+    - troubleshooting/browser-automation.md
+  
+  - Contributing:
+    - contributing/index.md
+    - contributing/development-setup.md
+    - contributing/code-style.md
+    - contributing/testing.md
+    - contributing/documentation.md
+    - contributing/pull-requests.md
