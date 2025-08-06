@@ -45,8 +45,10 @@ class Config:
         Args:
             config_file: Path to configuration file
         """
+        import copy
+
         self.config_file = config_file
-        self.config = DEFAULT_CONFIG.copy()
+        self.config = copy.deepcopy(DEFAULT_CONFIG)
 
         # Load environment variables
         load_dotenv()

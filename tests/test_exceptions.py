@@ -307,7 +307,7 @@ class TestConfigurationError:
 
     def test_initialization_with_parameters(self):
         """Test initialization with all parameters."""
-        original = yaml.YAMLError("Invalid YAML") if "yaml" in globals() else ValueError("Parse error")
+        original = ValueError("Parse error")
         error = ConfigurationError(
             "Config parse failed",
             config_file="/path/to/config.yaml",

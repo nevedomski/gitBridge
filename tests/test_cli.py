@@ -11,7 +11,7 @@ mock_browser_sync = Mock()
 mock_browser_sync.GitHubBrowserSync = Mock()
 sys.modules["gitsync.browser_sync"] = mock_browser_sync
 
-from gitsync.cli import cli, init, main, status, sync, validate
+from gitsync.cli import cli, init, main, status, sync, validate  # noqa: E402
 
 
 class TestCLIGroup:

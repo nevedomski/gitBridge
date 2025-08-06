@@ -16,11 +16,15 @@ class TestConfig:
 
     def test_init_without_config_file(self):
         """Test Config initialization without config file"""
-        with patch("gitsync.config.load_dotenv"):
+        import copy
+
+        with patch("gitsync.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
             config = Config()
 
         assert config.config_file is None
-        assert config.config == DEFAULT_CONFIG.copy()
+        # Use deepcopy to match the implementation
+        expected = copy.deepcopy(DEFAULT_CONFIG)
+        assert config.config == expected
 
     def test_init_with_config_file(self, temp_dir):
         """Test Config initialization with config file"""
@@ -48,7 +52,9 @@ class TestConfig:
 
     def test_default_config_values(self):
         """Test default configuration values"""
-        with patch("gitsync.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
+        with patch("gitsync.config.load_dotenv"), patch.dict(os.environ, {}, clear=True), patch(
+            "gitsync.config.Path.exists", return_value=False
+        ):
             config = Config()
 
         assert config.get("repository.url") is None
@@ -592,7 +598,7 @@ class TestConfigSetupLogging:
         """Test setup logging with default level"""
         with patch("gitsync.config.load_dotenv"), patch("logging.basicConfig") as mock_basic_config, patch(
             "logging.StreamHandler"
-        ) as mock_stream_handler, patch.dict(os.environ, {}, clear=True):
+        ), patch.dict(os.environ, {}, clear=True):
             config = Config()
             config.setup_logging()
 
@@ -635,7 +641,7 @@ class TestConfigSetupLogging:
         """Test setup logging uses correct format"""
         with patch("gitsync.config.load_dotenv"), patch("logging.basicConfig"), patch(
             "logging.StreamHandler"
-        ) as mock_stream_handler, patch("logging.Formatter") as mock_formatter, patch.dict(os.environ, {}, clear=True):
+        ), patch("logging.Formatter") as mock_formatter, patch.dict(os.environ, {}, clear=True):
             config = Config()
             config.setup_logging()
 

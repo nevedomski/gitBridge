@@ -218,7 +218,7 @@ class TestRepositoryManager:
         tree_response.json.return_value = {"tree": []}
         self.mock_client.get.return_value = tree_response
 
-        result = self.manager.get_repository_tree(ref, recursive=False)
+        self.manager.get_repository_tree(ref, recursive=False)
 
         self.mock_client.get.assert_called_once_with(f"repos/test_owner/test_repo/git/trees/{commit_sha}", params={})
 

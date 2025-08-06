@@ -132,4 +132,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For questions about upgrading or changelog entries:
 - Open an issue: https://github.com/nevedomski/gitsync/issues
-- Check documentation: https://gitsync.readthedocs.io
+- Check documentation: https://nevedomski.github.io/gitSync/

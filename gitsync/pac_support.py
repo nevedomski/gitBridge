@@ -20,7 +20,6 @@ except ImportError:
 # Try to import pypac
 try:
     import pypac
-    from pypac import PACSession
 
     PYPAC_AVAILABLE = True
 except ImportError:

@@ -7,7 +7,7 @@
 [![Type](https://img.shields.io/badge/type%20checker-mypy-blue)](https://mypy.readthedocs.io/)
 [![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Docs](https://img.shields.io/badge/docs-github%20pages-blue)](https://user.github.io/gitSync/)
+[![Docs](https://img.shields.io/badge/docs-github%20pages-blue)](https://nevedomski.github.io/gitSync/)
 
 A Python tool to synchronize GitHub repositories to local folders when direct git access is blocked.
 

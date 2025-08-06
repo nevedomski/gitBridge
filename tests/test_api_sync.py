@@ -4,10 +4,7 @@ import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-import pytest
-
 from gitsync.api_sync import GitHubAPISync
-from gitsync.exceptions import SyncError
 
 
 class TestGitHubAPISync:
@@ -30,7 +27,7 @@ class TestGitHubAPISync:
         assert sync.repo == "repo"
         assert sync.local_path == Path(self.temp_dir)
         assert sync.token is None
-        
+
         # Verify components were initialized correctly
         mock_client.assert_called_once_with(
             owner="owner",
@@ -52,7 +49,7 @@ class TestGitHubAPISync:
         sync = GitHubAPISync(self.repo_url, self.temp_dir, token=self.token)
 
         assert sync.token == self.token
-        
+
         mock_client.assert_called_once_with(
             owner="owner",
             repo="repo",
@@ -187,7 +184,7 @@ class TestGitHubAPISync:
         mock_client.return_value = mock_client_instance
         mock_repo_instance = Mock()
         mock_repo_mgr.return_value = mock_repo_instance
-        
+
         sha = "a1b2c3d4e5f6789012345678901234567890abcd"
         mock_repo_instance.resolve_ref.return_value = sha
 
@@ -206,7 +203,7 @@ class TestGitHubAPISync:
         mock_client.return_value = mock_client_instance
         mock_repo_instance = Mock()
         mock_repo_mgr.return_value = mock_repo_instance
-        
+
         tree_data = [
             {"path": "README.md", "type": "blob", "sha": "abc123"},
             {"path": "src", "type": "tree", "sha": "def456"},
@@ -230,18 +227,18 @@ class TestGitHubAPISync:
         mock_client.return_value = mock_client_instance
         mock_client_instance.test_connection.return_value = True
         mock_client_instance.get_rate_limit.return_value = {"rate": {"remaining": 5000}}
-        
+
         mock_repo_instance = Mock()
         mock_repo_mgr.return_value = mock_repo_instance
         mock_repo_instance.get_repository_tree.return_value = [
             {"path": "README.md", "type": "blob", "sha": "file1", "size": 100},
         ]
-        
+
         mock_sync_instance = Mock()
         mock_file_sync.return_value = mock_sync_instance
         mock_sync_instance.should_download_file.return_value = True
         mock_sync_instance.sync_file.return_value = True
-        
+
         mock_tracker_instance = Mock()
         mock_progress_tracker.return_value = mock_tracker_instance
         mock_tracker_instance.should_throttle.return_value = False
@@ -250,7 +247,7 @@ class TestGitHubAPISync:
         result = sync.sync()
 
         assert result is True
-        mock_repo_instance.get_repository_tree.assert_called_once_with("main")
+        mock_repo_instance.get_repository_tree.assert_called_once_with("main", True)
         mock_sync_instance.sync_file.assert_called_once()
 
     @patch("gitsync.api_sync.GitHubAPIClient")
@@ -264,14 +261,14 @@ class TestGitHubAPISync:
         mock_client.return_value = mock_client_instance
         mock_client_instance.test_connection.return_value = True
         mock_client_instance.get_rate_limit.return_value = {}
-        
+
         mock_repo_instance = Mock()
         mock_repo_mgr.return_value = mock_repo_instance
         mock_repo_instance.get_repository_tree.return_value = []
-        
+
         mock_sync_instance = Mock()
         mock_file_sync.return_value = mock_sync_instance
-        
+
         mock_tracker_instance = Mock()
         mock_progress_tracker.return_value = mock_tracker_instance
 
@@ -279,7 +276,7 @@ class TestGitHubAPISync:
         result = sync.sync(ref="develop")
 
         assert result is True
-        mock_repo_instance.get_repository_tree.assert_called_once_with("develop")
+        mock_repo_instance.get_repository_tree.assert_called_once_with("develop", True)
 
     @patch("gitsync.api_sync.GitHubAPIClient")
     @patch("gitsync.api_sync.RepositoryManager")
@@ -289,17 +286,17 @@ class TestGitHubAPISync:
         mock_client_instance = Mock()
         mock_client.return_value = mock_client_instance
         mock_client_instance.test_connection.return_value = True
-        
+
         mock_repo_instance = Mock()
         mock_repo_mgr.return_value = mock_repo_instance
         mock_repo_instance.get_repository_tree.return_value = None
-        
+
         mock_sync_instance = Mock()
         mock_file_sync.return_value = mock_sync_instance
 
         sync = GitHubAPISync(self.repo_url, self.temp_dir)
         result = sync.sync(ref="nonexistent")
-        
+
         assert result is False
 
     @patch("gitsync.api_sync.GitHubAPIClient")
@@ -309,99 +306,107 @@ class TestGitHubAPISync:
         """Test sync when getting tree fails"""
         mock_client_instance = Mock()
         mock_client.return_value = mock_client_instance
+        mock_client_instance.test_connection.return_value = True
+
         mock_repo_instance = Mock()
         mock_repo_mgr.return_value = mock_repo_instance
+        mock_repo_instance.get_repository_tree.side_effect = Exception("Failed to get tree")
+
         mock_sync_instance = Mock()
         mock_file_sync.return_value = mock_sync_instance
-        
-        mock_repo_instance.resolve_ref.return_value = "abc123"
-        mock_repo_instance.get_tree.side_effect = Exception("Failed to get tree")
 
         sync = GitHubAPISync(self.repo_url, self.temp_dir)
-        
-        with pytest.raises(SyncError, match="Failed to retrieve repository tree"):
-            sync.sync()
+        result = sync.sync()
+
+        assert result is False
 
     @patch("gitsync.api_sync.GitHubAPIClient")
     @patch("gitsync.api_sync.RepositoryManager")
     @patch("gitsync.api_sync.FileSynchronizer")
-    def test_sync_with_progress_callback(self, mock_file_sync, mock_repo_mgr, mock_client):
-        """Test sync with progress callback"""
+    @patch("gitsync.api_sync.ProgressTracker")
+    @patch("gitsync.api_sync.ensure_dir")
+    def test_sync_with_progress(self, mock_ensure_dir, mock_progress_tracker, mock_file_sync, mock_repo_mgr, mock_client):
+        """Test sync with progress tracking"""
         mock_client_instance = Mock()
         mock_client.return_value = mock_client_instance
+        mock_client_instance.test_connection.return_value = True
+        mock_client_instance.get_rate_limit.return_value = {}
+
         mock_repo_instance = Mock()
         mock_repo_mgr.return_value = mock_repo_instance
+        mock_repo_instance.get_repository_tree.return_value = [
+            {"path": "file.txt", "type": "blob", "sha": "abc123", "size": 100}
+        ]
+
         mock_sync_instance = Mock()
         mock_file_sync.return_value = mock_sync_instance
-        
-        # Setup mocks
-        mock_repo_instance.resolve_ref.return_value = "abc123"
-        mock_repo_instance.get_tree.return_value = []
-        mock_stats = Mock()
-        mock_sync_instance.sync_tree.return_value = mock_stats
-        
-        # Progress callback
-        progress_callback = Mock()
+        mock_sync_instance.should_download_file.return_value = True
+        mock_sync_instance.sync_file.return_value = True
+
+        mock_tracker_instance = Mock()
+        mock_progress_tracker.return_value = mock_tracker_instance
+        mock_tracker_instance.should_throttle.return_value = False
 
         sync = GitHubAPISync(self.repo_url, self.temp_dir)
-        stats = sync.sync(progress_callback=progress_callback)
+        result = sync.sync(show_progress=True)
 
-        assert stats == mock_stats
-        # Verify progress callback was passed to sync_tree
-        mock_sync_instance.sync_tree.assert_called_once()
-        call_kwargs = mock_sync_instance.sync_tree.call_args[1]
-        assert call_kwargs.get("progress_callback") == progress_callback
+        assert result is True
+        mock_progress_tracker.assert_called_once_with(
+            total_files=1, show_progress=True, desc="Syncing files"
+        )
 
     @patch("gitsync.api_sync.GitHubAPIClient")
     @patch("gitsync.api_sync.RepositoryManager")
     @patch("gitsync.api_sync.FileSynchronizer")
-    def test_sync_incremental(self, mock_file_sync, mock_repo_mgr, mock_client):
-        """Test incremental sync"""
+    @patch("gitsync.api_sync.ProgressTracker")
+    @patch("gitsync.api_sync.ensure_dir")
+    def test_sync_skip_existing(self, mock_ensure_dir, mock_progress_tracker, mock_file_sync, mock_repo_mgr, mock_client):
+        """Test sync skips existing files"""
         mock_client_instance = Mock()
         mock_client.return_value = mock_client_instance
+        mock_client_instance.test_connection.return_value = True
+        mock_client_instance.get_rate_limit.return_value = {}
+
         mock_repo_instance = Mock()
         mock_repo_mgr.return_value = mock_repo_instance
+        mock_repo_instance.get_repository_tree.return_value = [
+            {"path": "existing.txt", "type": "blob", "sha": "abc123"}
+        ]
+
         mock_sync_instance = Mock()
         mock_file_sync.return_value = mock_sync_instance
-        
-        # Setup mocks
-        mock_repo_instance.resolve_ref.return_value = "abc123"
-        mock_repo_instance.get_tree.return_value = []
-        mock_stats = Mock()
-        mock_sync_instance.sync_tree.return_value = mock_stats
+        # File should be skipped
+        mock_sync_instance.should_download_file.return_value = False
+
+        mock_tracker_instance = Mock()
+        mock_progress_tracker.return_value = mock_tracker_instance
 
         sync = GitHubAPISync(self.repo_url, self.temp_dir)
-        stats = sync.sync(incremental=True)
+        result = sync.sync()
 
-        assert stats == mock_stats
-        # Verify incremental flag was passed
-        mock_sync_instance.sync_tree.assert_called_once()
-        call_kwargs = mock_sync_instance.sync_tree.call_args[1]
-        assert call_kwargs.get("incremental") is True
+        assert result is True
+        # Should not call sync_file if file is skipped
+        mock_sync_instance.sync_file.assert_not_called()
+        mock_tracker_instance.update_progress.assert_called_once_with("existing.txt", skipped=True)
 
     @patch("gitsync.api_sync.GitHubAPIClient")
     @patch("gitsync.api_sync.RepositoryManager")
     @patch("gitsync.api_sync.FileSynchronizer")
-    def test_sync_with_file_pattern(self, mock_file_sync, mock_repo_mgr, mock_client):
-        """Test sync with file pattern filter"""
+    def test_sync_connection_failure(self, mock_file_sync, mock_repo_mgr, mock_client):
+        """Test sync fails when connection test fails"""
         mock_client_instance = Mock()
         mock_client.return_value = mock_client_instance
+        mock_client_instance.test_connection.return_value = False
+
         mock_repo_instance = Mock()
         mock_repo_mgr.return_value = mock_repo_instance
+
         mock_sync_instance = Mock()
         mock_file_sync.return_value = mock_sync_instance
-        
-        # Setup mocks
-        mock_repo_instance.resolve_ref.return_value = "abc123"
-        mock_repo_instance.get_tree.return_value = []
-        mock_stats = Mock()
-        mock_sync_instance.sync_tree.return_value = mock_stats
 
         sync = GitHubAPISync(self.repo_url, self.temp_dir)
-        stats = sync.sync(file_pattern="*.py")
+        result = sync.sync()
 
-        assert stats == mock_stats
-        # Verify file pattern was passed
-        mock_sync_instance.sync_tree.assert_called_once()
-        call_kwargs = mock_sync_instance.sync_tree.call_args[1]
-        assert call_kwargs.get("file_pattern") == "*.py"
+        assert result is False
+        # Should not attempt to get tree if connection fails
+        mock_repo_instance.get_repository_tree.assert_not_called()

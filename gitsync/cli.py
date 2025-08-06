@@ -338,7 +338,7 @@ def status(
                 with open(hash_cache) as f:
                     hashes = json.load(f)
                 click.echo(f"  Tracked files: {len(hashes)}")
-            except:
+            except (OSError, json.JSONDecodeError):
                 pass
     else:
         click.echo("✗ Local directory does not exist")

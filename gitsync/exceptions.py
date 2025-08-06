@@ -297,7 +297,6 @@ class FileWriteError(FileSystemError):
             size: Size of content that failed to write
             original_error: Original I/O exception
         """
-        details = {"size": size}
         super().__init__(message, file_path, "write", original_error)
         if size is not None:
             self.details["size"] = size
@@ -401,7 +400,6 @@ class PageLoadError(BrowserError):
             timeout: Timeout value in seconds
             original_error: Original Selenium exception
         """
-        details = {"timeout": timeout}
         super().__init__(message, "chrome", url, original_error)
         if timeout is not None:
             self.details["timeout"] = timeout

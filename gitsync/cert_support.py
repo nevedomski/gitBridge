@@ -116,7 +116,7 @@ class WindowsCertificateDetector(CertificateProvider):
             windows_certs = self.get_windows_certificates()
 
             # Export each certificate
-            for cert_bytes, encoding_type, trust in windows_certs:
+            for cert_bytes, encoding_type, _trust in windows_certs:
                 # Only process X.509 ASN.1 encoded certificates
                 if encoding_type == "x509_asn":
                     try:

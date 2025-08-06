@@ -8,7 +8,7 @@
 
 [![Python Version](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green)](license.md)
-[![Documentation](https://img.shields.io/badge/docs-mkdocs-brightgreen)](https://gitsync.readthedocs.io)
+[![Documentation](https://img.shields.io/badge/docs-mkdocs-brightgreen)](index.md)
 [![Coverage](https://img.shields.io/badge/coverage-94%25-brightgreen)](troubleshooting/index.md)
 
 [Get Started](getting-started/quick-start.md){ .md-button .md-button--primary }
@@ -167,7 +167,7 @@ uv pip install -e .
 ## Support
 
 - :material-github: [GitHub Issues](https://github.com/nevedomski/gitsync/issues)
-- :material-book: [Documentation](https://gitsync.readthedocs.io)
+- :material-book: [Documentation](index.md)
 - :material-email: [Email Support](mailto:info@nevedomski.us)
 
 ## License

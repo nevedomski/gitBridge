@@ -6,6 +6,7 @@ from unittest.mock import mock_open, patch
 
 import pytest
 
+from gitsync.exceptions import ConfigurationError
 from gitsync.utils import (
     SyncStats,
     calculate_file_hash,
@@ -54,17 +55,17 @@ class TestParseGitHubUrl:
 
     def test_parse_invalid_domain(self):
         """Test parsing URL with invalid domain"""
-        with pytest.raises(ValueError, match="Not a GitHub URL"):
+        with pytest.raises(ConfigurationError, match="Not a GitHub URL"):
             parse_github_url("https://gitlab.com/owner/repo")
 
     def test_parse_missing_repo(self):
         """Test parsing URL with missing repository name"""
-        with pytest.raises(ValueError, match="Invalid GitHub repository URL"):
+        with pytest.raises(ConfigurationError, match="Invalid GitHub repository URL"):
             parse_github_url("https://github.com/owner")
 
     def test_parse_empty_path(self):
         """Test parsing URL with empty path"""
-        with pytest.raises(ValueError, match="Invalid GitHub repository URL"):
+        with pytest.raises(ConfigurationError, match="Invalid GitHub repository URL"):
             parse_github_url("https://github.com/")
 
 

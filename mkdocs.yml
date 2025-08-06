@@ -1,7 +1,7 @@
 site_name: GitSync Documentation
 site_description: GitHub Repository Synchronization Tool - Documentation
 site_author: GitSync Team
-site_url: https://gitsync.readthedocs.io
+site_url: https://nevedomski.github.io/gitSync/
 repo_url: https://github.com/nevedomski/gitsync
 repo_name: gitsync
 edit_uri: edit/main/docs/
