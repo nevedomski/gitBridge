@@ -1,11 +1,11 @@
-"""Custom exception classes for GitSync.
+"""Custom exception classes for GitBridge.
 
 This module defines a comprehensive exception hierarchy for better error handling
-throughout the GitSync application. The exceptions provide specific error types
+throughout the GitBridge application. The exceptions provide specific error types
 for different failure scenarios and include context information for debugging.
 
 Exception Hierarchy:
-    GitSyncError (base)
+    GitBridgeError (base)
     ├── AuthenticationError
     ├── NetworkError
     │   ├── RateLimitError
@@ -29,18 +29,18 @@ Usage:
     except AuthenticationError as e:
         logger.error(f"Authentication failed: {e}")
         # Handle auth failure
-    except GitSyncError as e:
-        # Catch all other GitSync-specific errors
+    except GitBridgeError as e:
+        # Catch all other GitBridge-specific errors
         logger.error(f"Sync failed: {e}")
 """
 
 from typing import Any
 
 
-class GitSyncError(Exception):
-    """Base exception for all GitSync-related errors.
+class GitBridgeError(Exception):
+    """Base exception for all GitBridge-related errors.
 
-    This is the base class for all custom exceptions in GitSync.
+    This is the base class for all custom exceptions in GitBridge.
     It provides common functionality for error handling and context preservation.
 
     Attributes:
@@ -50,7 +50,7 @@ class GitSyncError(Exception):
     """
 
     def __init__(self, message: str, details: dict[str, Any] | None = None, original_error: Exception | None = None):
-        """Initialize GitSync base exception.
+        """Initialize GitBridge base exception.
 
         Args:
             message: Human-readable error message
@@ -80,7 +80,7 @@ class GitSyncError(Exception):
         return context
 
 
-class AuthenticationError(GitSyncError):
+class AuthenticationError(GitBridgeError):
     """Authentication-related errors.
 
     Raised when GitHub authentication fails due to invalid tokens,
@@ -112,7 +112,7 @@ class AuthenticationError(GitSyncError):
         super().__init__(message, {k: v for k, v in details.items() if v is not None}, original_error)
 
 
-class NetworkError(GitSyncError):
+class NetworkError(GitBridgeError):
     """Network-related errors.
 
     Base class for all network connectivity issues including
@@ -205,7 +205,7 @@ class ProxyError(NetworkError):
         self.details.update({k: v for k, v in proxy_details.items() if v is not None})
 
 
-class ConfigurationError(GitSyncError):
+class ConfigurationError(GitBridgeError):
     """Configuration validation and loading errors.
 
     Raised when configuration files are invalid, required settings are missing,
@@ -231,7 +231,7 @@ class ConfigurationError(GitSyncError):
         super().__init__(message, {k: v for k, v in details.items() if v is not None}, original_error)
 
 
-class RepositoryNotFoundError(GitSyncError):
+class RepositoryNotFoundError(GitBridgeError):
     """Repository not found or not accessible.
 
     Raised when a GitHub repository doesn't exist, is private without
@@ -261,7 +261,7 @@ class RepositoryNotFoundError(GitSyncError):
         super().__init__(message, {k: v for k, v in details.items() if v is not None}, original_error)
 
 
-class FileSystemError(GitSyncError):
+class FileSystemError(GitBridgeError):
     """File system operation errors.
 
     Base class for all file system related errors including
@@ -337,7 +337,7 @@ class DirectoryCreateError(FileSystemError):
         super().__init__(message, dir_path, "create", original_error)
 
 
-class BrowserError(GitSyncError):
+class BrowserError(GitBridgeError):
     """Browser automation errors.
 
     Base class for all Selenium WebDriver and browser automation
@@ -417,7 +417,7 @@ class PageLoadError(BrowserError):
             self.details["timeout"] = timeout
 
 
-class SyncError(GitSyncError):
+class SyncError(GitBridgeError):
     """General synchronization process errors.
 
     Raised for sync-specific errors that don't fit into other
@@ -447,15 +447,15 @@ class SyncError(GitSyncError):
 
 
 # DOCDEV-NOTE: Exception utility functions for common error scenarios
-def wrap_requests_exception(error: Exception, url: str) -> GitSyncError:
-    """Convert requests exceptions to appropriate GitSync exceptions.
+def wrap_requests_exception(error: Exception, url: str) -> GitBridgeError:
+    """Convert requests exceptions to appropriate GitBridge exceptions.
 
     Args:
         error: Original requests exception
         url: URL that caused the error
 
     Returns:
-        Appropriate GitSync exception with context
+        Appropriate GitBridge exception with context
     """
     import requests
 
@@ -482,7 +482,7 @@ def wrap_requests_exception(error: Exception, url: str) -> GitSyncError:
 
 
 def wrap_file_operation_exception(error: Exception, path: str, operation: str) -> FileSystemError:
-    """Convert file operation exceptions to appropriate GitSync exceptions.
+    """Convert file operation exceptions to appropriate GitBridge exceptions.
 
     Args:
         error: Original file system exception
@@ -503,7 +503,7 @@ def wrap_file_operation_exception(error: Exception, path: str, operation: str) -
 
 
 def wrap_playwright_exception(error: Exception, url: str | None = None) -> BrowserError:
-    """Convert Playwright exceptions to appropriate GitSync exceptions.
+    """Convert Playwright exceptions to appropriate GitBridge exceptions.
 
     Args:
         error: Original Playwright exception

@@ -1,4 +1,4 @@
-"""Configuration handling for GitSync"""
+"""Configuration handling for GitBridge"""
 
 import logging
 import os
@@ -37,7 +37,7 @@ DEFAULT_CONFIG = {
 
 
 class Config:
-    """GitSync configuration handler."""
+    """GitBridge configuration handler."""
 
     def __init__(self, config_file: str | None = None):
         """Initialize configuration.
@@ -105,7 +105,7 @@ class Config:
             self.config["repository"]["ref"] = github_ref
 
         # Local path
-        local_path = os.getenv("GITSYNC_LOCAL_PATH")
+        local_path = os.getenv("GITBRIDGE_LOCAL_PATH")
         if local_path:
             self.config["local"]["path"] = local_path
 
@@ -115,20 +115,20 @@ class Config:
             self.config["auth"]["token"] = github_token
 
         # Sync settings
-        sync_method = os.getenv("GITSYNC_METHOD")
+        sync_method = os.getenv("GITBRIDGE_METHOD")
         if sync_method:
             self.config["sync"]["method"] = sync_method
 
-        incremental_env = os.getenv("GITSYNC_INCREMENTAL")
+        incremental_env = os.getenv("GITBRIDGE_INCREMENTAL")
         if incremental_env:
             self.config["sync"]["incremental"] = incremental_env.lower() in ("true", "1", "yes")
 
         # Logging
-        log_level = os.getenv("GITSYNC_LOG_LEVEL")
+        log_level = os.getenv("GITBRIDGE_LOG_LEVEL")
         if log_level:
             self.config["logging"]["level"] = log_level
 
-        log_file = os.getenv("GITSYNC_LOG_FILE")
+        log_file = os.getenv("GITBRIDGE_LOG_FILE")
         if log_file:
             self.config["logging"]["file"] = log_file
 

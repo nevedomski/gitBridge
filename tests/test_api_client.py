@@ -5,8 +5,8 @@ from unittest.mock import Mock, patch
 import pytest
 import requests
 
-from gitsync.api_client import GitHubAPIClient
-from gitsync.exceptions import AuthenticationError, NetworkError, RateLimitError, RepositoryNotFoundError
+from gitbridge.api_client import GitHubAPIClient
+from gitbridge.exceptions import AuthenticationError, NetworkError, RateLimitError, RepositoryNotFoundError
 
 
 class TestGitHubAPIClient:
@@ -18,7 +18,7 @@ class TestGitHubAPIClient:
         self.repo = "test_repo"
         self.token = "test_token"
 
-    @patch("gitsync.api_client.SessionFactory")
+    @patch("gitbridge.api_client.SessionFactory")
     def test_init_basic(self, mock_session_factory):
         """Test basic initialization"""
         mock_factory = Mock()
@@ -41,7 +41,7 @@ class TestGitHubAPIClient:
             auto_cert=False,
         )
 
-    @patch("gitsync.api_client.SessionFactory")
+    @patch("gitbridge.api_client.SessionFactory")
     def test_init_with_options(self, mock_session_factory):
         """Test initialization with all options"""
         mock_factory = Mock()

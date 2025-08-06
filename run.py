@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Direct runner for GitSync without installation"""
+"""Direct runner for GitBridge without installation"""
 
 import os
 import sys
@@ -8,7 +8,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # Import and run the CLI
-from gitsync.cli import main
+from gitbridge.cli import main
 
 if __name__ == "__main__":
     main()

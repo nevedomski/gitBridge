@@ -1,15 +1,15 @@
 # API Reference
 
-Welcome to the GitSync API Reference. This documentation covers the Python API for programmatic use of GitSync.
+Welcome to the GitBridge API Reference. This documentation covers the Python API for programmatic use of GitBridge.
 
 ## Overview
 
-GitSync provides a comprehensive Python API for integrating repository synchronization into your applications. The API is designed to be simple for basic use cases while providing advanced features for complex scenarios.
+GitBridge provides a comprehensive Python API for integrating repository synchronization into your applications. The API is designed to be simple for basic use cases while providing advanced features for complex scenarios.
 
 ## Quick Start
 
 ```python
-from gitsync.api_sync import GitHubAPISync
+from gitbridge.api_sync import GitHubAPISync
 
 # Basic synchronization
 sync = GitHubAPISync(
@@ -25,7 +25,7 @@ if success:
 
 ## Core Modules
 
-### [gitsync](gitsync.md)
+### [gitbridge](gitbridge.md)
 Main package initialization and version information.
 
 ### [api_sync](api_sync.md)
@@ -74,7 +74,7 @@ Certificate management:
 ### Simple Sync
 
 ```python
-from gitsync import GitHubAPISync
+from gitbridge import GitHubAPISync
 
 # Initialize sync client
 sync = GitHubAPISync(
@@ -95,7 +95,7 @@ else:
 
 ```python
 import os
-from gitsync import GitHubAPISync
+from gitbridge import GitHubAPISync
 
 # Using token from environment
 token = os.getenv("GITHUB_TOKEN")
@@ -113,7 +113,7 @@ sync.sync()
 ### Browser-Based Sync
 
 ```python
-from gitsync.browser_sync import GitHubBrowserSync
+from gitbridge.browser_sync import GitHubBrowserSync
 
 # Use browser automation when API is blocked
 browser_sync = GitHubBrowserSync(
@@ -132,8 +132,8 @@ browser_sync.sync()
 ### Custom Configuration
 
 ```python
-from gitsync import GitHubAPISync
-from gitsync.config import Config
+from gitbridge import GitHubAPISync
+from gitbridge.config import Config
 
 # Load configuration from file
 config = Config.from_file("config.yaml")
@@ -168,8 +168,8 @@ sync.sync()
 ### Error Handling
 
 ```python
-from gitsync import GitHubAPISync
-from gitsync.exceptions import (
+from gitbridge import GitHubAPISync
+from gitbridge.exceptions import (
     AuthenticationError,
     NetworkError,
     RateLimitError,
@@ -199,10 +199,10 @@ except Exception as e:
 ### Component-Based Architecture
 
 ```python
-from gitsync.api_client import GitHubAPIClient
-from gitsync.repository_manager import RepositoryManager
-from gitsync.file_synchronizer import FileSynchronizer
-from gitsync.session_factory import SessionFactory
+from gitbridge.api_client import GitHubAPIClient
+from gitbridge.repository_manager import RepositoryManager
+from gitbridge.file_synchronizer import FileSynchronizer
+from gitbridge.session_factory import SessionFactory
 
 # Create individual components
 session_factory = SessionFactory(config)
@@ -222,7 +222,7 @@ if api_client.test_connection():
 ### Custom Sync Provider
 
 ```python
-from gitsync.interfaces import SyncProvider
+from gitbridge.interfaces import SyncProvider
 from typing import Dict, Any
 
 class CustomSyncProvider(SyncProvider):
@@ -249,8 +249,8 @@ class CustomSyncProvider(SyncProvider):
 ### Proxy Configuration
 
 ```python
-from gitsync import GitHubAPISync
-from gitsync.pac_support import PACProxyDetector
+from gitbridge import GitHubAPISync
+from gitbridge.pac_support import PACProxyDetector
 
 # Auto-detect proxy
 detector = PACProxyDetector()
@@ -270,8 +270,8 @@ sync = GitHubAPISync(
 ### Certificate Management
 
 ```python
-from gitsync import GitHubAPISync
-from gitsync.cert_support import WindowsCertificateDetector
+from gitbridge import GitHubAPISync
+from gitbridge.cert_support import WindowsCertificateDetector
 
 # Auto-detect certificates (Windows)
 cert_detector = WindowsCertificateDetector()
@@ -291,7 +291,7 @@ sync = GitHubAPISync(
 
 ```python
 from flask import Flask, jsonify
-from gitsync import GitHubAPISync
+from gitbridge import GitHubAPISync
 
 app = Flask(__name__)
 
@@ -314,7 +314,7 @@ def sync_repo(owner, repo):
 
 ```python
 from celery import Celery
-from gitsync import GitHubAPISync
+from gitbridge import GitHubAPISync
 
 app = Celery('tasks', broker='redis://localhost:6379')
 
@@ -330,7 +330,7 @@ def sync_repository(repo_url, local_path, ref="main"):
 ```python
 import schedule
 import time
-from gitsync import GitHubAPISync
+from gitbridge import GitHubAPISync
 
 def sync_job():
     """Scheduled sync job."""
@@ -371,7 +371,7 @@ while True:
 ### Exception Hierarchy
 
 ```
-GitSyncError (base)
+GitBridgeError (base)
 ├── ConfigurationError
 ├── AuthenticationError
 │   └── TokenError
@@ -405,7 +405,7 @@ sync = GitHubAPISync(
 
 ```python
 # Reuse connections for better performance
-from gitsync.session_factory import SessionFactory
+from gitbridge.session_factory import SessionFactory
 
 factory = SessionFactory(config)
 session = factory.create_session()
@@ -419,7 +419,7 @@ sync2 = GitHubAPISync(repo2_url, path2, session=session)
 
 ```python
 import concurrent.futures
-from gitsync import GitHubAPISync
+from gitbridge import GitHubAPISync
 
 repos = [
     ("https://github.com/user/repo1", "/path/to/repo1"),
@@ -444,10 +444,10 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
 ```python
 import unittest
 from unittest.mock import Mock, patch
-from gitsync import GitHubAPISync
+from gitbridge import GitHubAPISync
 
-class TestGitSync(unittest.TestCase):
-    @patch('gitsync.api_sync.requests.Session')
+class TestGitBridge(unittest.TestCase):
+    @patch('gitbridge.api_sync.requests.Session')
     def test_sync(self, mock_session):
         """Test repository sync."""
         # Mock API responses
@@ -470,7 +470,7 @@ class TestGitSync(unittest.TestCase):
 ```python
 import tempfile
 import shutil
-from gitsync import GitHubAPISync
+from gitbridge import GitHubAPISync
 
 def test_real_sync():
     """Integration test with real repository."""
@@ -505,5 +505,5 @@ def test_real_sync():
 
 - Explore individual [module documentation](api_sync.md)
 - Review [interface definitions](interfaces.md)
-- Check [examples repository](https://github.com/nevedomski/gitsync-examples)
+- Check [examples repository](https://github.com/nevedomski/gitbridge-examples)
 - Read the [developer guide](../contributing/index.md)

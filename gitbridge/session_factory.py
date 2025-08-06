@@ -15,7 +15,7 @@ Key Features:
     - Corporate environment support
 
 Typical Usage:
-    >>> from gitsync.session_factory import SessionFactory
+    >>> from gitbridge.session_factory import SessionFactory
     >>> factory = SessionFactory()
     >>> session = factory.create_session(
     ...     token="github_token",

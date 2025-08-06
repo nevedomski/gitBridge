@@ -11,9 +11,9 @@ import pytest
 from playwright._impl._errors import Error as PlaywrightError
 from playwright._impl._errors import TimeoutError as PlaywrightTimeoutError
 
-from gitsync.browser_sync import GitHubBrowserSync
-from gitsync.exceptions import ConfigurationError
-from gitsync.utils import SyncStats
+from gitbridge.browser_sync import GitHubBrowserSync
+from gitbridge.exceptions import ConfigurationError
+from gitbridge.utils import SyncStats
 
 
 class TestGitHubBrowserSync:
@@ -181,7 +181,7 @@ class TestGitHubBrowserSync:
         mock_context = Mock()
         mock_page = Mock()
 
-        import gitsync.browser_sync as browser_sync_module
+        import gitbridge.browser_sync as browser_sync_module
 
         with patch.object(browser_sync_module, "sync_playwright") as mock_sync_playwright:
             # Set up the full mock chain: sync_playwright() returns an object
@@ -212,7 +212,7 @@ class TestGitHubBrowserSync:
 
     def test_setup_browser_failure(self, browser_sync):
         """Test Playwright browser setup failure"""
-        import gitsync.browser_sync as browser_sync_module
+        import gitbridge.browser_sync as browser_sync_module
 
         with patch.object(browser_sync_module, "sync_playwright") as mock_sync_playwright:
             mock_sync_playwright.return_value.start.side_effect = PlaywrightError("Browser not found")
@@ -395,7 +395,7 @@ class TestGitHubBrowserSync:
         mock_page.expect_download.return_value.__exit__ = Mock(return_value=None)
 
         # Create a fake ZIP file for testing
-        test_zip_path = temp_dir / ".gitsync" / "temp_repo.zip"
+        test_zip_path = temp_dir / ".gitbridge" / "temp_repo.zip"
         test_zip_path.parent.mkdir(parents=True, exist_ok=True)
 
         with zipfile.ZipFile(test_zip_path, "w") as zip_ref:
@@ -764,7 +764,7 @@ class TestGitHubBrowserSync:
         browser_sync,
     ):
         """Test successful repository sync"""
-        import gitsync.browser_sync as browser_sync_module
+        import gitbridge.browser_sync as browser_sync_module
 
         with patch.object(browser_sync_module, "save_file_hashes") as mock_save_hashes:
             # Mock all dependencies
@@ -842,7 +842,7 @@ class TestGitHubBrowserSync:
         browser_sync,
     ):
         """Test sync with some file failures"""
-        import gitsync.browser_sync as browser_sync_module
+        import gitbridge.browser_sync as browser_sync_module
 
         with patch.object(browser_sync_module, "save_file_hashes"):
             browser_sync.page = Mock()  # Set page to avoid setup
@@ -883,7 +883,7 @@ class TestGitHubBrowserSync:
         browser_sync,
     ):
         """Test sync with progress bar enabled"""
-        import gitsync.browser_sync as browser_sync_module
+        import gitbridge.browser_sync as browser_sync_module
 
         with patch.object(browser_sync_module, "save_file_hashes"):
             with patch.object(browser_sync_module, "tqdm") as mock_tqdm:
@@ -968,7 +968,7 @@ class TestGitHubBrowserSync:
         assert browser_sync.browser is None
         assert browser_sync.playwright is None
 
-    @patch("gitsync.pac_support.detect_and_configure_proxy")
+    @patch("gitbridge.pac_support.detect_and_configure_proxy")
     def test_get_browser_launch_options_auto_proxy_success(self, mock_detect_proxy, temp_dir):
         """Test browser launch options with successful auto proxy detection"""
         mock_detect_proxy.return_value = {"http": "http://proxy.example.com:8080"}
@@ -983,7 +983,7 @@ class TestGitHubBrowserSync:
         assert "proxy" in options
         assert options["proxy"]["server"] == "http://proxy.example.com:8080"
 
-    @patch("gitsync.pac_support.detect_and_configure_proxy")
+    @patch("gitbridge.pac_support.detect_and_configure_proxy")
     def test_get_browser_launch_options_auto_proxy_failure(self, mock_detect_proxy, temp_dir):
         """Test browser launch options with auto proxy detection failure"""
         mock_detect_proxy.side_effect = Exception("PAC detection failed")
@@ -1000,8 +1000,8 @@ class TestGitHubBrowserSync:
 
     def test_hash_cache_initialization(self, browser_sync, temp_dir):
         """Test that hash cache is properly initialized"""
-        # Hash cache file should be created in .gitsync subdirectory
-        expected_cache_file = temp_dir / ".gitsync" / "file_hashes.json"
+        # Hash cache file should be created in .gitbridge subdirectory
+        expected_cache_file = temp_dir / ".gitbridge" / "file_hashes.json"
         assert browser_sync.hash_cache_file == expected_cache_file
 
         # file_hashes should be initialized (empty dict if file doesn't exist)

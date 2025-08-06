@@ -73,7 +73,7 @@ class GitHubBrowserSync(SyncProvider):
         self.page: Page | None = None
 
         # Cache file for tracking downloaded files
-        self.hash_cache_file = self.local_path / ".gitsync" / "file_hashes.json"
+        self.hash_cache_file = self.local_path / ".gitbridge" / "file_hashes.json"
         self.file_hashes = load_file_hashes(self.hash_cache_file)
 
         # Statistics
@@ -158,7 +158,7 @@ class GitHubBrowserSync(SyncProvider):
             self.browser = self.playwright.chromium.launch(**launch_options)
 
             # Create browser context with user agent
-            context_options: dict[str, Any] = {"user_agent": "GitSync/1.0 (+https://github.com/browser-automation)"}
+            context_options: dict[str, Any] = {"user_agent": "GitBridge/1.0 (+https://github.com/browser-automation)"}
 
             # Add CA bundle if specified
             if self.ca_bundle and os.path.exists(self.ca_bundle):
@@ -206,8 +206,7 @@ class GitHubBrowserSync(SyncProvider):
             # via browser's saved credentials or manual intervention
             # Token-based browser login is complex and would require additional steps
             logger.warning(
-                "Token-based browser login not fully implemented. "
-                "Please ensure you're logged in to GitHub in this browser session."
+                "Token-based browser login not fully implemented. Please ensure you're logged in to GitHub in this browser session."
             )
 
             return True
@@ -326,7 +325,7 @@ class GitHubBrowserSync(SyncProvider):
             download = download_info.value
 
             # Save ZIP temporarily
-            temp_zip = self.local_path / ".gitsync" / "temp_repo.zip"
+            temp_zip = self.local_path / ".gitbridge" / "temp_repo.zip"
             ensure_dir(temp_zip.parent)
 
             # Save the downloaded file

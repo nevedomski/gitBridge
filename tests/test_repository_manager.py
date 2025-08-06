@@ -2,8 +2,8 @@
 
 from unittest.mock import Mock
 
-from gitsync.api_client import GitHubAPIClient
-from gitsync.repository_manager import RepositoryManager
+from gitbridge.api_client import GitHubAPIClient
+from gitbridge.repository_manager import RepositoryManager
 
 
 class TestRepositoryManager:

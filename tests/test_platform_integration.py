@@ -54,28 +54,28 @@ class TestConditionalImports:
         """Test that pac_support can be imported on any platform."""
         # This should work because we mock the Windows-specific modules
         with patch.dict("sys.modules", mock_windows_modules()):
-            import gitsync.pac_support
+            import gitbridge.pac_support
 
-            detector = gitsync.pac_support.PACProxyDetector()
+            detector = gitbridge.pac_support.PACProxyDetector()
             assert detector is not None
 
     def test_cert_support_import_on_any_platform(self):
         """Test that cert_support can be imported on any platform."""
-        import gitsync.cert_support
+        import gitbridge.cert_support
 
-        detector = gitsync.cert_support.WindowsCertificateDetector()
+        detector = gitbridge.cert_support.WindowsCertificateDetector()
         assert detector is not None
 
     def test_pac_support_availability_check(self):
         """Test PAC support availability check works correctly."""
         with patch.dict("sys.modules", mock_windows_modules()):
-            import gitsync.pac_support
+            import gitbridge.pac_support
 
-            detector = gitsync.pac_support.PACProxyDetector()
+            detector = gitbridge.pac_support.PACProxyDetector()
 
             # On actual Windows, this should work
             with patch("platform.system", return_value="Windows"):
-                with patch("gitsync.pac_support.WINDOWS_AVAILABLE", True):
+                with patch("gitbridge.pac_support.WINDOWS_AVAILABLE", True):
                     assert detector.is_available() is True
 
             # On non-Windows, this should return False
@@ -84,18 +84,18 @@ class TestConditionalImports:
 
     def test_cert_support_availability_check(self):
         """Test certificate support availability check works correctly."""
-        import gitsync.cert_support
+        import gitbridge.cert_support
 
         # On actual Windows with SSL support, this should work
         with patch("platform.system", return_value="Windows"):
-            detector = gitsync.cert_support.WindowsCertificateDetector()
-            with patch("gitsync.cert_support.ssl") as mock_ssl:
+            detector = gitbridge.cert_support.WindowsCertificateDetector()
+            with patch("gitbridge.cert_support.ssl") as mock_ssl:
                 mock_ssl.enum_certificates.return_value = []
                 assert detector.is_available() is True
 
         # On non-Windows, this should return False
         with patch("platform.system", return_value="Linux"):
-            detector = gitsync.cert_support.WindowsCertificateDetector()
+            detector = gitbridge.cert_support.WindowsCertificateDetector()
             assert detector.is_available() is False
 
 
@@ -145,7 +145,7 @@ class TestCrossPlatformFunctionality:
     def test_pac_detection_cross_platform(self):
         """Test PAC detection works on all platforms with proper mocking."""
         with patch.dict("sys.modules", mock_windows_modules()):
-            from gitsync.pac_support import detect_and_configure_proxy
+            from gitbridge.pac_support import detect_and_configure_proxy
 
             # Should work on any platform with proper mocking
             result = detect_and_configure_proxy()
@@ -155,11 +155,11 @@ class TestCrossPlatformFunctionality:
 
     def test_cert_detection_cross_platform(self):
         """Test certificate detection works on all platforms."""
-        from gitsync.cert_support import get_combined_cert_bundle
+        from gitbridge.cert_support import get_combined_cert_bundle
 
         # On Windows (mocked), should potentially return a bundle
         with patch("platform.system", return_value="Windows"):
-            with patch("gitsync.cert_support.WindowsCertificateDetector") as mock_detector:
+            with patch("gitbridge.cert_support.WindowsCertificateDetector") as mock_detector:
                 mock_instance = MagicMock()
                 mock_instance.is_available.return_value = True
                 mock_instance.export_certificates_to_pem.return_value = "/tmp/test.pem"

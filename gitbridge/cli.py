@@ -1,4 +1,4 @@
-"""Command-line interface for GitSync"""
+"""Command-line interface for GitBridge"""
 
 import logging
 import sys
@@ -15,7 +15,7 @@ from .exceptions import (
     BrowserError,
     ConfigurationError,
     FileSystemError,
-    GitSyncError,
+    GitBridgeError,
     NetworkError,
     RateLimitError,
     RepositoryNotFoundError,
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 @click.group()
 @click.version_option()
 def cli() -> None:
-    """GitSync - Synchronize GitHub repositories when git access is blocked."""
+    """GitBridge - Synchronize GitHub repositories when git access is blocked."""
     pass
 
 
@@ -200,7 +200,7 @@ def sync(
         if verbose:
             click.echo(f"Error details: {e.get_context()}", err=True)
         sys.exit(1)
-    except GitSyncError as e:
+    except GitBridgeError as e:
         click.echo(f"✗ Sync error: {e}", err=True)
         if verbose:
             click.echo(f"Error details: {e.get_context()}", err=True)
@@ -327,7 +327,7 @@ def status(
         click.echo("✓ Local directory exists")
 
         # Check for hash cache
-        hash_cache = local_dir / ".gitsync" / "file_hashes.json"
+        hash_cache = local_dir / ".gitbridge" / "file_hashes.json"
         if hash_cache.exists():
             click.echo("✓ Incremental sync data found")
 
@@ -377,7 +377,7 @@ def init(output: str, repo: str, local: str, ref: str, token: str | None, method
 
     # Show example usage
     click.echo("\nExample usage:")
-    click.echo(f"  gitsync sync --config {output}")
+    click.echo(f"  gitbridge sync --config {output}")
 
     if not token:
         click.echo("\nNote: No token provided. You may need to set GITHUB_TOKEN environment variable")

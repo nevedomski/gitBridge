@@ -1,4 +1,4 @@
-"""Common utilities for GitSync"""
+"""Common utilities for GitBridge"""
 
 import hashlib
 import json

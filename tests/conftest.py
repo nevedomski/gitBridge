@@ -1,4 +1,4 @@
-"""Test configuration and fixtures for gitSync tests"""
+"""Test configuration and fixtures for gitBridge tests"""
 
 import shutil
 import tempfile

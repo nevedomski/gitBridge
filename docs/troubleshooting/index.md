@@ -1,6 +1,6 @@
 # Troubleshooting Guide
 
-This comprehensive troubleshooting guide helps you resolve common issues with GitSync. Start with the diagnostic tool, then refer to specific problem categories.
+This comprehensive troubleshooting guide helps you resolve common issues with GitBridge. Start with the diagnostic tool, then refer to specific problem categories.
 
 ## Quick Diagnostics
 
@@ -8,13 +8,13 @@ Run the built-in diagnostic tool to identify issues:
 
 ```bash
 # Run full diagnostics
-gitsync diagnose
+gitbridge diagnose
 
 # Test specific components
-gitsync diagnose --network
-gitsync diagnose --auth
-gitsync diagnose --proxy
-gitsync diagnose --ssl
+gitbridge diagnose --network
+gitbridge diagnose --auth
+gitbridge diagnose --proxy
+gitbridge diagnose --ssl
 ```
 
 ## Common Issues by Category
@@ -61,29 +61,29 @@ gitsync diagnose --ssl
 
 ```bash
 # Clear all cache and metadata
-rm -rf ~/.gitsync/cache
-rm -rf ./.gitsync
+rm -rf ~/.gitbridge/cache
+rm -rf ./.gitbridge
 
-# Reinstall GitSync
-pip uninstall gitsync -y
-pip install gitsync --upgrade
+# Reinstall GitBridge
+pip uninstall gitbridge -y
+pip install gitbridge --upgrade
 
 # Test with minimal configuration
-gitsync sync --repo https://github.com/github/gitignore --local ./test
+gitbridge sync --repo https://github.com/github/gitignore --local ./test
 ```
 
 ### 2. Enable Debug Mode
 
 ```bash
 # Maximum verbosity
-gitsync sync --config config.yaml -vvv
+gitbridge sync --config config.yaml -vvv
 
 # Debug specific component
 export GITSYNC_DEBUG=network,auth,proxy
-gitsync sync --config config.yaml
+gitbridge sync --config config.yaml
 
 # Save debug output
-gitsync sync --config config.yaml \
+gitbridge sync --config config.yaml \
   --log-level DEBUG \
   --log-file debug.log 2>&1
 ```
@@ -92,10 +92,10 @@ gitsync sync --config config.yaml \
 
 ```bash
 # Check configuration syntax
-gitsync validate --config config.yaml
+gitbridge validate --config config.yaml
 
 # Test all components
-gitsync validate --config config.yaml \
+gitbridge validate --config config.yaml \
   --check-auth \
   --check-network \
   --check-paths
@@ -119,35 +119,35 @@ gitsync validate --config config.yaml \
 ### Check System Information
 
 ```bash
-# GitSync version and environment
-gitsync info
+# GitBridge version and environment
+gitbridge info
 
 # Output:
-# GitSync Version: 0.2.0
+# GitBridge Version: 0.2.0
 # Python Version: 3.11.5
 # Platform: Windows-10
-# Config Path: C:\Users\user\.gitsync
-# Cache Path: C:\Users\user\.gitsync\cache
+# Config Path: C:\Users\user\.gitbridge
+# Cache Path: C:\Users\user\.gitbridge\cache
 ```
 
 ### Test Connectivity
 
 ```bash
 # Test GitHub API access
-gitsync test-connection --url https://api.github.com
+gitbridge test-connection --url https://api.github.com
 
 # Test repository access
-gitsync test-connection --repo https://github.com/user/repo
+gitbridge test-connection --repo https://github.com/user/repo
 
 # Test with authentication
-gitsync test-connection --repo https://github.com/user/repo --token $TOKEN
+gitbridge test-connection --repo https://github.com/user/repo --token $TOKEN
 ```
 
 ### Check Rate Limits
 
 ```bash
 # Show current rate limit status
-gitsync status --show-rate-limit
+gitbridge status --show-rate-limit
 
 # Output:
 # Rate Limit Status:
@@ -166,10 +166,10 @@ gitsync status --show-rate-limit
 git config --system core.longpaths true
 
 # 2. Certificate store access
-gitsync sync --auto-cert
+gitbridge sync --auto-cert
 
 # 3. Proxy from Internet Explorer
-gitsync sync --auto-proxy
+gitbridge sync --auto-proxy
 ```
 
 ### macOS
@@ -180,7 +180,7 @@ gitsync sync --auto-proxy
 security unlock-keychain
 
 # 2. Gatekeeper issues
-xattr -d com.apple.quarantine /path/to/gitsync
+xattr -d com.apple.quarantine /path/to/gitbridge
 
 # 3. SSL certificates
 export SSL_CERT_FILE=$(python -m certifi)
@@ -194,8 +194,8 @@ export SSL_CERT_FILE=$(python -m certifi)
 sudo apt-get install ca-certificates
 
 # 2. Permission issues
-chmod 755 ~/.gitsync
-chown -R $USER:$USER ~/.gitsync
+chmod 755 ~/.gitbridge
+chown -R $USER:$USER ~/.gitbridge
 
 # 3. DNS resolution
 echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
@@ -207,7 +207,7 @@ echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
 
 ```bash
 # Profile sync performance
-gitsync sync --config config.yaml --profile
+gitbridge sync --config config.yaml --profile
 
 # Optimize configuration
 cat > optimized.yaml << EOF
@@ -250,10 +250,10 @@ sync:
 
 ```bash
 # Generate diagnostic report
-gitsync diagnose --full --output diagnostic-report.txt
+gitbridge diagnose --full --output diagnostic-report.txt
 
 # What to include when reporting issues:
-# 1. GitSync version (gitsync --version)
+# 1. GitBridge version (gitbridge --version)
 # 2. Configuration file (remove sensitive data)
 # 3. Error messages and stack traces
 # 4. Debug log (--log-level DEBUG)
@@ -262,9 +262,9 @@ gitsync diagnose --full --output diagnostic-report.txt
 
 ### Community Support
 
-- **GitHub Issues**: [Report bugs](https://github.com/nevedomski/gitsync/issues)
-- **Discussions**: [Ask questions](https://github.com/nevedomski/gitsync/discussions)
-- **Stack Overflow**: Tag with `gitsync`
+- **GitHub Issues**: [Report bugs](https://github.com/nevedomski/gitbridge/issues)
+- **Discussions**: [Ask questions](https://github.com/nevedomski/gitbridge/discussions)
+- **Stack Overflow**: Tag with `gitbridge`
 
 ### Enable Verbose Logging
 
@@ -272,7 +272,7 @@ gitsync diagnose --full --output diagnostic-report.txt
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
-from gitsync import GitHubAPISync
+from gitbridge import GitHubAPISync
 # Debug output will now be shown
 ```
 
@@ -282,33 +282,33 @@ from gitsync import GitHubAPISync
 
 ```bash
 # Backup current state
-cp -r ~/.gitsync ~/.gitsync.backup
+cp -r ~/.gitbridge ~/.gitbridge.backup
 
 # Clear cache
-rm -rf ~/.gitsync/cache/*
+rm -rf ~/.gitbridge/cache/*
 
 # Rebuild cache
-gitsync sync --config config.yaml --rebuild-cache
+gitbridge sync --config config.yaml --rebuild-cache
 ```
 
 ### Interrupted Sync
 
 ```bash
 # Resume from last checkpoint
-gitsync sync --config config.yaml --resume
+gitbridge sync --config config.yaml --resume
 
 # Or force full resync
-gitsync sync --config config.yaml --force
+gitbridge sync --config config.yaml --force
 ```
 
 ### Configuration Issues
 
 ```bash
 # Reset to defaults
-gitsync init --output config.yaml --force
+gitbridge init --output config.yaml --force
 
 # Validate new configuration
-gitsync validate --config config.yaml --strict
+gitbridge validate --config config.yaml --strict
 ```
 
 ## Prevention Tips
@@ -317,27 +317,27 @@ gitsync validate --config config.yaml --strict
 
 ```bash
 # Weekly cache cleanup
-0 0 * * 0 gitsync cache clean --older-than 7d
+0 0 * * 0 gitbridge cache clean --older-than 7d
 
 # Monthly full validation
-0 0 1 * * gitsync validate --config config.yaml --full
+0 0 1 * * gitbridge validate --config config.yaml --full
 ```
 
 ### 2. Monitor Health
 
 ```bash
 # Set up health checks
-gitsync health --config config.yaml --watch
+gitbridge health --config config.yaml --watch
 
 # Create status dashboard
-gitsync status --format json > /var/log/gitsync-status.json
+gitbridge status --format json > /var/log/gitbridge-status.json
 ```
 
 ### 3. Backup Configuration
 
 ```bash
 # Version control your config
-git init ~/.gitsync-configs
+git init ~/.gitbridge-configs
 git add config.yaml
 git commit -m "Working configuration"
 ```
@@ -348,20 +348,20 @@ git commit -m "Working configuration"
 
 ```bash
 # Python trace
-python -m trace -t $(which gitsync) sync --config config.yaml
+python -m trace -t $(which gitbridge) sync --config config.yaml
 
 # System trace (Linux)
-strace -f gitsync sync --config config.yaml
+strace -f gitbridge sync --config config.yaml
 
 # Network trace
-tcpdump -i any -w gitsync.pcap host api.github.com
+tcpdump -i any -w gitbridge.pcap host api.github.com
 ```
 
 ### Memory Profiling
 
 ```python
 from memory_profiler import profile
-from gitsync import GitHubAPISync
+from gitbridge import GitHubAPISync
 
 @profile
 def test_sync():
@@ -373,7 +373,7 @@ def test_sync():
 
 ```python
 import pdb
-from gitsync import GitHubAPISync
+from gitbridge import GitHubAPISync
 
 # Set breakpoint
 pdb.set_trace()
@@ -383,11 +383,11 @@ sync.sync()
 
 ## FAQ
 
-### Q: Why is GitSync slower than git clone?
+### Q: Why is GitBridge slower than git clone?
 
-GitSync is designed for environments where git is blocked. It uses GitHub's REST API which has different performance characteristics than git protocol.
+GitBridge is designed for environments where git is blocked. It uses GitHub's REST API which has different performance characteristics than git protocol.
 
-### Q: Can I use GitSync with GitHub Enterprise?
+### Q: Can I use GitBridge with GitHub Enterprise?
 
 Yes! Configure the API endpoint:
 
@@ -411,9 +411,9 @@ sync:
   large_file_threshold: 104857600  # 100MB
 ```
 
-### Q: Can GitSync work offline?
+### Q: Can GitBridge work offline?
 
-No, GitSync requires internet access to GitHub. For offline work, use git with a local repository.
+No, GitBridge requires internet access to GitHub. For offline work, use git with a local repository.
 
 ## Next Steps
 

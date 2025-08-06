@@ -26,7 +26,7 @@ Components Coordinated:
     - ProgressTracker: Progress reporting and statistics
 
 Typical Usage:
-    >>> from gitsync.api_sync import GitHubAPISync
+    >>> from gitbridge.api_sync import GitHubAPISync
     >>> sync = GitHubAPISync(
     ...     repo_url="https://github.com/owner/repo",
     ...     local_path="/path/to/local",

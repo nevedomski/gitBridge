@@ -4,7 +4,7 @@ from unittest.mock import Mock, mock_open, patch
 
 import pytest
 
-from gitsync.cert_support import (
+from gitbridge.cert_support import (
     WindowsCertificateDetector,
     _temp_cert_files,
     cleanup_temp_certs,
@@ -73,7 +73,7 @@ class TestWindowsCertificateDetector:
             assert result == "/tmp/existing_bundle.pem"
 
     @pytest.mark.windows
-    @patch("gitsync.cert_support.ssl")
+    @patch("gitbridge.cert_support.ssl")
     def test_is_available_windows_with_ssl_support(self, mock_ssl):
         """Test is_available returns True on Windows with SSL certificate enumeration"""
         mock_ssl.enum_certificates.return_value = []
@@ -83,7 +83,7 @@ class TestWindowsCertificateDetector:
             assert detector.is_available() is True
             mock_ssl.enum_certificates.assert_called_once_with("ROOT")
 
-    @patch("gitsync.cert_support.ssl")
+    @patch("gitbridge.cert_support.ssl")
     def test_is_available_windows_without_ssl_support(self, mock_ssl):
         """Test is_available returns False when SSL enumeration fails"""
         mock_ssl.enum_certificates.side_effect = AttributeError("enum_certificates not available")
@@ -93,7 +93,7 @@ class TestWindowsCertificateDetector:
             assert detector.is_available() is False
 
     @pytest.mark.windows
-    @patch("gitsync.cert_support.ssl")
+    @patch("gitbridge.cert_support.ssl")
     def test_get_windows_certificates_default_stores(self, mock_ssl):
         """Test get_windows_certificates with default store names"""
         # Mock certificate data
@@ -117,7 +117,7 @@ class TestWindowsCertificateDetector:
             assert result == root_certs + ca_certs
             assert mock_ssl.enum_certificates.call_count >= 2
 
-    @patch("gitsync.cert_support.ssl")
+    @patch("gitbridge.cert_support.ssl")
     def test_get_windows_certificates_store_error(self, mock_ssl):
         """Test get_windows_certificates handles store access errors gracefully"""
 
@@ -139,8 +139,8 @@ class TestWindowsCertificateDetector:
             assert len(result) == 1
             assert result[0] == (b"cert1", "x509_asn", None)
 
-    @patch("gitsync.cert_support.ssl")
-    @patch("gitsync.cert_support.tempfile.NamedTemporaryFile")
+    @patch("gitbridge.cert_support.ssl")
+    @patch("gitbridge.cert_support.tempfile.NamedTemporaryFile")
     def test_export_certificates_to_pem_without_certifi(self, mock_temp_file, mock_ssl):
         """Test export_certificates_to_pem without including certifi bundle"""
         mock_ssl.enum_certificates.return_value = [(b"cert_der_data", "x509_asn", None)]
@@ -162,8 +162,8 @@ class TestWindowsCertificateDetector:
             mock_file.write.assert_called()
             mock_file.close.assert_called_once()
 
-    @patch("gitsync.cert_support.ssl")
-    @patch("gitsync.cert_support.tempfile.NamedTemporaryFile")
+    @patch("gitbridge.cert_support.ssl")
+    @patch("gitbridge.cert_support.tempfile.NamedTemporaryFile")
     @patch("builtins.open", new_callable=mock_open, read_data="# Certifi bundle content\n")
     @patch("certifi.where")
     def test_export_certificates_to_pem_with_certifi(
@@ -189,8 +189,8 @@ class TestWindowsCertificateDetector:
             # Should write certifi content and certificate
             assert mock_file.write.call_count >= 2
 
-    @patch("gitsync.cert_support.ssl")
-    @patch("gitsync.cert_support.tempfile.NamedTemporaryFile")
+    @patch("gitbridge.cert_support.ssl")
+    @patch("gitbridge.cert_support.tempfile.NamedTemporaryFile")
     def test_export_certificates_to_pem_der_conversion_error(self, mock_temp_file, mock_ssl):
         """Test export_certificates_to_pem handles DER to PEM conversion errors"""
         mock_ssl.enum_certificates.return_value = [(b"good_cert", "x509_asn", None), (b"bad_cert", "x509_asn", None)]
@@ -215,8 +215,8 @@ class TestWindowsCertificateDetector:
             assert result == "/tmp/test_certs.pem"
             # Should still succeed with the valid certificate
 
-    @patch("gitsync.cert_support.ssl")
-    @patch("gitsync.cert_support.tempfile.NamedTemporaryFile")
+    @patch("gitbridge.cert_support.ssl")
+    @patch("gitbridge.cert_support.tempfile.NamedTemporaryFile")
     def test_export_certificates_to_pem_non_x509_encoding(self, mock_temp_file, mock_ssl):
         """Test export_certificates_to_pem skips non-x509_asn certificates"""
         mock_ssl.enum_certificates.return_value = [
@@ -240,8 +240,8 @@ class TestWindowsCertificateDetector:
             # Verify it was called with the right certificate
             mock_ssl.DER_cert_to_PEM_cert.assert_called_with(b"x509_cert")
 
-    @patch("gitsync.cert_support.ssl")
-    @patch("gitsync.cert_support.tempfile.NamedTemporaryFile")
+    @patch("gitbridge.cert_support.ssl")
+    @patch("gitbridge.cert_support.tempfile.NamedTemporaryFile")
     def test_export_certificates_to_pem_temp_file_error(self, mock_temp_file, mock_ssl):
         """Test export_certificates_to_pem handles temporary file creation errors"""
         mock_ssl.enum_certificates.return_value = []
@@ -318,7 +318,7 @@ class TestCleanupTempCerts:
 class TestGetSystemCertBundle:
     """Test cases for get_system_cert_bundle function"""
 
-    @patch("gitsync.cert_support.WindowsCertificateDetector")
+    @patch("gitbridge.cert_support.WindowsCertificateDetector")
     def test_get_system_cert_bundle_available(self, mock_detector_class):
         """Test get_system_cert_bundle when Windows certificates are available"""
         mock_detector = Mock()
@@ -332,7 +332,7 @@ class TestGetSystemCertBundle:
         mock_detector.is_available.assert_called_once()
         mock_detector.export_certificates_to_pem.assert_called_once()
 
-    @patch("gitsync.cert_support.WindowsCertificateDetector")
+    @patch("gitbridge.cert_support.WindowsCertificateDetector")
     def test_get_system_cert_bundle_not_available(self, mock_detector_class):
         """Test get_system_cert_bundle when Windows certificates are not available"""
         mock_detector = Mock()
@@ -355,7 +355,7 @@ class TestGetCombinedCertBundle:
             result = get_combined_cert_bundle()
             assert result is None
 
-    @patch("gitsync.cert_support.WindowsCertificateDetector")
+    @patch("gitbridge.cert_support.WindowsCertificateDetector")
     def test_get_combined_cert_bundle_windows_available(self, mock_detector_class):
         """Test get_combined_cert_bundle on Windows with available certificates"""
         mock_detector = Mock()
@@ -370,7 +370,7 @@ class TestGetCombinedCertBundle:
             mock_detector.is_available.assert_called_once()
             mock_detector.export_certificates_to_pem.assert_called_once_with(include_certifi=True)
 
-    @patch("gitsync.cert_support.WindowsCertificateDetector")
+    @patch("gitbridge.cert_support.WindowsCertificateDetector")
     def test_get_combined_cert_bundle_windows_not_available(self, mock_detector_class):
         """Test get_combined_cert_bundle on Windows without available certificates"""
         mock_detector = Mock()
@@ -384,7 +384,7 @@ class TestGetCombinedCertBundle:
             mock_detector.is_available.assert_called_once()
             mock_detector.export_certificates_to_pem.assert_not_called()
 
-    @patch("gitsync.cert_support.WindowsCertificateDetector")
+    @patch("gitbridge.cert_support.WindowsCertificateDetector")
     def test_get_combined_cert_bundle_windows_exception(self, mock_detector_class):
         """Test get_combined_cert_bundle handles exceptions gracefully"""
         mock_detector_class.side_effect = Exception("Detector initialization failed")
@@ -393,7 +393,7 @@ class TestGetCombinedCertBundle:
             result = get_combined_cert_bundle()
             assert result is None
 
-    @patch("gitsync.cert_support.WindowsCertificateDetector")
+    @patch("gitbridge.cert_support.WindowsCertificateDetector")
     def test_get_combined_cert_bundle_export_returns_none(self, mock_detector_class):
         """Test get_combined_cert_bundle when export returns None"""
         mock_detector = Mock()
@@ -411,7 +411,7 @@ class TestGetCombinedCertBundle:
 class TestExportWithWincertstore:
     """Test cases for export_with_wincertstore function"""
 
-    @patch("gitsync.cert_support.tempfile.NamedTemporaryFile")
+    @patch("gitbridge.cert_support.tempfile.NamedTemporaryFile")
     @patch("builtins.open", new_callable=mock_open, read_data="# Certifi content")
     @patch("certifi.where")
     def test_export_with_wincertstore_success(self, mock_certifi_where, mock_open_file, mock_temp_file):
@@ -462,7 +462,7 @@ class TestExportWithWincertstore:
 
         assert result is None
 
-    @patch("gitsync.cert_support.tempfile.NamedTemporaryFile")
+    @patch("gitbridge.cert_support.tempfile.NamedTemporaryFile")
     @patch("builtins.open", new_callable=mock_open, read_data="# Certifi content")
     @patch("certifi.where")
     def test_export_with_wincertstore_general_exception(self, mock_certifi_where, mock_open_file, mock_temp_file):
@@ -486,8 +486,8 @@ class TestIntegrationScenarios:
         """Clean up after tests"""
         _temp_cert_files.clear()
 
-    @patch("gitsync.cert_support.ssl")
-    @patch("gitsync.cert_support.tempfile.NamedTemporaryFile")
+    @patch("gitbridge.cert_support.ssl")
+    @patch("gitbridge.cert_support.tempfile.NamedTemporaryFile")
     @patch("builtins.open", new_callable=mock_open, read_data="# Certifi CA bundle\n")
     @patch("certifi.where")
     def test_full_certificate_detection_workflow(self, mock_certifi_where, mock_open_file, mock_temp_file, mock_ssl):
@@ -553,7 +553,7 @@ class TestIntegrationScenarios:
             assert detector.get_windows_certificates() == []
             assert detector.export_certificates_to_pem() is None
 
-    @patch("gitsync.cert_support.ssl")
+    @patch("gitbridge.cert_support.ssl")
     def test_graceful_degradation_on_ssl_errors(self, mock_ssl):
         """Test graceful degradation when SSL certificate enumeration fails"""
         mock_ssl.enum_certificates.side_effect = OSError("Certificate store access denied")
@@ -591,8 +591,8 @@ class TestTempFileManagement:
         assert "/tmp/cert1.pem" in _temp_cert_files
         assert "/tmp/cert2.pem" in _temp_cert_files
 
-    @patch("gitsync.cert_support.ssl")
-    @patch("gitsync.cert_support.tempfile.NamedTemporaryFile")
+    @patch("gitbridge.cert_support.ssl")
+    @patch("gitbridge.cert_support.tempfile.NamedTemporaryFile")
     def test_multiple_exports_track_all_files(self, mock_temp_file, mock_ssl):
         """Test that multiple certificate exports track all temporary files"""
         mock_ssl.enum_certificates.return_value = []
@@ -644,7 +644,7 @@ class TestErrorHandlingAndEdgeCases:
         """Clean up after tests"""
         _temp_cert_files.clear()
 
-    @patch("gitsync.cert_support.ssl")
+    @patch("gitbridge.cert_support.ssl")
     def test_empty_certificate_stores(self, mock_ssl):
         """Test handling of empty certificate stores"""
         mock_ssl.enum_certificates.return_value = []  # Empty store
@@ -655,8 +655,8 @@ class TestErrorHandlingAndEdgeCases:
 
             assert result == []
 
-    @patch("gitsync.cert_support.ssl")
-    @patch("gitsync.cert_support.tempfile.NamedTemporaryFile")
+    @patch("gitbridge.cert_support.ssl")
+    @patch("gitbridge.cert_support.tempfile.NamedTemporaryFile")
     def test_export_with_no_valid_certificates(self, mock_temp_file, mock_ssl):
         """Test export when no valid certificates are found"""
         # Return certificates with unsupported encoding
@@ -673,8 +673,8 @@ class TestErrorHandlingAndEdgeCases:
             # Should still create file even with no valid certificates
             assert result == "/tmp/empty_bundle.pem"
 
-    @patch("gitsync.cert_support.ssl")
-    @patch("gitsync.cert_support.tempfile.NamedTemporaryFile")
+    @patch("gitbridge.cert_support.ssl")
+    @patch("gitbridge.cert_support.tempfile.NamedTemporaryFile")
     def test_partial_certificate_conversion_failure(self, mock_temp_file, mock_ssl):
         """Test handling when some certificates fail to convert"""
         mock_ssl.enum_certificates.return_value = [
@@ -713,7 +713,7 @@ class TestErrorHandlingAndEdgeCases:
             assert any("good_cert" in str(call) for call in write_calls)
             assert any("another_good_cert" in str(call) for call in write_calls)
 
-    @patch("gitsync.cert_support.WindowsCertificateDetector")
+    @patch("gitbridge.cert_support.WindowsCertificateDetector")
     def test_detector_initialization_failure(self, mock_detector_class):
         """Test handling when WindowsCertificateDetector initialization fails"""
         mock_detector_class.side_effect = RuntimeError("Failed to initialize detector")

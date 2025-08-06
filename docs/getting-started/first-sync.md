@@ -1,12 +1,12 @@
 # Your First Sync
 
-This guide will walk you through your first repository synchronization with GitSync. By the end, you'll have successfully synced a GitHub repository to your local machine.
+This guide will walk you through your first repository synchronization with GitBridge. By the end, you'll have successfully synced a GitHub repository to your local machine.
 
 ## Prerequisites
 
 Before starting, ensure you have:
 
-- GitSync installed ([Installation Guide](installation.md))
+- GitBridge installed ([Installation Guide](installation.md))
 - Internet access to GitHub
 - A GitHub repository URL to sync
 
@@ -27,7 +27,7 @@ REPO_URL="https://github.com/yourusername/yourrepo"
 The simplest way to sync a repository:
 
 ```bash
-gitsync sync --repo $REPO_URL --local ./my-first-sync
+gitbridge sync --repo $REPO_URL --local ./my-first-sync
 ```
 
 This command will:
@@ -39,7 +39,7 @@ This command will:
 ### Expected Output
 
 ```
-GitSync v0.2.0 - GitHub Repository Synchronization Tool
+GitBridge v0.2.0 - GitHub Repository Synchronization Tool
 ========================================================
 
 Connecting to: https://github.com/github/gitignore
@@ -74,8 +74,8 @@ ls -la my-first-sync/
 # Count the files
 find my-first-sync -type f | wc -l
 
-# Check the GitSync metadata
-ls -la my-first-sync/.gitsync/
+# Check the GitBridge metadata
+ls -la my-first-sync/.gitbridge/
 ```
 
 ## Step 4: Try Incremental Sync
@@ -83,13 +83,13 @@ ls -la my-first-sync/.gitsync/
 Run the same command again to see incremental sync in action:
 
 ```bash
-gitsync sync --repo $REPO_URL --local ./my-first-sync
+gitbridge sync --repo $REPO_URL --local ./my-first-sync
 ```
 
 ### Expected Output (Incremental)
 
 ```
-GitSync v0.2.0 - GitHub Repository Synchronization Tool
+GitBridge v0.2.0 - GitHub Repository Synchronization Tool
 ========================================================
 
 Connecting to: https://github.com/github/gitignore
@@ -114,10 +114,10 @@ Try syncing a different branch or tag:
 
 ```bash
 # List available branches
-gitsync list-branches --repo $REPO_URL
+gitbridge list-branches --repo $REPO_URL
 
 # Sync a specific branch
-gitsync sync --repo $REPO_URL --local ./my-branch-sync --ref develop
+gitbridge sync --repo $REPO_URL --local ./my-branch-sync --ref develop
 ```
 
 ## Private Repository Sync
@@ -128,7 +128,7 @@ If you want to sync a private repository, you'll need authentication:
 
 1. Go to GitHub → Settings → Developer settings → Personal access tokens
 2. Click "Generate new token (classic)"
-3. Give it a name like "GitSync"
+3. Give it a name like "GitBridge"
 4. Select scopes:
    - `repo` for private repositories
    - `public_repo` for public repositories only
@@ -141,7 +141,7 @@ If you want to sync a private repository, you'll need authentication:
 export GITHUB_TOKEN="ghp_your_token_here"
 
 # Sync private repository
-gitsync sync \
+gitbridge sync \
   --repo https://github.com/yourusername/private-repo \
   --local ./private-sync \
   --token $GITHUB_TOKEN
@@ -175,7 +175,7 @@ logging:
 ### Step 2: Run with Configuration
 
 ```bash
-gitsync sync --config config.yaml
+gitbridge sync --config config.yaml
 ```
 
 ## Advanced First Sync Options
@@ -185,7 +185,7 @@ gitsync sync --config config.yaml
 See detailed information during sync:
 
 ```bash
-gitsync sync --repo $REPO_URL --local ./verbose-sync --verbose
+gitbridge sync --repo $REPO_URL --local ./verbose-sync --verbose
 ```
 
 ### Dry Run
@@ -193,7 +193,7 @@ gitsync sync --repo $REPO_URL --local ./verbose-sync --verbose
 See what would be synced without actually downloading:
 
 ```bash
-gitsync sync --repo $REPO_URL --local ./dry-run-test --dry-run
+gitbridge sync --repo $REPO_URL --local ./dry-run-test --dry-run
 ```
 
 ### Specific File Types
@@ -216,7 +216,7 @@ sync:
     - "*.test.*"  # Skip test files
 EOF
 
-gitsync sync --config filtered-sync.yaml
+gitbridge sync --config filtered-sync.yaml
 ```
 
 ## Troubleshooting Your First Sync
@@ -230,7 +230,7 @@ gitsync sync --config filtered-sync.yaml
 curl -I https://github.com/username/repo
 
 # For private repos, ensure token has access
-gitsync validate --repo $REPO_URL --token $GITHUB_TOKEN
+gitbridge validate --repo $REPO_URL --token $GITHUB_TOKEN
 ```
 
 #### 2. "Permission denied" for local directory
@@ -248,18 +248,18 @@ chmod 755 my-first-sync
 
 ```bash
 # Check your rate limit
-gitsync status --show-rate-limit
+gitbridge status --show-rate-limit
 
 # Use authentication to increase limits
 export GITHUB_TOKEN="your_token"
-gitsync sync --repo $REPO_URL --local ./my-sync
+gitbridge sync --repo $REPO_URL --local ./my-sync
 ```
 
 #### 4. Network timeout
 
 ```bash
 # Increase timeout and retry settings
-gitsync sync \
+gitbridge sync \
   --repo $REPO_URL \
   --local ./my-sync \
   --timeout 60 \
@@ -282,29 +282,29 @@ Now that you've completed your first sync:
 1. **Sync Multiple Repositories**
    ```bash
    for repo in repo1 repo2 repo3; do
-     gitsync sync --repo https://github.com/user/$repo --local ./$repo
+     gitbridge sync --repo https://github.com/user/$repo --local ./$repo
    done
    ```
 
 2. **Schedule Regular Syncs**
    ```bash
    # Add to crontab for hourly syncs
-   0 * * * * gitsync sync --config ~/gitsync/config.yaml
+   0 * * * * gitbridge sync --config ~/gitbridge/config.yaml
    ```
 
 3. **Sync Specific Tags**
    ```bash
    # Sync a release version
-   gitsync sync --repo $REPO_URL --local ./release --ref v1.0.0
+   gitbridge sync --repo $REPO_URL --local ./release --ref v1.0.0
    ```
 
 4. **Compare Sync Methods**
    ```bash
    # Time API method
-   time gitsync sync --repo $REPO_URL --local ./api-sync --method api
+   time gitbridge sync --repo $REPO_URL --local ./api-sync --method api
    
    # Time Browser method
-   time gitsync sync --repo $REPO_URL --local ./browser-sync --method browser
+   time gitbridge sync --repo $REPO_URL --local ./browser-sync --method browser
    ```
 
 ## Quick Reference Card
@@ -313,31 +313,31 @@ Keep these commands handy:
 
 ```bash
 # Basic sync
-gitsync sync --repo URL --local PATH
+gitbridge sync --repo URL --local PATH
 
 # With authentication
-gitsync sync --repo URL --local PATH --token TOKEN
+gitbridge sync --repo URL --local PATH --token TOKEN
 
 # Specific branch/tag
-gitsync sync --repo URL --local PATH --ref BRANCH
+gitbridge sync --repo URL --local PATH --ref BRANCH
 
 # Using config file
-gitsync sync --config config.yaml
+gitbridge sync --config config.yaml
 
 # Verbose mode
-gitsync sync --config config.yaml -v
+gitbridge sync --config config.yaml -v
 
 # Dry run
-gitsync sync --config config.yaml --dry-run
+gitbridge sync --config config.yaml --dry-run
 
 # Force full sync
-gitsync sync --config config.yaml --force
+gitbridge sync --config config.yaml --force
 
 # Check status
-gitsync status --config config.yaml
+gitbridge status --config config.yaml
 
 # Validate setup
-gitsync validate --config config.yaml
+gitbridge validate --config config.yaml
 ```
 
 ## Success Checklist
@@ -350,4 +350,4 @@ gitsync validate --config config.yaml
 - [ ] Set up authentication (if needed)
 - [ ] Scheduled automated syncs (optional)
 
-Congratulations! You've successfully completed your first sync with GitSync. You're now ready to explore more advanced features and customize GitSync for your workflow.
+Congratulations! You've successfully completed your first sync with GitBridge. You're now ready to explore more advanced features and customize GitBridge for your workflow.

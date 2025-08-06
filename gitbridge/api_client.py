@@ -12,7 +12,7 @@ Key Features:
     - Support for corporate environments via SessionFactory
 
 Typical Usage:
-    >>> from gitsync.api_client import GitHubAPIClient
+    >>> from gitbridge.api_client import GitHubAPIClient
     >>> client = GitHubAPIClient(
     ...     owner="user",
     ...     repo="repository",

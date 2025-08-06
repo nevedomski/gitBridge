@@ -5,8 +5,8 @@ import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from gitsync.api_client import GitHubAPIClient
-from gitsync.file_synchronizer import FileSynchronizer
+from gitbridge.api_client import GitHubAPIClient
+from gitbridge.file_synchronizer import FileSynchronizer
 
 
 class TestFileSynchronizer:
@@ -20,7 +20,7 @@ class TestFileSynchronizer:
         self.mock_client.owner = "test_owner"
         self.mock_client.repo = "test_repo"
 
-    @patch("gitsync.file_synchronizer.load_file_hashes")
+    @patch("gitbridge.file_synchronizer.load_file_hashes")
     def test_init(self, mock_load_hashes):
         """Test initialization"""
         mock_load_hashes.return_value = {"file1.txt": "abc123"}
@@ -31,11 +31,11 @@ class TestFileSynchronizer:
         assert synchronizer.local_path == self.local_path
         assert synchronizer.current_ref is None
         assert synchronizer.file_hashes == {"file1.txt": "abc123"}
-        assert synchronizer.hash_cache_file == self.local_path / ".gitsync" / "file_hashes.json"
+        assert synchronizer.hash_cache_file == self.local_path / ".gitbridge" / "file_hashes.json"
 
     def test_set_current_ref(self):
         """Test setting current reference"""
-        with patch("gitsync.file_synchronizer.load_file_hashes", return_value={}):
+        with patch("gitbridge.file_synchronizer.load_file_hashes", return_value={}):
             synchronizer = FileSynchronizer(self.mock_client, self.local_path)
 
         synchronizer.set_current_ref("main")
@@ -44,7 +44,7 @@ class TestFileSynchronizer:
 
     def test_should_download_file_new_file(self):
         """Test should download for new file"""
-        with patch("gitsync.file_synchronizer.load_file_hashes", return_value={}):
+        with patch("gitbridge.file_synchronizer.load_file_hashes", return_value={}):
             synchronizer = FileSynchronizer(self.mock_client, self.local_path)
 
         # File doesn't exist locally
@@ -54,7 +54,7 @@ class TestFileSynchronizer:
 
     def test_should_download_file_changed_hash(self):
         """Test should download for file with changed hash"""
-        with patch("gitsync.file_synchronizer.load_file_hashes", return_value={"file1.txt": "old_hash"}):
+        with patch("gitbridge.file_synchronizer.load_file_hashes", return_value={"file1.txt": "old_hash"}):
             synchronizer = FileSynchronizer(self.mock_client, self.local_path)
 
         # Create the file locally
@@ -68,7 +68,7 @@ class TestFileSynchronizer:
 
     def test_should_download_file_unchanged(self):
         """Test should not download for unchanged file"""
-        with patch("gitsync.file_synchronizer.load_file_hashes", return_value={"file1.txt": "same_hash"}):
+        with patch("gitbridge.file_synchronizer.load_file_hashes", return_value={"file1.txt": "same_hash"}):
             synchronizer = FileSynchronizer(self.mock_client, self.local_path)
 
         # Create the file locally
@@ -82,7 +82,7 @@ class TestFileSynchronizer:
 
     def test_download_file_success(self):
         """Test successful file download via Contents API"""
-        with patch("gitsync.file_synchronizer.load_file_hashes", return_value={}):
+        with patch("gitbridge.file_synchronizer.load_file_hashes", return_value={}):
             synchronizer = FileSynchronizer(self.mock_client, self.local_path)
 
         synchronizer.set_current_ref("main")
@@ -105,7 +105,7 @@ class TestFileSynchronizer:
 
     def test_download_file_large_file_fallback(self):
         """Test file download fallback to Blob API for large files"""
-        with patch("gitsync.file_synchronizer.load_file_hashes", return_value={}):
+        with patch("gitbridge.file_synchronizer.load_file_hashes", return_value={}):
             synchronizer = FileSynchronizer(self.mock_client, self.local_path)
 
         # Mock Contents API response indicating large file
@@ -128,7 +128,7 @@ class TestFileSynchronizer:
 
     def test_download_file_rate_limit_fallback(self):
         """Test file download fallback to Blob API on rate limit"""
-        with patch("gitsync.file_synchronizer.load_file_hashes", return_value={}):
+        with patch("gitbridge.file_synchronizer.load_file_hashes", return_value={}):
             synchronizer = FileSynchronizer(self.mock_client, self.local_path)
 
         # Mock Contents API 403 response (rate limit)
@@ -147,7 +147,7 @@ class TestFileSynchronizer:
 
     def test_download_file_not_found(self):
         """Test file download with 404 error"""
-        with patch("gitsync.file_synchronizer.load_file_hashes", return_value={}):
+        with patch("gitbridge.file_synchronizer.load_file_hashes", return_value={}):
             synchronizer = FileSynchronizer(self.mock_client, self.local_path)
 
         mock_response = Mock()
@@ -160,7 +160,7 @@ class TestFileSynchronizer:
 
     def test_download_blob_success(self):
         """Test successful blob download"""
-        with patch("gitsync.file_synchronizer.load_file_hashes", return_value={}):
+        with patch("gitbridge.file_synchronizer.load_file_hashes", return_value={}):
             synchronizer = FileSynchronizer(self.mock_client, self.local_path)
 
         test_content = "Blob content"
@@ -178,7 +178,7 @@ class TestFileSynchronizer:
 
     def test_download_blob_failure(self):
         """Test blob download failure"""
-        with patch("gitsync.file_synchronizer.load_file_hashes", return_value={}):
+        with patch("gitbridge.file_synchronizer.load_file_hashes", return_value={}):
             synchronizer = FileSynchronizer(self.mock_client, self.local_path)
 
         mock_response = Mock()
@@ -189,10 +189,10 @@ class TestFileSynchronizer:
 
         assert result is None
 
-    @patch("gitsync.file_synchronizer.ensure_dir")
+    @patch("gitbridge.file_synchronizer.ensure_dir")
     def test_sync_file_success(self, mock_ensure_dir):
         """Test successful file synchronization"""
-        with patch("gitsync.file_synchronizer.load_file_hashes", return_value={}):
+        with patch("gitbridge.file_synchronizer.load_file_hashes", return_value={}):
             synchronizer = FileSynchronizer(self.mock_client, self.local_path)
 
         entry = {"path": "test.txt", "sha": "abc123", "type": "blob"}
@@ -211,7 +211,7 @@ class TestFileSynchronizer:
 
     def test_sync_file_skip_unchanged(self):
         """Test file sync skip for unchanged file"""
-        with patch("gitsync.file_synchronizer.load_file_hashes", return_value={}):
+        with patch("gitbridge.file_synchronizer.load_file_hashes", return_value={}):
             synchronizer = FileSynchronizer(self.mock_client, self.local_path)
 
         entry = {"path": "test.txt", "sha": "abc123", "type": "blob"}
@@ -226,7 +226,7 @@ class TestFileSynchronizer:
 
     def test_sync_file_download_failure(self):
         """Test file sync with download failure"""
-        with patch("gitsync.file_synchronizer.load_file_hashes", return_value={}):
+        with patch("gitbridge.file_synchronizer.load_file_hashes", return_value={}):
             synchronizer = FileSynchronizer(self.mock_client, self.local_path)
 
         entry = {"path": "test.txt", "sha": "abc123", "type": "blob"}
@@ -239,10 +239,10 @@ class TestFileSynchronizer:
 
         assert result is False
 
-    @patch("gitsync.file_synchronizer.save_file_hashes")
+    @patch("gitbridge.file_synchronizer.save_file_hashes")
     def test_save_hash_cache(self, mock_save_hashes):
         """Test saving hash cache"""
-        with patch("gitsync.file_synchronizer.load_file_hashes", return_value={"file1.txt": "abc123"}):
+        with patch("gitbridge.file_synchronizer.load_file_hashes", return_value={"file1.txt": "abc123"}):
             synchronizer = FileSynchronizer(self.mock_client, self.local_path)
 
         synchronizer.save_hash_cache()
@@ -252,7 +252,7 @@ class TestFileSynchronizer:
     def test_get_cached_files(self):
         """Test getting cached files"""
         cached_hashes = {"file1.txt": "abc123", "file2.txt": "def456"}
-        with patch("gitsync.file_synchronizer.load_file_hashes", return_value=cached_hashes):
+        with patch("gitbridge.file_synchronizer.load_file_hashes", return_value=cached_hashes):
             synchronizer = FileSynchronizer(self.mock_client, self.local_path)
 
         result = synchronizer.get_cached_files()
@@ -261,7 +261,7 @@ class TestFileSynchronizer:
 
     def test_clear_hash_cache(self):
         """Test clearing hash cache"""
-        with patch("gitsync.file_synchronizer.load_file_hashes", return_value={"file1.txt": "abc123"}):
+        with patch("gitbridge.file_synchronizer.load_file_hashes", return_value={"file1.txt": "abc123"}):
             synchronizer = FileSynchronizer(self.mock_client, self.local_path)
 
         # Create a fake hash cache file
@@ -276,7 +276,7 @@ class TestFileSynchronizer:
 
     def test_get_file_info_exists(self):
         """Test getting file info for cached file"""
-        with patch("gitsync.file_synchronizer.load_file_hashes", return_value={"test.txt": "abc123"}):
+        with patch("gitbridge.file_synchronizer.load_file_hashes", return_value={"test.txt": "abc123"}):
             synchronizer = FileSynchronizer(self.mock_client, self.local_path)
 
         # Create test file
@@ -292,7 +292,7 @@ class TestFileSynchronizer:
 
     def test_get_file_info_not_cached(self):
         """Test getting file info for non-cached file"""
-        with patch("gitsync.file_synchronizer.load_file_hashes", return_value={}):
+        with patch("gitbridge.file_synchronizer.load_file_hashes", return_value={}):
             synchronizer = FileSynchronizer(self.mock_client, self.local_path)
 
         result = synchronizer.get_file_info("test.txt")
@@ -301,7 +301,7 @@ class TestFileSynchronizer:
 
     def test_sync_files_multiple(self):
         """Test syncing multiple files"""
-        with patch("gitsync.file_synchronizer.load_file_hashes", return_value={}):
+        with patch("gitbridge.file_synchronizer.load_file_hashes", return_value={}):
             synchronizer = FileSynchronizer(self.mock_client, self.local_path)
 
         files = [

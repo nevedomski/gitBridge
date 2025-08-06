@@ -6,8 +6,8 @@ from unittest.mock import mock_open, patch
 
 import pytest
 
-from gitsync.exceptions import ConfigurationError
-from gitsync.utils import (
+from gitbridge.exceptions import ConfigurationError
+from gitbridge.utils import (
     SyncStats,
     calculate_file_hash,
     ensure_dir,

@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import requests
 
-from gitsync.session_factory import SessionFactory
+from gitbridge.session_factory import SessionFactory
 
 
 class TestSessionFactory:
@@ -55,7 +55,7 @@ class TestSessionFactory:
         assert session.proxies.get("http") == "http://proxy:8080"
         assert session.proxies.get("https") == "https://proxy:8080"
 
-    @patch("gitsync.cert_support.get_combined_cert_bundle")
+    @patch("gitbridge.cert_support.get_combined_cert_bundle")
     def test_create_session_auto_cert_success(self, mock_get_bundle):
         """Test session creation with successful auto certificate detection."""
         mock_bundle_path = "/tmp/auto-cert-bundle.pem"
@@ -66,7 +66,7 @@ class TestSessionFactory:
         assert session.verify == mock_bundle_path
         mock_get_bundle.assert_called_once()
 
-    @patch("gitsync.cert_support.get_combined_cert_bundle")
+    @patch("gitbridge.cert_support.get_combined_cert_bundle")
     def test_create_session_auto_cert_failure(self, mock_get_bundle):
         """Test session creation with failed auto certificate detection."""
         mock_get_bundle.side_effect = Exception("Failed to get bundle")
@@ -77,7 +77,7 @@ class TestSessionFactory:
         assert session.verify is True
         mock_get_bundle.assert_called_once()
 
-    @patch("gitsync.pac_support.detect_and_configure_proxy")
+    @patch("gitbridge.pac_support.detect_and_configure_proxy")
     def test_create_session_auto_proxy_success(self, mock_detect_proxy):
         """Test session creation with successful auto proxy detection."""
         mock_proxies = {"http": "http://auto-proxy:8080", "https": "https://auto-proxy:8080"}
@@ -89,7 +89,7 @@ class TestSessionFactory:
         assert session.proxies.get("https") == "https://auto-proxy:8080"
         mock_detect_proxy.assert_called_once()
 
-    @patch("gitsync.pac_support.detect_and_configure_proxy")
+    @patch("gitbridge.pac_support.detect_and_configure_proxy")
     def test_create_session_auto_proxy_failure(self, mock_detect_proxy):
         """Test session creation with failed auto proxy detection."""
         mock_detect_proxy.side_effect = Exception("Failed to detect proxy")
@@ -101,7 +101,7 @@ class TestSessionFactory:
         mock_detect_proxy.assert_called_once()
 
     @patch.dict(os.environ, {"HTTP_PROXY": "http://env-proxy:8080"})
-    @patch("gitsync.pac_support.detect_and_configure_proxy")
+    @patch("gitbridge.pac_support.detect_and_configure_proxy")
     def test_env_proxy_overrides_auto_proxy(self, mock_detect_proxy):
         """Test that environment variables override auto-detected proxy."""
         mock_proxies = {"http": "http://auto-proxy:8080"}
@@ -117,7 +117,7 @@ class TestSessionFactory:
         """Test that explicit ca_bundle overrides auto certificate detection."""
         ca_bundle = "/explicit/ca-bundle.pem"
 
-        with patch("gitsync.cert_support.get_combined_cert_bundle") as mock_get_bundle:
+        with patch("gitbridge.cert_support.get_combined_cert_bundle") as mock_get_bundle:
             session = self.factory.create_session(ca_bundle=ca_bundle, auto_cert=True)
 
             assert session.verify == ca_bundle

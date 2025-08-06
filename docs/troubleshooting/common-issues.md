@@ -1,13 +1,13 @@
 # Common Issues and Solutions
 
-This guide covers the most common issues users encounter with GitSync and their solutions.
+This guide covers the most common issues users encounter with GitBridge and their solutions.
 
 ## Quick Diagnostics
 
 Before troubleshooting, run the diagnostic command:
 
 ```bash
-gitsync diagnose --verbose
+gitbridge diagnose --verbose
 ```
 
 This will check:
@@ -50,10 +50,10 @@ This will check:
    ```bash
    # Environment variable (recommended)
    export GITHUB_TOKEN=ghp_YourTokenHere
-   gitsync sync --config config.yaml
+   gitbridge sync --config config.yaml
    
    # Command line
-   gitsync sync --token ghp_YourTokenHere --repo URL --local PATH
+   gitbridge sync --token ghp_YourTokenHere --repo URL --local PATH
    
    # Config file
    echo "auth:
@@ -87,7 +87,7 @@ This will check:
 
 4. **Switch to browser method temporarily:**
    ```bash
-   gitsync sync --method browser --config config.yaml
+   gitbridge sync --method browser --config config.yaml
    ```
 
 ## Network and Connectivity Issues
@@ -119,16 +119,16 @@ This will check:
 2. **Configure proxy:**
    ```bash
    # Auto-detect
-   gitsync sync --auto-proxy --config config.yaml
+   gitbridge sync --auto-proxy --config config.yaml
    
    # Manual proxy
    export HTTPS_PROXY=http://proxy.company.com:8080
-   gitsync sync --config config.yaml
+   gitbridge sync --config config.yaml
    ```
 
 3. **Try browser method:**
    ```bash
-   gitsync sync --method browser --config config.yaml
+   gitbridge sync --method browser --config config.yaml
    ```
 
 ### Error: Proxy Authentication Required
@@ -179,13 +179,13 @@ This will check:
 1. **Auto-detect certificates:**
    ```bash
    # Windows: Extract from certificate store
-   gitsync sync --auto-cert --config config.yaml
+   gitbridge sync --auto-cert --config config.yaml
    ```
 
 2. **Use custom certificate bundle:**
    ```bash
    # Get company certificates from IT
-   gitsync sync --ca-bundle /path/to/company-ca-bundle.crt
+   gitbridge sync --ca-bundle /path/to/company-ca-bundle.crt
    
    # Or set environment variable
    export REQUESTS_CA_BUNDLE=/path/to/company-ca-bundle.crt
@@ -201,7 +201,7 @@ This will check:
 4. **Last resort - disable verification:**
    ```bash
    # WARNING: Insecure! Only for testing!
-   gitsync sync --no-ssl-verify --config config.yaml
+   gitbridge sync --no-ssl-verify --config config.yaml
    ```
 
 ## Browser Method Issues
@@ -229,7 +229,7 @@ This will check:
 
 2. **Specify browser path:**
    ```bash
-   gitsync sync --method browser \
+   gitbridge sync --method browser \
      --browser-path "/usr/bin/chromium" \
      --config config.yaml
    ```
@@ -252,14 +252,14 @@ This will check:
 
 1. **Increase timeout:**
    ```bash
-   gitsync sync --method browser \
+   gitbridge sync --method browser \
      --browser-timeout 60 \
      --config config.yaml
    ```
 
 2. **Run in non-headless mode for debugging:**
    ```bash
-   gitsync sync --method browser --no-headless
+   gitbridge sync --method browser --no-headless
    ```
 
 3. **Check memory usage:**
@@ -291,7 +291,7 @@ This will check:
 
 2. **Use different directory:**
    ```bash
-   gitsync sync --local ~/writable-directory --repo URL
+   gitbridge sync --local ~/writable-directory --repo URL
    ```
 
 3. **Run as appropriate user:**
@@ -316,11 +316,11 @@ This will check:
 
 2. **Clean up old files:**
    ```bash
-   # Remove .gitsync cache
-   rm -rf /path/to/repo/.gitsync
+   # Remove .gitbridge cache
+   rm -rf /path/to/repo/.gitbridge
    
    # Full resync after cleanup
-   gitsync sync --force --config config.yaml
+   gitbridge sync --force --config config.yaml
    ```
 
 ## Configuration Issues
@@ -382,7 +382,7 @@ This will check:
 2. **Use .env file:**
    ```bash
    echo "GITHUB_TOKEN=ghp_YourToken" > .env
-   # GitSync will load .env automatically
+   # GitBridge will load .env automatically
    ```
 
 ## Performance Issues
@@ -398,7 +398,7 @@ This will check:
 
 1. **Use API method (faster):**
    ```bash
-   gitsync sync --method api --config config.yaml
+   gitbridge sync --method api --config config.yaml
    ```
 
 2. **Enable parallel downloads:**
@@ -418,7 +418,7 @@ This will check:
 4. **Use incremental mode:**
    ```bash
    # Default behavior, but ensure it's enabled
-   gitsync sync --incremental --config config.yaml
+   gitbridge sync --incremental --config config.yaml
    ```
 
 ## Repository-Specific Issues
@@ -456,7 +456,7 @@ This will check:
 
 !!! error "Error Message"
     ```
-    GitSyncError: Reference 'feature/branch' not found in repository
+    GitBridgeError: Reference 'feature/branch' not found in repository
     ```
 
 **Solutions:**
@@ -471,13 +471,13 @@ This will check:
 2. **Use correct reference:**
    ```bash
    # Branch
-   gitsync sync --ref main
+   gitbridge sync --ref main
    
    # Tag
-   gitsync sync --ref v1.0.0
+   gitbridge sync --ref v1.0.0
    
    # Commit SHA
-   gitsync sync --ref abc123def
+   gitbridge sync --ref abc123def
    ```
 
 ## Debug Mode
@@ -486,7 +486,7 @@ For persistent issues, enable debug mode:
 
 ```bash
 # Maximum verbosity
-gitsync sync --config config.yaml \
+gitbridge sync --config config.yaml \
   --verbose \
   --log-file debug.log
 
@@ -500,18 +500,18 @@ If these solutions don't resolve your issue:
 
 1. **Run diagnostics:**
    ```bash
-   gitsync diagnose --verbose > diagnostic.txt
+   gitbridge diagnose --verbose > diagnostic.txt
    ```
 
 2. **Collect information:**
-   - GitSync version: `gitsync --version`
+   - GitBridge version: `gitbridge --version`
    - Python version: `python --version`
    - Operating system: `uname -a` (Linux/macOS) or `ver` (Windows)
    - Full error message and stack trace
    - Configuration file (remove sensitive data)
 
 3. **Create issue:**
-   - Visit: https://github.com/nevedomski/gitsync/issues/new
+   - Visit: https://github.com/nevedomski/gitbridge/issues/new
    - Include diagnostic information
    - Describe steps to reproduce
 
@@ -519,12 +519,12 @@ If these solutions don't resolve your issue:
 
 1. **Test configuration early:**
    ```bash
-   gitsync status --config config.yaml
+   gitbridge status --config config.yaml
    ```
 
 2. **Use verbose mode during setup:**
    ```bash
-   gitsync sync --verbose --dry-run
+   gitbridge sync --verbose --dry-run
    ```
 
 3. **Keep credentials secure:**
@@ -533,10 +533,10 @@ If these solutions don't resolve your issue:
 
 4. **Monitor rate limits:**
    ```bash
-   gitsync status --show-limits
+   gitbridge status --show-limits
    ```
 
 5. **Regular updates:**
    ```bash
-   pip install --upgrade gitsync
+   pip install --upgrade gitbridge
    ```

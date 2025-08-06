@@ -1,10 +1,10 @@
 # Proxy Configuration Guide
 
-GitSync provides comprehensive proxy support for corporate and restricted network environments. This guide covers all aspects of configuring and using proxies.
+GitBridge provides comprehensive proxy support for corporate and restricted network environments. This guide covers all aspects of configuring and using proxies.
 
 ## Overview
 
-GitSync supports multiple proxy configurations:
+GitBridge supports multiple proxy configurations:
 
 - **HTTP/HTTPS proxies** - Standard web proxies
 - **SOCKS proxies** - SOCKS4/SOCKS5 proxies
@@ -18,12 +18,12 @@ GitSync supports multiple proxy configurations:
 
 ```bash
 # Simple HTTP proxy
-gitsync sync --repo https://github.com/user/repo \
+gitbridge sync --repo https://github.com/user/repo \
              --local ~/projects/repo \
              --proxy http://proxy.company.com:8080
 
 # Proxy with authentication
-gitsync sync --repo https://github.com/user/repo \
+gitbridge sync --repo https://github.com/user/repo \
              --local ~/projects/repo \
              --proxy http://username:password@proxy.company.com:8080
 ```
@@ -49,7 +49,7 @@ export HTTP_PROXY=http://proxy.company.com:8080
 export HTTPS_PROXY=https://proxy.company.com:8443
 export NO_PROXY=localhost,127.0.0.1,.internal.company.com
 
-# GitSync-specific variables
+# GitBridge-specific variables
 export GITSYNC_PROXY_HTTP=http://proxy.company.com:8080
 export GITSYNC_PROXY_HTTPS=https://proxy.company.com:8443
 ```
@@ -72,7 +72,7 @@ network:
 ```bash
 # Special characters must be URL-encoded
 # @ becomes %40, : becomes %3A, etc.
-gitsync sync --proxy http://user%40domain:pass%3Aword@proxy:8080
+gitbridge sync --proxy http://user%40domain:pass%3Aword@proxy:8080
 ```
 
 ### Secure Credential Storage
@@ -85,8 +85,8 @@ export PROXY_USER=john.doe
 export PROXY_PASS=secret_password
 
 # System keyring (Python keyring)
-python -c "import keyring; keyring.set_password('gitsync', 'proxy_user', 'john.doe')"
-python -c "import keyring; keyring.set_password('gitsync', 'proxy_pass', 'secret')"
+python -c "import keyring; keyring.set_password('gitbridge', 'proxy_user', 'john.doe')"
+python -c "import keyring; keyring.set_password('gitbridge', 'proxy_pass', 'secret')"
 ```
 
 ## PAC Script Configuration
@@ -115,7 +115,7 @@ network:
 
 ```bash
 # Enable PAC auto-detection
-gitsync sync --config config.yaml --auto-proxy
+gitbridge sync --config config.yaml --auto-proxy
 
 # This will check:
 # 1. Windows Registry for PAC URL
@@ -128,7 +128,7 @@ gitsync sync --config config.yaml --auto-proxy
 
 ```bash
 # Test PAC script
-gitsync test-pac --pac-url http://proxy.company.com/proxy.pac \
+gitbridge test-pac --pac-url http://proxy.company.com/proxy.pac \
                   --test-url https://github.com
 
 # Output:
@@ -156,7 +156,7 @@ network:
 
 ```bash
 # SOCKS4 doesn't support authentication
-gitsync sync --proxy socks4://proxy.company.com:1080
+gitbridge sync --proxy socks4://proxy.company.com:1080
 ```
 
 ## Proxy Bypass Rules
@@ -190,7 +190,7 @@ network:
 
 ```python
 # Custom proxy resolver
-from gitsync.pac_support import ProxyResolver
+from gitbridge.pac_support import ProxyResolver
 
 resolver = ProxyResolver()
 resolver.add_rule("*.github.com", "PROXY proxy1:8080")
@@ -204,7 +204,7 @@ resolver.add_rule("10.*", "DIRECT")
 
 ```bash
 # Auto-detect all proxy settings
-gitsync sync --config config.yaml --auto-proxy
+gitbridge sync --config config.yaml --auto-proxy
 
 # What it does:
 # 1. Checks Windows Registry
@@ -218,7 +218,7 @@ gitsync sync --config config.yaml --auto-proxy
 
 ```bash
 # Uses macOS network settings
-gitsync sync --config config.yaml --auto-proxy
+gitbridge sync --config config.yaml --auto-proxy
 
 # Checks:
 # 1. System Preferences → Network → Advanced → Proxies
@@ -229,7 +229,7 @@ gitsync sync --config config.yaml --auto-proxy
 
 ```bash
 # Checks multiple sources
-gitsync sync --config config.yaml --auto-proxy
+gitbridge sync --config config.yaml --auto-proxy
 
 # Sources:
 # 1. Environment variables (HTTP_PROXY, etc.)
@@ -333,11 +333,11 @@ network:
 
 ```bash
 # Test proxy connectivity
-gitsync test-proxy --proxy http://proxy:8080 \
+gitbridge test-proxy --proxy http://proxy:8080 \
                    --test-url https://api.github.com
 
 # Verbose output
-gitsync test-proxy --proxy http://proxy:8080 -v
+gitbridge test-proxy --proxy http://proxy:8080 -v
 
 # Output:
 # Testing proxy: http://proxy:8080
@@ -352,10 +352,10 @@ gitsync test-proxy --proxy http://proxy:8080 -v
 ```bash
 # Enable proxy debugging
 export GITSYNC_DEBUG_PROXY=1
-gitsync sync --config config.yaml -v
+gitbridge sync --config config.yaml -v
 
 # Log all proxy decisions
-gitsync sync --config config.yaml \
+gitbridge sync --config config.yaml \
              --log-level DEBUG \
              --log-file proxy-debug.log
 ```
@@ -364,7 +364,7 @@ gitsync sync --config config.yaml \
 
 ```bash
 # Run comprehensive proxy diagnostics
-gitsync diagnose-proxy
+gitbridge diagnose-proxy
 
 # Output:
 # Proxy Diagnostics
@@ -473,7 +473,7 @@ network:
     
     cache:
       enabled: true
-      cache_dir: ~/.gitsync/proxy-cache
+      cache_dir: ~/.gitbridge/proxy-cache
       max_size: 100MB
       ttl: 3600  # seconds
 ```
@@ -493,18 +493,18 @@ echo $PROXY_PASS | sed 's/./*/g'  # Mask password
 curl -x http://user:pass@proxy:8080 https://api.github.com
 
 # Try different authentication methods
-gitsync sync --proxy http://DOMAIN\\user:pass@proxy:8080  # NTLM
-gitsync sync --proxy http://user@domain:pass@proxy:8080   # Alternative
+gitbridge sync --proxy http://DOMAIN\\user:pass@proxy:8080  # NTLM
+gitbridge sync --proxy http://user@domain:pass@proxy:8080   # Alternative
 ```
 
 #### 2. SSL Certificate Errors with Proxy
 
 ```bash
 # Temporarily disable SSL verification (not recommended)
-gitsync sync --config config.yaml --no-verify-ssl
+gitbridge sync --config config.yaml --no-verify-ssl
 
 # Better: Add proxy CA certificate
-gitsync sync --config config.yaml --proxy-ca /path/to/proxy-ca.crt
+gitbridge sync --config config.yaml --proxy-ca /path/to/proxy-ca.crt
 ```
 
 #### 3. PAC Script Not Working
@@ -512,10 +512,10 @@ gitsync sync --config config.yaml --proxy-ca /path/to/proxy-ca.crt
 ```bash
 # Download and test PAC script manually
 curl http://proxy.company.com/proxy.pac -o proxy.pac
-gitsync test-pac --pac-file proxy.pac --test-url https://github.com
+gitbridge test-pac --pac-file proxy.pac --test-url https://github.com
 
 # Use PAC script directly
-gitsync sync --pac-file ./proxy.pac
+gitbridge sync --pac-file ./proxy.pac
 ```
 
 #### 4. Proxy Timeout
@@ -552,7 +552,7 @@ network:
 
 ```bash
 # Always test before production use
-gitsync validate --config config.yaml --check-network
+gitbridge validate --config config.yaml --check-network
 ```
 
 ### 3. Document Proxy Requirements
@@ -575,10 +575,10 @@ network:
 
 ```bash
 # Enable metrics
-gitsync sync --config config.yaml --metrics
+gitbridge sync --config config.yaml --metrics
 
 # Check proxy latency
-gitsync benchmark-proxy --proxy http://proxy:8080
+gitbridge benchmark-proxy --proxy http://proxy:8080
 ```
 
 ## Next Steps

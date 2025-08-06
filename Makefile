@@ -10,7 +10,7 @@ help:
 	@echo "  make type-check   Type check with mypy"
 	@echo "  make test         Run tests with pytest"
 	@echo "  make clean        Clean build artifacts"
-	@echo "  make run ARGS=... Run gitsync CLI with arguments"
+	@echo "  make run ARGS=... Run gitbridge CLI with arguments"
 
 install:
 	uv pip install -e .
@@ -28,7 +28,7 @@ lint:
 	uv run ruff check . --fix
 
 type-check:
-	uv run mypy gitsync
+	uv run mypy gitbridge
 
 test:
 	uv run pytest
@@ -42,4 +42,4 @@ clean:
 
 # Usage: make run ARGS="sync --config config.yaml"
 run:
-	uv run gitsync $(ARGS)
+	uv run gitbridge $(ARGS)

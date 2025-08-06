@@ -1,11 +1,76 @@
 # Changelog
 
-All notable changes to GitSync will be documented in this file.
+All notable changes to GitBridge will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Security
+- Identified path traversal vulnerability in file_synchronizer.py
+- Identified proxy URL validation issue in browser_sync.py
+- Identified race condition in certificate cleanup
+
+### Planned for 1.0.0
+- Security fixes for all identified vulnerabilities
+- Performance improvements (parallel downloads, connection pooling)
+- PyPI package distribution
+- Windows installer
+
+## [0.4.2b1] - 2025-08-06
+
+### Added
+- **Project Documentation**
+  - SECURITY.md with vulnerability disclosure policy
+  - ROADMAP.md with detailed development timeline
+  - CONTRIBUTING.md with contribution guidelines
+  - Comprehensive review documentation in PROJECT_STATUS.md
+
+### Changed
+- **Documentation**
+  - Updated README with production status and security monitoring
+  - Added comprehensive review results and action items
+  - Fixed Selenium references to Playwright throughout docs
+  - Enhanced project status with prioritized action items
+
+### Security
+- Documented critical security issues pending fixes:
+  - Path traversal vulnerability in FileSynchronizer
+  - Proxy URL validation in BrowserSync
+  - Race condition in certificate cleanup
+
+## [0.4.1b1] - 2025-08-06
+
+### Added
+- **Comprehensive Review Process**
+  - Product management review completed
+  - Architecture review completed
+  - Documentation review completed
+  - Code quality review completed
+  - Security audit performed
+
+### Fixed
+- All ruff linting issues resolved
+- All mypy type checking errors fixed
+- Test isolation issues addressed
+- Documentation formatting issues corrected
+
+## [0.4.0b1] - 2025-08-06
+
+### Changed
+- **Version Numbering**
+  - Updated to semantic versioning 0.4.x series
+  - Marked as beta (b1) pending security fixes
+
+### Fixed
+- **Type Hints and Code Quality**
+  - Fixed all remaining type hints across 15 source files
+  - Resolved 110+ mypy type annotation issues
+  - Fixed RateLimitError and ProxyError exception classes
+  - Updated test expectations for correct exception structure
+  - All 502 tests now passing (7 skipped)
+  - Achieved 83% overall test coverage
 
 ## [0.3.0b1] - 2025-08-06
 
@@ -175,6 +240,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 0.4.2b1 | 2025-08-06 | Added security documentation, roadmap, and contribution guidelines |
+| 0.4.1b1 | 2025-08-06 | Comprehensive review completed, all quality checks passing |
+| 0.4.0b1 | 2025-08-06 | Fixed all type hints, 502 tests passing, 83% coverage |
 | 0.3.0b1 | 2025-08-06 | Beta release with CI/CD improvements and bug fixes |
 | 0.2.0 | 2025-08-06 | Major refactoring with component architecture, Playwright migration, comprehensive testing |
 | 0.1.0 | 2025-01-15 | First stable release with full feature set |
@@ -182,11 +250,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Upgrade Guide
 
+### From 0.3.x to 0.4.x
+
+1. **Security Considerations:**
+   - Review SECURITY.md for known vulnerabilities
+   - Avoid syncing untrusted repositories until 1.0.0 release
+   - Validate proxy URLs before use
+
+2. **Browser Automation:**
+   - Selenium has been completely replaced with Playwright
+   - Update any custom scripts that reference Selenium
+
+3. **Type Hints:**
+   - All code now has complete type annotations
+   - Update any custom integrations to match new type signatures
+
+### From 0.2.x to 0.3.x
+
+1. **No Breaking Changes:**
+   - This version maintains full backward compatibility
+   - All existing configurations continue to work
+
+### From 0.1.x to 0.2.x
+
+1. **Component Architecture:**
+   - Internal refactoring doesn't affect external API
+   - All CLI commands remain the same
+
 ### From 0.0.x to 0.1.0
 
 1. **Configuration Changes:**
    - The configuration schema has been updated
-   - Run `gitsync migrate-config` to update your configuration files
+   - Run `gitbridge migrate-config` to update your configuration files
    - New fields added for proxy and certificate configuration
 
 2. **Command Changes:**
@@ -200,5 +295,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For questions about upgrading or changelog entries:
 
-- Open an issue: [GitHub Issues](https://github.com/nevedomski/gitsync/issues)
-- Check documentation: [GitSync Documentation](https://nevedomski.github.io/gitSync/)
+- Open an issue: [GitHub Issues](https://github.com/nevedomski/gitbridge/issues)
+- Check documentation: [GitBridge Documentation](https://nevedomski.github.io/gitBridge/)

@@ -1,12 +1,12 @@
 # Authentication Guide
 
-GitSync supports multiple authentication methods for accessing GitHub repositories. This guide covers how to set up and manage authentication securely.
+GitBridge supports multiple authentication methods for accessing GitHub repositories. This guide covers how to set up and manage authentication securely.
 
 ## Authentication Methods
 
 ### 1. Personal Access Token (Recommended)
 
-Personal Access Tokens (PATs) are the recommended authentication method for GitSync.
+Personal Access Tokens (PATs) are the recommended authentication method for GitBridge.
 
 #### Creating a Personal Access Token
 
@@ -24,7 +24,7 @@ Personal Access Tokens (PATs) are the recommended authentication method for GitS
 
 ```bash
 export GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxx
-gitsync sync --repo https://github.com/user/repo --local ~/projects/repo
+gitbridge sync --repo https://github.com/user/repo --local ~/projects/repo
 ```
 
 **Configuration File:**
@@ -37,7 +37,7 @@ auth:
 **Command Line (Not Recommended):**
 
 ```bash
-gitsync sync --token ghp_xxxxxxxxxxxxxxxxxxxx ...
+gitbridge sync --token ghp_xxxxxxxxxxxxxxxxxxxx ...
 ```
 
 ### 2. GitHub App Installation Token
@@ -56,7 +56,7 @@ auth:
 Public repositories can be accessed without authentication:
 
 ```bash
-gitsync sync --repo https://github.com/torvalds/linux --local ~/linux
+gitbridge sync --repo https://github.com/torvalds/linux --local ~/linux
 ```
 
 **Note:** Anonymous access has lower rate limits (60 requests/hour vs 5000 for authenticated).
@@ -119,7 +119,7 @@ export GITHUB_TOKEN=$NEW_TOKEN
 echo $NEW_TOKEN | secret-tool store --label="GitHub Token" service github
 
 # Test new token
-gitsync validate --config config.yaml
+gitbridge validate --config config.yaml
 ```
 
 ## Environment-Specific Setup
@@ -138,7 +138,7 @@ Load in shell:
 
 ```bash
 source .env
-gitsync sync --config config.yaml
+gitbridge sync --config config.yaml
 ```
 
 ### CI/CD Pipelines
@@ -160,8 +160,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.SYNC_TOKEN }}
         run: |
-          pip install gitsync
-          gitsync sync --config config.yaml
+          pip install gitbridge
+          gitbridge sync --config config.yaml
 ```
 
 #### Jenkins
@@ -175,7 +175,7 @@ pipeline {
     stages {
         stage('Sync') {
             steps {
-                sh 'gitsync sync --config config.yaml'
+                sh 'gitbridge sync --config config.yaml'
             }
         }
     }
@@ -189,7 +189,7 @@ pipeline {
 sync:
   script:
     - export GITHUB_TOKEN=$GITHUB_TOKEN
-    - gitsync sync --config config.yaml
+    - gitbridge sync --config config.yaml
   variables:
     GITHUB_TOKEN: $GITHUB_TOKEN
 ```
@@ -200,20 +200,20 @@ sync:
 # Dockerfile
 FROM python:3.11-slim
 
-RUN pip install gitsync
+RUN pip install gitbridge
 
 # Use build args for tokens (don't bake into image)
 ARG GITHUB_TOKEN
 ENV GITHUB_TOKEN=$GITHUB_TOKEN
 
-CMD ["gitsync", "sync", "--config", "/config/config.yaml"]
+CMD ["gitbridge", "sync", "--config", "/config/config.yaml"]
 ```
 
 Build and run:
 
 ```bash
-docker build --build-arg GITHUB_TOKEN=$GITHUB_TOKEN -t gitsync .
-docker run -e GITHUB_TOKEN=$GITHUB_TOKEN gitsync
+docker build --build-arg GITHUB_TOKEN=$GITHUB_TOKEN -t gitbridge .
+docker run -e GITHUB_TOKEN=$GITHUB_TOKEN gitbridge
 ```
 
 ### Kubernetes Secrets
@@ -233,13 +233,13 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gitsync
+  name: gitbridge
 spec:
   template:
     spec:
       containers:
-      - name: gitsync
-        image: gitsync:latest
+      - name: gitbridge
+        image: gitbridge:latest
         env:
         - name: GITHUB_TOKEN
           valueFrom:
@@ -287,7 +287,7 @@ sync:
 
 browser:
   headless: false  # Shows browser for manual login
-  user_data_dir: ~/.gitsync/browser  # Saves session
+  user_data_dir: ~/.gitbridge/browser  # Saves session
 ```
 
 ## Rate Limits
@@ -307,8 +307,8 @@ Check rate limit status:
 curl -H "Authorization: token $GITHUB_TOKEN" \
   https://api.github.com/rate_limit
 
-# Using GitSync
-gitsync status --show-rate-limit
+# Using GitBridge
+gitbridge status --show-rate-limit
 ```
 
 ## Multi-Account Setup
@@ -316,11 +316,11 @@ gitsync status --show-rate-limit
 Configure multiple accounts using profiles:
 
 ```yaml
-# ~/.gitsync/profiles/personal.yaml
+# ~/.gitbridge/profiles/personal.yaml
 auth:
   token: ${PERSONAL_GITHUB_TOKEN}
 
-# ~/.gitsync/profiles/work.yaml
+# ~/.gitbridge/profiles/work.yaml
 auth:
   token: ${WORK_GITHUB_TOKEN}
 ```
@@ -329,10 +329,10 @@ Use profiles:
 
 ```bash
 # Personal account
-GITHUB_TOKEN=$PERSONAL_TOKEN gitsync sync --config personal.yaml
+GITHUB_TOKEN=$PERSONAL_TOKEN gitbridge sync --config personal.yaml
 
 # Work account
-GITHUB_TOKEN=$WORK_TOKEN gitsync sync --config work.yaml
+GITHUB_TOKEN=$WORK_TOKEN gitbridge sync --config work.yaml
 ```
 
 ## OAuth App Authentication
@@ -340,7 +340,7 @@ GITHUB_TOKEN=$WORK_TOKEN gitsync sync --config work.yaml
 For OAuth applications:
 
 ```python
-from gitsync import GitHubAPISync
+from gitbridge import GitHubAPISync
 
 # OAuth token from your app
 oauth_token = get_oauth_token()
@@ -398,7 +398,7 @@ curl -I -H "Authorization: token $GITHUB_TOKEN" \
 **Solution:**
 ```bash
 # Check rate limit
-gitsync status --show-rate-limit
+gitbridge status --show-rate-limit
 
 # Wait for reset or use different token
 ```
@@ -408,7 +408,7 @@ gitsync status --show-rate-limit
 Enable debug logging to troubleshoot:
 
 ```bash
-gitsync sync --config config.yaml -v --log-level DEBUG
+gitbridge sync --config config.yaml -v --log-level DEBUG
 ```
 
 This shows:

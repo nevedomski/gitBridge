@@ -1,16 +1,15 @@
-site_name: GitSync Documentation
+site_name: GitBridge Documentation
 site_description: GitHub Repository Synchronization Tool - Documentation
-site_author: GitSync Team
-site_url: https://nevedomski.github.io/gitSync/
-repo_url: https://github.com/nevedomski/gitsync
-repo_name: gitsync
+site_author: GitBridge Team
+site_url: https://nevedomski.github.io/gitBridge/
+repo_url: https://github.com/nevedomski/gitbridge
+repo_name: gitbridge
 edit_uri: edit/main/docs/
-copyright: Copyright &copy; 2025 GitSync Team
+copyright: Copyright &copy; 2025 GitBridge Team
 
 theme:
   name: material
   language: en
-  custom_dir: docs/overrides
   
   font:
     text: Roboto
@@ -90,7 +89,7 @@ plugins:
       default_handler: python
       handlers:
         python:
-          paths: [gitsync]
+          paths: [gitbridge]
           options:
             show_source: true
             show_root_heading: true
@@ -147,7 +146,7 @@ markdown_extensions:
       normalize_issue_symbols: true
       repo_url_shorthand: true
       user: nevedomski
-      repo: gitsync
+      repo: gitbridge
   - pymdownx.mark
   - pymdownx.smartsymbols
   - pymdownx.superfences:
@@ -173,11 +172,11 @@ extra:
     default: stable
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/nevedomski/gitsync
-      name: GitSync on GitHub
+      link: https://github.com/nevedomski/gitbridge
+      name: GitBridge on GitHub
     - icon: fontawesome/brands/python
-      link: https://pypi.org/project/gitsync/
-      name: GitSync on PyPI
+      link: https://pypi.org/project/gitbridge/
+      name: GitBridge on PyPI
   analytics:
     provider: google
     property: G-XXXXXXXXXX
@@ -194,7 +193,7 @@ extra:
           data: 0
           note: >-
             Thanks for your feedback! Help us improve this page by
-            using our <a href="https://github.com/nevedomski/gitsync/issues/new/?title=[Feedback]+{title}">feedback form</a>.
+            using our <a href="https://github.com/nevedomski/gitbridge/issues/new/?title=[Feedback]+{title}">feedback form</a>.
   consent:
     title: Cookie consent
     description: >-

@@ -1,6 +1,6 @@
 # Installation
 
-This guide covers all installation methods for GitSync, including optional components for corporate environments.
+This guide covers all installation methods for GitBridge, including optional components for corporate environments.
 
 ## System Requirements
 
@@ -9,7 +9,7 @@ This guide covers all installation methods for GitSync, including optional compo
 - **Python**: 3.9 or higher
 - **Operating System**: Windows 10+, macOS 10.14+, or Linux (Ubuntu 18.04+)
 - **Memory**: 512 MB RAM
-- **Disk Space**: 100 MB for GitSync + space for repositories
+- **Disk Space**: 100 MB for GitBridge + space for repositories
 - **Network**: HTTPS access to github.com
 
 ### Recommended Requirements
@@ -26,13 +26,13 @@ The simplest installation method using Python's package manager:
 
 ```bash
 # Basic installation
-pip install gitsync
+pip install gitbridge
 
 # With all optional dependencies
-pip install gitsync[full]
+pip install gitbridge[full]
 
 # For development
-pip install gitsync[dev]
+pip install gitbridge[dev]
 ```
 
 ### Method 2: Using uv (Recommended)
@@ -45,11 +45,11 @@ pip install gitsync[dev]
     # Install uv
     curl -LsSf https://astral.sh/uv/install.sh | sh
     
-    # Install gitsync
-    uv pip install gitsync
+    # Install gitbridge
+    uv pip install gitbridge
     
     # With optional dependencies
-    uv pip install "gitsync[pac,win]"
+    uv pip install "gitbridge[pac,win]"
     ```
 
 === "Windows"
@@ -58,11 +58,11 @@ pip install gitsync[dev]
     # Install uv
     powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
     
-    # Install gitsync
-    uv pip install gitsync
+    # Install gitbridge
+    uv pip install gitbridge
     
     # With Windows-specific features
-    uv pip install "gitsync[pac,win]"
+    uv pip install "gitbridge[pac,win]"
     ```
 
 ### Method 3: From Source
@@ -71,8 +71,8 @@ Install directly from the GitHub repository:
 
 ```bash
 # Clone the repository
-git clone https://github.com/nevedomski/gitsync
-cd gitsync
+git clone https://github.com/nevedomski/gitbridge
+cd gitbridge
 
 # Install with uv
 uv pip install -e .
@@ -86,14 +86,14 @@ uv pip install -e ".[dev]"
 
 ## Optional Dependencies
 
-GitSync has several optional dependency groups for specific features:
+GitBridge has several optional dependency groups for specific features:
 
 ### PAC Proxy Support
 
 For automatic proxy detection from PAC scripts (Windows/Chrome):
 
 ```bash
-pip install "gitsync[pac]"
+pip install "gitbridge[pac]"
 ```
 
 This installs:
@@ -104,7 +104,7 @@ This installs:
 For automatic certificate extraction from Windows certificate store:
 
 ```bash
-pip install "gitsync[win]"
+pip install "gitbridge[win]"
 ```
 
 This installs:
@@ -113,10 +113,10 @@ This installs:
 
 ### Development Dependencies
 
-For contributing to GitSync:
+For contributing to GitBridge:
 
 ```bash
-pip install "gitsync[dev]"
+pip install "gitbridge[dev]"
 ```
 
 This installs:
@@ -131,9 +131,9 @@ This installs:
 Install all optional dependencies:
 
 ```bash
-pip install "gitsync[full]"
+pip install "gitbridge[full]"
 # or
-pip install "gitsync[pac,win,dev]"
+pip install "gitbridge[pac,win,dev]"
 ```
 
 ## Browser Mode Setup
@@ -195,22 +195,22 @@ ChromeDriver is automatically managed by Selenium, but you can install it manual
 
 ## Verification
 
-After installation, verify GitSync is working:
+After installation, verify GitBridge is working:
 
 ```bash
 # Check version
-gitsync --version
+gitbridge --version
 
 # Show help
-gitsync --help
+gitbridge --help
 
 # Test configuration
-gitsync status
+gitbridge status
 ```
 
 Expected output:
 ```
-GitSync version 0.1.0
+GitBridge version 0.1.0
 Python 3.11.5
 System: Linux-6.15.8-200.fc42.x86_64
 ```
@@ -227,7 +227,7 @@ export HTTP_PROXY=http://proxy.company.com:8080
 export HTTPS_PROXY=http://proxy.company.com:8080
 
 # Install with proxy
-pip install --proxy http://proxy.company.com:8080 gitsync
+pip install --proxy http://proxy.company.com:8080 gitbridge
 ```
 
 ### 2. Custom Certificate Bundle
@@ -237,8 +237,8 @@ pip install --proxy http://proxy.company.com:8080 gitsync
 export REQUESTS_CA_BUNDLE=/path/to/company/ca-bundle.crt
 export SSL_CERT_FILE=/path/to/company/ca-bundle.crt
 
-# Or use GitSync's auto-detection
-gitsync sync --auto-cert
+# Or use GitBridge's auto-detection
+gitbridge sync --auto-cert
 ```
 
 ### 3. Offline Installation
@@ -247,28 +247,28 @@ For air-gapped environments:
 
 ```bash
 # On a machine with internet access
-pip download gitsync -d ./offline_packages
+pip download gitbridge -d ./offline_packages
 pip download -r requirements.txt -d ./offline_packages
 
 # Transfer offline_packages directory to target machine
 
 # On the target machine
-pip install --no-index --find-links ./offline_packages gitsync
+pip install --no-index --find-links ./offline_packages gitbridge
 ```
 
-## Updating GitSync
+## Updating GitBridge
 
 ### Update to Latest Version
 
 ```bash
 # Using pip
-pip install --upgrade gitsync
+pip install --upgrade gitbridge
 
 # Using uv
-uv pip install --upgrade gitsync
+uv pip install --upgrade gitbridge
 
 # From source
-cd gitsync
+cd gitbridge
 git pull
 pip install -e .
 ```
@@ -277,26 +277,26 @@ pip install -e .
 
 ```bash
 # Check current version
-gitsync --version
+gitbridge --version
 
 # Check latest version on PyPI
-pip index versions gitsync
+pip index versions gitbridge
 ```
 
 ## Uninstallation
 
-To completely remove GitSync:
+To completely remove GitBridge:
 
 ```bash
 # Using pip
-pip uninstall gitsync
+pip uninstall gitbridge
 
 # Remove configuration files (optional)
-rm -rf ~/.gitsync
-rm ~/.gitsyncrc  # If exists
+rm -rf ~/.gitbridge
+rm ~/.gitbridgerc  # If exists
 
 # Remove cached data (optional)
-rm -rf ~/.cache/gitsync
+rm -rf ~/.cache/gitbridge
 ```
 
 ## Troubleshooting Installation
@@ -306,24 +306,24 @@ rm -rf ~/.cache/gitsync
 !!! warning "Permission Denied"
     If you get permission errors, use `--user` flag:
     ```bash
-    pip install --user gitsync
+    pip install --user gitbridge
     ```
 
 !!! warning "Python Version Error"
-    GitSync requires Python 3.9+. Check your version:
+    GitBridge requires Python 3.9+. Check your version:
     ```bash
     python --version
     ```
     
     Use `python3` if needed:
     ```bash
-    python3 -m pip install gitsync
+    python3 -m pip install gitbridge
     ```
 
 !!! warning "SSL Certificate Error"
     For SSL errors in corporate environments:
     ```bash
-    pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org gitsync
+    pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org gitbridge
     ```
 
 ### Getting Help
@@ -331,16 +331,16 @@ rm -rf ~/.cache/gitsync
 If you encounter issues:
 
 1. Check [Troubleshooting Guide](../troubleshooting/index.md)
-2. Search [GitHub Issues](https://github.com/nevedomski/gitsync/issues)
-3. Create a [new issue](https://github.com/nevedomski/gitsync/issues/new) with:
+2. Search [GitHub Issues](https://github.com/nevedomski/gitbridge/issues)
+3. Create a [new issue](https://github.com/nevedomski/gitbridge/issues/new) with:
    - Python version (`python --version`)
-   - GitSync version (`gitsync --version`)
+   - GitBridge version (`gitbridge --version`)
    - Full error message
    - Operating system details
 
 ## Next Steps
 
-Now that GitSync is installed:
+Now that GitBridge is installed:
 
 - [Quick Start Guide](quick-start.md) - Start syncing repositories
 - [Configuration](configuration-basics.md) - Set up your preferences

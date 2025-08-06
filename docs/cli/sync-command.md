@@ -5,7 +5,7 @@ The `sync` command is the primary command for synchronizing GitHub repositories 
 ## Synopsis
 
 ```bash
-gitsync sync [OPTIONS]
+gitbridge sync [OPTIONS]
 ```
 
 ## Description
@@ -82,10 +82,10 @@ Either provide a configuration file OR specify repository and local path:
 
 ```bash
 # Sync a public repository
-gitsync sync --repo https://github.com/python/cpython --local ~/cpython
+gitbridge sync --repo https://github.com/python/cpython --local ~/cpython
 
 # Sync a private repository with token
-gitsync sync \
+gitbridge sync \
   --repo https://github.com/company/private-repo \
   --local ~/projects/private-repo \
   --token ghp_YourGitHubToken
@@ -95,29 +95,29 @@ gitsync sync \
 
 ```bash
 # With configuration file
-gitsync sync --config ~/.gitsync/config.yaml
+gitbridge sync --config ~/.gitbridge/config.yaml
 
 # Override config file settings
-gitsync sync --config config.yaml --ref develop --force
+gitbridge sync --config config.yaml --ref develop --force
 ```
 
 ### Specific Branch or Tag
 
 ```bash
 # Sync specific branch
-gitsync sync \
+gitbridge sync \
   --repo https://github.com/user/repo \
   --local ~/repo \
   --ref feature/new-feature
 
 # Sync specific tag
-gitsync sync \
+gitbridge sync \
   --repo https://github.com/user/repo \
   --local ~/repo \
   --ref v2.0.0
 
 # Sync specific commit
-gitsync sync \
+gitbridge sync \
   --repo https://github.com/user/repo \
   --local ~/repo \
   --ref abc123def456
@@ -127,20 +127,20 @@ gitsync sync \
 
 ```bash
 # Auto-detect proxy and certificates
-gitsync sync \
+gitbridge sync \
   --config config.yaml \
   --auto-proxy \
   --auto-cert
 
 # Manual proxy configuration
-gitsync sync \
+gitbridge sync \
   --repo https://github.com/user/repo \
   --local ~/repo \
   --proxy http://proxy.company.com:8080 \
   --proxy-auth domain\\username:password
 
 # Custom certificate bundle
-gitsync sync \
+gitbridge sync \
   --config config.yaml \
   --ca-bundle /path/to/company-ca-bundle.crt
 ```
@@ -149,20 +149,20 @@ gitsync sync \
 
 ```bash
 # Use browser method
-gitsync sync \
+gitbridge sync \
   --repo https://github.com/user/repo \
   --local ~/repo \
   --method browser
 
 # Browser with custom path
-gitsync sync \
+gitbridge sync \
   --repo https://github.com/user/repo \
   --local ~/repo \
   --method browser \
   --browser-path /usr/bin/chromium
 
 # Browser in visible mode (for debugging)
-gitsync sync \
+gitbridge sync \
   --repo https://github.com/user/repo \
   --local ~/repo \
   --method browser \
@@ -173,27 +173,27 @@ gitsync sync \
 
 ```bash
 # Dry run to see what would be synced
-gitsync sync \
+gitbridge sync \
   --config config.yaml \
   --dry-run \
   --verbose
 
 # Force full sync (ignore cache)
-gitsync sync \
+gitbridge sync \
   --config config.yaml \
   --force \
   --full
 
 # JSON output for scripting
-gitsync sync \
+gitbridge sync \
   --config config.yaml \
   --json > sync-result.json
 
 # Quiet mode with log file
-gitsync sync \
+gitbridge sync \
   --config config.yaml \
   --quiet \
-  --log-file ~/.gitsync/sync.log
+  --log-file ~/.gitbridge/sync.log
 ```
 
 ## Configuration File
@@ -257,7 +257,7 @@ The sync command respects these environment variables:
 ### Standard Output
 
 ```
-GitSync v0.1.0
+GitBridge v0.1.0
 Repository: https://github.com/user/repo (branch: main)
 Local path: /home/user/projects/repo
 
@@ -342,35 +342,35 @@ With `--verbose` flag, additional information is shown:
 
 ```bash
 # Check token is valid
-gitsync sync --repo https://github.com/user/private-repo --token YOUR_TOKEN
+gitbridge sync --repo https://github.com/user/private-repo --token YOUR_TOKEN
 
 # Token from environment
 export GITHUB_TOKEN=ghp_YourToken
-gitsync sync --repo https://github.com/user/private-repo
+gitbridge sync --repo https://github.com/user/private-repo
 ```
 
 ### Proxy Issues
 
 ```bash
 # Test with auto-detection
-gitsync sync --auto-proxy --verbose
+gitbridge sync --auto-proxy --verbose
 
 # Manual proxy with authentication
 export HTTPS_PROXY=http://user:pass@proxy:8080
-gitsync sync --config config.yaml
+gitbridge sync --config config.yaml
 ```
 
 ### SSL Certificate Errors
 
 ```bash
 # Try auto-detection first
-gitsync sync --auto-cert
+gitbridge sync --auto-cert
 
 # Custom certificate bundle
-gitsync sync --ca-bundle /path/to/certs.pem
+gitbridge sync --ca-bundle /path/to/certs.pem
 
 # Last resort (insecure!)
-gitsync sync --no-ssl-verify
+gitbridge sync --no-ssl-verify
 ```
 
 ## See Also

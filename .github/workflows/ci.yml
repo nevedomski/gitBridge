@@ -42,7 +42,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          uv sync --all
+          uv sync --all-extras
               
       - name: 🔬 Unit tests with coverage
         shell: bash
@@ -50,16 +50,16 @@ jobs:
           # Run platform-specific tests based on the OS
           if [[ "${{ runner.os }}" == "Windows" ]]; then
             # On Windows, run all tests including Windows-specific ones
-            uv run pytest --maxfail=1 --disable-warnings --cov=gitsync --cov-report=xml
+            uv run pytest --maxfail=1 --disable-warnings --cov=gitbridge --cov-report=xml
           elif [[ "${{ runner.os }}" == "Linux" ]]; then
             # On Linux, skip Windows-specific tests
-            uv run pytest --maxfail=1 --disable-warnings --cov=gitsync --cov-report=xml -m "not windows"
+            uv run pytest --maxfail=1 --disable-warnings --cov=gitbridge --cov-report=xml -m "not windows"
           elif [[ "${{ runner.os }}" == "macOS" ]]; then
             # On macOS, skip Windows-specific tests
-            uv run pytest --maxfail=1 --disable-warnings --cov=gitsync --cov-report=xml -m "not windows"
+            uv run pytest --maxfail=1 --disable-warnings --cov=gitbridge --cov-report=xml -m "not windows"
           else
             # Fallback - skip Windows-specific tests
-            uv run pytest --maxfail=1 --disable-warnings --cov=gitsync --cov-report=xml -m "not windows"
+            uv run pytest --maxfail=1 --disable-warnings --cov=gitbridge --cov-report=xml -m "not windows"
           fi
 
       - name: 📊 Upload coverage to Codecov

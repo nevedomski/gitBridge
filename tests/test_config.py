@@ -7,8 +7,8 @@ from unittest.mock import patch
 import pytest
 import yaml
 
-from gitsync.config import DEFAULT_CONFIG, Config
-from gitsync.exceptions import ConfigurationError
+from gitbridge.config import DEFAULT_CONFIG, Config
+from gitbridge.exceptions import ConfigurationError
 
 
 class TestConfig:
@@ -18,7 +18,7 @@ class TestConfig:
         """Test Config initialization without config file"""
         import copy
 
-        with patch("gitsync.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
+        with patch("gitbridge.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
             config = Config()
 
         assert config.config_file is None
@@ -34,7 +34,7 @@ class TestConfig:
         with open(config_file, "w") as f:
             yaml.dump(test_config, f)
 
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config(config_file)
 
         assert config.config_file == config_file
@@ -43,7 +43,7 @@ class TestConfig:
     def test_init_calls_load_env(self):
         """Test that initialization calls load_env"""
         with (
-            patch("gitsync.config.load_dotenv") as mock_load_dotenv,
+            patch("gitbridge.config.load_dotenv") as mock_load_dotenv,
             patch.object(Config, "load_env") as mock_load_env,
             patch.dict(os.environ, {}, clear=True),
         ):
@@ -55,9 +55,9 @@ class TestConfig:
     def test_default_config_values(self):
         """Test default configuration values"""
         with (
-            patch("gitsync.config.load_dotenv"),
+            patch("gitbridge.config.load_dotenv"),
             patch.dict(os.environ, {}, clear=True),
-            patch("gitsync.config.Path.exists", return_value=False),
+            patch("gitbridge.config.Path.exists", return_value=False),
         ):
             config = Config()
 
@@ -87,7 +87,7 @@ class TestConfigLoadFile:
         with open(config_file, "w") as f:
             yaml.dump(test_config, f)
 
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
             config.load_file(config_file)
 
@@ -98,7 +98,7 @@ class TestConfigLoadFile:
 
     def test_load_file_nonexistent(self):
         """Test loading non-existent file"""
-        with patch("gitsync.config.load_dotenv"), patch("gitsync.config.logger") as mock_logger:
+        with patch("gitbridge.config.load_dotenv"), patch("gitbridge.config.logger") as mock_logger:
             config = Config()
             config.load_file("/nonexistent/config.yaml")
 
@@ -111,7 +111,7 @@ class TestConfigLoadFile:
         with open(config_file, "w") as f:
             f.write("")
 
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
             original_config = config.config.copy()
             config.load_file(config_file)
@@ -125,7 +125,7 @@ class TestConfigLoadFile:
         with open(config_file, "w") as f:
             f.write("invalid: yaml: content: [")
 
-        with patch("gitsync.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
+        with patch("gitbridge.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
             config = Config()
             with pytest.raises(ConfigurationError, match="Invalid YAML syntax"):
                 config.load_file(config_file)
@@ -138,7 +138,7 @@ class TestConfigLoadFile:
         with open(config_file, "w") as f:
             yaml.dump(test_config, f)
 
-        with patch("gitsync.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
+        with patch("gitbridge.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
             config = Config()
             config.load_file(config_file)
 
@@ -154,9 +154,9 @@ class TestConfigLoadFile:
         config_file = os.path.join(temp_dir, "restricted_config.yaml")
 
         with (
-            patch("gitsync.config.Path.exists", return_value=True),
+            patch("gitbridge.config.Path.exists", return_value=True),
             patch("builtins.open", side_effect=PermissionError("Permission denied")),
-            patch("gitsync.config.load_dotenv"),
+            patch("gitbridge.config.load_dotenv"),
             patch.dict(os.environ, {}, clear=True),
         ):
             config = Config()
@@ -171,87 +171,90 @@ class TestConfigLoadEnv:
         """Test loading GITHUB_REPO_URL environment variable"""
         with (
             patch.dict(os.environ, {"GITHUB_REPO_URL": "https://github.com/env/repo"}, clear=True),
-            patch("gitsync.config.load_dotenv"),
+            patch("gitbridge.config.load_dotenv"),
         ):
             config = Config()
             assert config.get("repository.url") == "https://github.com/env/repo"
 
     def test_load_env_github_ref(self):
         """Test loading GITHUB_REF environment variable"""
-        with patch.dict(os.environ, {"GITHUB_REF": "develop"}, clear=True), patch("gitsync.config.load_dotenv"):
+        with patch.dict(os.environ, {"GITHUB_REF": "develop"}, clear=True), patch("gitbridge.config.load_dotenv"):
             config = Config()
             assert config.get("repository.ref") == "develop"
 
     def test_load_env_local_path(self):
-        """Test loading GITSYNC_LOCAL_PATH environment variable"""
+        """Test loading GITBRIDGE_LOCAL_PATH environment variable"""
         with (
-            patch.dict(os.environ, {"GITSYNC_LOCAL_PATH": "/env/path"}, clear=True),
-            patch("gitsync.config.load_dotenv"),
+            patch.dict(os.environ, {"GITBRIDGE_LOCAL_PATH": "/env/path"}, clear=True),
+            patch("gitbridge.config.load_dotenv"),
         ):
             config = Config()
             assert config.get("local.path") == "/env/path"
 
     def test_load_env_github_token(self):
         """Test loading GITHUB_TOKEN environment variable"""
-        with patch.dict(os.environ, {"GITHUB_TOKEN": "env_token"}, clear=True), patch("gitsync.config.load_dotenv"):
+        with patch.dict(os.environ, {"GITHUB_TOKEN": "env_token"}, clear=True), patch("gitbridge.config.load_dotenv"):
             config = Config()
             assert config.get("auth.token") == "env_token"
 
     def test_load_env_sync_method(self):
-        """Test loading GITSYNC_METHOD environment variable"""
-        with patch.dict(os.environ, {"GITSYNC_METHOD": "browser"}, clear=True), patch("gitsync.config.load_dotenv"):
+        """Test loading GITBRIDGE_METHOD environment variable"""
+        with patch.dict(os.environ, {"GITBRIDGE_METHOD": "browser"}, clear=True), patch("gitbridge.config.load_dotenv"):
             config = Config()
             assert config.get("sync.method") == "browser"
 
     def test_load_env_incremental_true(self):
-        """Test loading GITSYNC_INCREMENTAL environment variable (true values)"""
+        """Test loading GITBRIDGE_INCREMENTAL environment variable (true values)"""
         for value in ["true", "1", "yes"]:
             with (
-                patch.dict(os.environ, {"GITSYNC_INCREMENTAL": value}, clear=True),
-                patch("gitsync.config.load_dotenv"),
+                patch.dict(os.environ, {"GITBRIDGE_INCREMENTAL": value}, clear=True),
+                patch("gitbridge.config.load_dotenv"),
             ):
                 config = Config()
                 assert config.get("sync.incremental") is True
 
     def test_load_env_incremental_false(self):
-        """Test loading GITSYNC_INCREMENTAL environment variable (false values)"""
+        """Test loading GITBRIDGE_INCREMENTAL environment variable (false values)"""
         for value in ["false", "0", "no", "other"]:
             with (
-                patch.dict(os.environ, {"GITSYNC_INCREMENTAL": value}, clear=True),
-                patch("gitsync.config.load_dotenv"),
+                patch.dict(os.environ, {"GITBRIDGE_INCREMENTAL": value}, clear=True),
+                patch("gitbridge.config.load_dotenv"),
             ):
                 config = Config()
                 assert config.get("sync.incremental") is False
 
     def test_load_env_log_level(self):
-        """Test loading GITSYNC_LOG_LEVEL environment variable"""
-        with patch.dict(os.environ, {"GITSYNC_LOG_LEVEL": "DEBUG"}, clear=True), patch("gitsync.config.load_dotenv"):
+        """Test loading GITBRIDGE_LOG_LEVEL environment variable"""
+        with (
+            patch.dict(os.environ, {"GITBRIDGE_LOG_LEVEL": "DEBUG"}, clear=True),
+            patch("gitbridge.config.load_dotenv"),
+        ):
             config = Config()
             assert config.get("logging.level") == "DEBUG"
 
     def test_load_env_log_file(self):
-        """Test loading GITSYNC_LOG_FILE environment variable"""
+        """Test loading GITBRIDGE_LOG_FILE environment variable"""
         with (
-            patch.dict(os.environ, {"GITSYNC_LOG_FILE": "/tmp/gitsync.log"}, clear=True),
-            patch("gitsync.config.load_dotenv"),
+            patch.dict(os.environ, {"GITBRIDGE_LOG_FILE": "/tmp/gitbridge.log"}, clear=True),
+            patch("gitbridge.config.load_dotenv"),
         ):
             config = Config()
-            assert config.get("logging.file") == "/tmp/gitsync.log"
+            assert config.get("logging.file") == "/tmp/gitbridge.log"
 
     def test_load_env_multiple_variables(self):
         """Test loading multiple environment variables"""
         env_vars = {
             "GITHUB_REPO_URL": "https://github.com/multi/repo",
             "GITHUB_REF": "feature-branch",
-            "GITSYNC_LOCAL_PATH": "/multi/path",
+            "GITBRIDGE_LOCAL_PATH": "/multi/path",
             "GITHUB_TOKEN": "multi_token",
-            "GITSYNC_METHOD": "browser",
-            "GITSYNC_INCREMENTAL": "false",
-            "GITSYNC_LOG_LEVEL": "WARNING",
-            "GITSYNC_LOG_FILE": "/multi/log.txt",
+            "GITBRIDGE_METHOD": "browser",
+            "GITBRIDGE_INCREMENTAL": "false",
+            "GITBRIDGE_LOG_LEVEL": "WARNING",
+            "GITBRIDGE_LOG_FILE": "/multi/log.txt",
         }
 
-        with patch.dict(os.environ, env_vars, clear=True), patch("gitsync.config.load_dotenv"):
+        with patch.dict(os.environ, env_vars, clear=True), patch("gitbridge.config.load_dotenv"):
             config = Config()
             assert config.get("repository.url") == "https://github.com/multi/repo"
             assert config.get("repository.ref") == "feature-branch"
@@ -268,7 +271,7 @@ class TestConfigDeepMerge:
 
     def test_deep_merge_simple(self):
         """Test simple deep merge"""
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
 
         target = {"a": {"b": 1, "c": 2}}
@@ -280,7 +283,7 @@ class TestConfigDeepMerge:
 
     def test_deep_merge_new_keys(self):
         """Test deep merge with new keys"""
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
 
         target = {"existing": {"key": "value"}}
@@ -292,7 +295,7 @@ class TestConfigDeepMerge:
 
     def test_deep_merge_overwrite_non_dict(self):
         """Test deep merge overwrites non-dict values"""
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
 
         target = {"key": "old_value"}
@@ -304,7 +307,7 @@ class TestConfigDeepMerge:
 
     def test_deep_merge_nested(self):
         """Test deep merge with nested dictionaries"""
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
 
         target = {"level1": {"level2": {"level3": "old"}}}
@@ -320,7 +323,7 @@ class TestConfigGet:
 
     def test_get_existing_key(self):
         """Test getting existing configuration key"""
-        with patch("gitsync.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
+        with patch("gitbridge.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
             config = Config()
 
         assert config.get("repository.ref") == "main"
@@ -328,7 +331,7 @@ class TestConfigGet:
 
     def test_get_nonexistent_key(self):
         """Test getting non-existent key returns default"""
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
 
         assert config.get("nonexistent.key") is None
@@ -336,7 +339,7 @@ class TestConfigGet:
 
     def test_get_nested_key(self):
         """Test getting nested configuration key"""
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
 
         config.config = {"level1": {"level2": {"level3": "value"}}}
@@ -344,7 +347,7 @@ class TestConfigGet:
 
     def test_get_partial_path(self):
         """Test getting partial path returns dict"""
-        with patch("gitsync.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
+        with patch("gitbridge.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
             config = Config()
 
         result = config.get("repository")
@@ -354,7 +357,7 @@ class TestConfigGet:
     def test_get_path_expansion_local_path(self):
         """Test path expansion for local.path"""
         with (
-            patch("gitsync.config.load_dotenv"),
+            patch("gitbridge.config.load_dotenv"),
             patch("os.path.expanduser", return_value="/home/user/expanded"),
             patch("os.path.expandvars", return_value="/home/user/expanded"),
         ):
@@ -367,7 +370,7 @@ class TestConfigGet:
     def test_get_path_expansion_non_local_path(self):
         """Test no path expansion for non-local.path keys"""
         with (
-            patch("gitsync.config.load_dotenv"),
+            patch("gitbridge.config.load_dotenv"),
             patch("os.path.expanduser") as mock_expand_user,
             patch("os.path.expandvars") as mock_expand_vars,
         ):
@@ -381,7 +384,7 @@ class TestConfigGet:
 
     def test_get_path_expansion_none_value(self):
         """Test path expansion with None value"""
-        with patch("gitsync.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
+        with patch("gitbridge.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
             config = Config()
 
         result = config.get("local.path")
@@ -389,7 +392,7 @@ class TestConfigGet:
 
     def test_get_invalid_key_format(self):
         """Test getting key with invalid format"""
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
 
         config.config = {"key": "not_dict"}
@@ -401,7 +404,7 @@ class TestConfigSet:
 
     def test_set_simple_key(self):
         """Test setting simple configuration key"""
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
 
         config.set("repository.url", "https://github.com/test/repo")
@@ -409,7 +412,7 @@ class TestConfigSet:
 
     def test_set_nested_key(self):
         """Test setting nested configuration key"""
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
 
         config.set("new.nested.key", "value")
@@ -417,7 +420,7 @@ class TestConfigSet:
 
     def test_set_creates_intermediate_dicts(self):
         """Test setting creates intermediate dictionaries"""
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
 
         config.set("a.b.c.d", "deep_value")
@@ -428,7 +431,7 @@ class TestConfigSet:
 
     def test_set_overwrites_existing(self):
         """Test setting overwrites existing values"""
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
 
         config.set("repository.ref", "develop")
@@ -440,7 +443,7 @@ class TestConfigValidate:
 
     def test_validate_valid_config(self):
         """Test validation with valid configuration"""
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
 
         config.set("repository.url", "https://github.com/test/repo")
@@ -450,7 +453,7 @@ class TestConfigValidate:
 
     def test_validate_missing_repository_url(self):
         """Test validation fails with missing repository URL"""
-        with patch("gitsync.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
+        with patch("gitbridge.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
             config = Config()
             config.set("local.path", "/tmp/test")
 
@@ -459,7 +462,7 @@ class TestConfigValidate:
 
     def test_validate_missing_local_path(self):
         """Test validation fails with missing local path"""
-        with patch("gitsync.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
+        with patch("gitbridge.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
             config = Config()
             config.set("repository.url", "https://github.com/test/repo")
 
@@ -468,7 +471,7 @@ class TestConfigValidate:
 
     def test_validate_invalid_sync_method(self):
         """Test validation fails with invalid sync method"""
-        with patch("gitsync.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
+        with patch("gitbridge.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
             config = Config()
             config.set("repository.url", "https://github.com/test/repo")
             config.set("local.path", "/tmp/test")
@@ -479,7 +482,7 @@ class TestConfigValidate:
 
     def test_validate_valid_sync_methods(self):
         """Test validation passes with valid sync methods"""
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
             config.set("repository.url", "https://github.com/test/repo")
             config.set("local.path", "/tmp/test")
@@ -490,7 +493,7 @@ class TestConfigValidate:
 
     def test_validate_invalid_log_level(self):
         """Test validation fails with invalid log level"""
-        with patch("gitsync.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
+        with patch("gitbridge.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
             config = Config()
             config.set("repository.url", "https://github.com/test/repo")
             config.set("local.path", "/tmp/test")
@@ -501,7 +504,7 @@ class TestConfigValidate:
 
     def test_validate_valid_log_levels(self):
         """Test validation passes with valid log levels"""
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
             config.set("repository.url", "https://github.com/test/repo")
             config.set("local.path", "/tmp/test")
@@ -518,7 +521,7 @@ class TestConfigSave:
         """Test saving configuration to specified file"""
         config_file = os.path.join(temp_dir, "save_config.yaml")
 
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
             config.set("repository.url", "https://github.com/save/repo")
             config.save(config_file)
@@ -533,7 +536,7 @@ class TestConfigSave:
         """Test saving configuration using existing config file path"""
         config_file = os.path.join(temp_dir, "existing_config.yaml")
 
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config(config_file)
             config.set("repository.url", "https://github.com/existing/repo")
             config.save()
@@ -546,7 +549,7 @@ class TestConfigSave:
 
     def test_save_without_file_path(self):
         """Test saving configuration without file path raises error"""
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
 
             with pytest.raises(ValueError, match="No configuration file specified"):
@@ -556,7 +559,7 @@ class TestConfigSave:
         """Test saving configuration creates parent directories"""
         config_file = os.path.join(temp_dir, "nested", "dir", "config.yaml")
 
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
             config.set("repository.url", "https://github.com/nested/repo")
             config.save(config_file)
@@ -571,7 +574,7 @@ class TestConfigSave:
         """Test saving configuration logs success message"""
         config_file = os.path.join(temp_dir, "log_config.yaml")
 
-        with patch("gitsync.config.load_dotenv"), patch("gitsync.config.logger") as mock_logger:
+        with patch("gitbridge.config.load_dotenv"), patch("gitbridge.config.logger") as mock_logger:
             config = Config()
             config.save(config_file)
 
@@ -583,7 +586,7 @@ class TestConfigToDict:
 
     def test_to_dict_returns_copy(self):
         """Test to_dict returns a copy of configuration"""
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
 
         config_dict = config.to_dict()
@@ -594,7 +597,7 @@ class TestConfigToDict:
 
     def test_to_dict_structure(self):
         """Test to_dict returns correct structure"""
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
 
         config_dict = config.to_dict()
@@ -613,7 +616,7 @@ class TestConfigSetupLogging:
     def test_setup_logging_default_level(self):
         """Test setup logging with default level"""
         with (
-            patch("gitsync.config.load_dotenv"),
+            patch("gitbridge.config.load_dotenv"),
             patch("logging.basicConfig") as mock_basic_config,
             patch("logging.StreamHandler"),
             patch.dict(os.environ, {}, clear=True),
@@ -630,7 +633,7 @@ class TestConfigSetupLogging:
     def test_setup_logging_custom_level(self):
         """Test setup logging with custom level"""
         with (
-            patch("gitsync.config.load_dotenv"),
+            patch("gitbridge.config.load_dotenv"),
             patch("logging.basicConfig") as mock_basic_config,
             patch.dict(os.environ, {}, clear=True),
         ):
@@ -647,7 +650,7 @@ class TestConfigSetupLogging:
         log_file = os.path.join(temp_dir, "test.log")
 
         with (
-            patch("gitsync.config.load_dotenv"),
+            patch("gitbridge.config.load_dotenv"),
             patch("logging.basicConfig") as mock_basic_config,
             patch("logging.FileHandler") as mock_file_handler,
             patch.dict(os.environ, {}, clear=True),
@@ -664,7 +667,7 @@ class TestConfigSetupLogging:
     def test_setup_logging_format(self):
         """Test setup logging uses correct format"""
         with (
-            patch("gitsync.config.load_dotenv"),
+            patch("gitbridge.config.load_dotenv"),
             patch("logging.basicConfig"),
             patch("logging.StreamHandler"),
             patch("logging.Formatter") as mock_formatter,
@@ -689,7 +692,7 @@ class TestConfigFileHandling:
         with open(config_file, "w", encoding="utf-8") as f:
             yaml.dump(test_config, f, allow_unicode=True)
 
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config(config_file)
 
         assert config.get("repository.url") == "https://github.com/tëst/repö"
@@ -712,7 +715,7 @@ local:
         with open(config_file, "w") as f:
             f.write(yaml_content)
 
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config(config_file)
 
         assert config.get("repository.url") == "https://github.com/test/repo"
@@ -734,7 +737,7 @@ local:
         with open(config_file, "w") as f:
             yaml.dump(test_config, f)
 
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config(config_file)
 
         assert config.get("repository.options.recursive") is True
@@ -751,7 +754,7 @@ class TestConfigIntegration:
         config_file = os.path.join(temp_dir, "workflow_config.yaml")
 
         # Create initial config
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             config = Config()
             config.set("repository.url", "https://github.com/workflow/repo")
             config.set("local.path", "/tmp/workflow")
@@ -759,7 +762,7 @@ class TestConfigIntegration:
             config.save(config_file)
 
         # Load config from file
-        with patch("gitsync.config.load_dotenv"):
+        with patch("gitbridge.config.load_dotenv"):
             loaded_config = Config(config_file)
 
         # Verify loaded values
@@ -784,7 +787,7 @@ class TestConfigIntegration:
 
         env_vars = {"GITHUB_REPO_URL": "https://github.com/env/repo", "GITHUB_TOKEN": "env_token"}
 
-        with patch.dict(os.environ, env_vars, clear=True), patch("gitsync.config.load_dotenv"):
+        with patch.dict(os.environ, env_vars, clear=True), patch("gitbridge.config.load_dotenv"):
             config = Config(config_file)
 
         # Environment variables should override file values
@@ -798,7 +801,7 @@ class TestConfigIntegration:
         with open(config_file, "w") as f:
             f.write("corrupted: yaml: [invalid")
 
-        with patch("gitsync.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
+        with patch("gitbridge.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
             # Should raise ConfigurationError when loading invalid file
             with pytest.raises(ConfigurationError, match="Invalid YAML syntax"):
                 Config(config_file)

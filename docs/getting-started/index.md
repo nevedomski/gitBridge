@@ -1,13 +1,13 @@
 # Getting Started
 
-Welcome to GitSync! This section will help you get up and running quickly.
+Welcome to GitBridge! This section will help you get up and running quickly.
 
 ## Quick Navigation
 
 <div class="grid cards" markdown>
 
 - :material-download: **[Installation](installation.md)**  
-  Install GitSync on your system
+  Install GitBridge on your system
 
 - :material-rocket: **[Quick Start](quick-start.md)**  
   5-minute guide to your first sync
@@ -34,7 +34,7 @@ Before you begin, ensure you have:
 === "Quick Install (pip)"
 
     ```bash
-    pip install gitsync
+    pip install gitbridge
     ```
 
 === "Recommended (uv)"
@@ -43,15 +43,15 @@ Before you begin, ensure you have:
     # Install uv first
     curl -LsSf https://astral.sh/uv/install.sh | sh
     
-    # Install gitsync
-    uv pip install gitsync
+    # Install gitbridge
+    uv pip install gitbridge
     ```
 
 === "From Source"
 
     ```bash
-    git clone https://github.com/nevedomski/gitsync
-    cd gitsync
+    git clone https://github.com/nevedomski/gitbridge
+    cd gitbridge
     pip install -e .
     ```
 
@@ -60,14 +60,14 @@ Before you begin, ensure you have:
 The simplest way to sync a repository:
 
 ```bash
-gitsync sync --repo https://github.com/python/cpython --local ~/cpython
+gitbridge sync --repo https://github.com/python/cpython --local ~/cpython
 ```
 
 This will:
 
 1. Connect to the GitHub repository
 2. Download all files to your local directory
-3. Create a `.gitsync` metadata file for tracking
+3. Create a `.gitbridge` metadata file for tracking
 4. Show progress with a nice progress bar
 
 !!! success "That's it!"
@@ -87,8 +87,8 @@ After your first successful sync, explore these topics:
 If you run into issues:
 
 1. Check the [Troubleshooting Guide](../troubleshooting/index.md)
-2. Search [existing issues](https://github.com/nevedomski/gitsync/issues)
-3. Ask for help by [creating an issue](https://github.com/nevedomski/gitsync/issues/new)
+2. Search [existing issues](https://github.com/nevedomski/gitbridge/issues)
+3. Ask for help by [creating an issue](https://github.com/nevedomski/gitbridge/issues/new)
 
 !!! tip "Pro Tip"
-    Use `gitsync --help` to see all available commands and options at any time.
+    Use `gitbridge --help` to see all available commands and options at any time.

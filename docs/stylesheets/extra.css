@@ -1,13 +1,13 @@
-/* GitSync Documentation - Custom Styles */
+/* GitBridge Documentation - Custom Styles */
 /* Complements Material for MkDocs theme */
 
 /* Custom CSS Variables that work with Material theme */
 :root {
     /* Extend Material palette */
-    --gitsync-success: #10b981;
-    --gitsync-warning: #f59e0b;
-    --gitsync-error: #ef4444;
-    --gitsync-info: #3b82f6;
+    --gitbridge-success: #10b981;
+    --gitbridge-warning: #f59e0b;
+    --gitbridge-error: #ef4444;
+    --gitbridge-info: #3b82f6;
 }
 
 /* Hero Section on Homepage - Use Material's color scheme */
@@ -53,18 +53,18 @@
 /* Custom Admonitions */
 .md-typeset .admonition.success,
 .md-typeset details.success {
-    border-color: var(--gitsync-success);
+    border-color: var(--gitbridge-success);
 }
 
 .md-typeset .admonition.success > .admonition-title,
 .md-typeset details.success > summary {
     background-color: rgba(16, 185, 129, 0.1);
-    border-color: var(--gitsync-success);
+    border-color: var(--gitbridge-success);
 }
 
 .md-typeset .admonition.success > .admonition-title::before,
 .md-typeset details.success > summary::before {
-    background-color: var(--gitsync-success);
+    background-color: var(--gitbridge-success);
     -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>');
     mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>');
 }
@@ -112,7 +112,7 @@
 }
 
 .md-typeset code.language-bash .token.string {
-    color: var(--gitsync-success);
+    color: var(--gitbridge-success);
 }
 
 /* Navigation Enhancements - Use Material's built-in active states */
@@ -167,10 +167,10 @@
 
 /* Dark Mode Adjustments */
 [data-md-color-scheme="slate"] {
-    --gitsync-success: #34d399;
-    --gitsync-warning: #fbbf24;
-    --gitsync-error: #f87171;
-    --gitsync-info: #60a5fa;
+    --gitbridge-success: #34d399;
+    --gitbridge-warning: #fbbf24;
+    --gitbridge-error: #f87171;
+    --gitbridge-info: #60a5fa;
 }
 
 [data-md-color-scheme="slate"] .md-typeset .grid.cards > li {
@@ -208,7 +208,7 @@
     right: 0;
     top: -1.5rem;
     padding: 0.25rem 0.5rem;
-    background-color: var(--gitsync-success);
+    background-color: var(--gitbridge-success);
     color: white;
     border-radius: 4px;
     font-size: 0.75rem;

@@ -12,8 +12,8 @@ Key Features:
     - File system operations with proper error handling
 
 Typical Usage:
-    >>> from gitsync.file_synchronizer import FileSynchronizer
-    >>> from gitsync.api_client import GitHubAPIClient
+    >>> from gitbridge.file_synchronizer import FileSynchronizer
+    >>> from gitbridge.api_client import GitHubAPIClient
     >>> from pathlib import Path
     >>>
     >>> client = GitHubAPIClient("owner", "repo", token="...")
@@ -93,7 +93,7 @@ class FileSynchronizer:
 
         # Cache file for tracking downloaded files
         # DOCDEV-NOTE: Hash cache enables incremental updates - only changed files are downloaded
-        self.hash_cache_file = self.local_path / ".gitsync" / "file_hashes.json"
+        self.hash_cache_file = self.local_path / ".gitbridge" / "file_hashes.json"
         self.file_hashes = load_file_hashes(self.hash_cache_file)
 
     def set_current_ref(self, ref: str) -> None:

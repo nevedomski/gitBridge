@@ -1,6 +1,6 @@
 # Corporate Environment Setup
 
-This guide helps you configure GitSync to work in restricted corporate networks with proxies, certificates, and other security measures.
+This guide helps you configure GitBridge to work in restricted corporate networks with proxies, certificates, and other security measures.
 
 ## Overview
 
@@ -12,7 +12,7 @@ Corporate networks often have:
 - 📋 **PAC scripts** for proxy configuration
 - 🛡️ **Deep packet inspection** firewalls
 
-GitSync is designed to handle all these scenarios.
+GitBridge is designed to handle all these scenarios.
 
 ## Quick Setup
 
@@ -20,17 +20,17 @@ For most corporate Windows environments:
 
 ```bash
 # Auto-detect everything
-gitsync sync --config config.yaml --auto-proxy --auto-cert
+gitbridge sync --config config.yaml --auto-proxy --auto-cert
 
 # If that doesn't work, disable SSL verification (last resort)
-gitsync sync --config config.yaml --auto-proxy --no-ssl-verify
+gitbridge sync --config config.yaml --auto-proxy --no-ssl-verify
 ```
 
 ## Proxy Configuration
 
 ### Automatic Proxy Detection
 
-GitSync can automatically detect proxy settings from:
+GitBridge can automatically detect proxy settings from:
 
 1. **PAC Scripts** (Windows/Chrome)
 2. **System Proxy Settings** (Windows)
@@ -41,7 +41,7 @@ GitSync can automatically detect proxy settings from:
 === "Command Line"
 
     ```bash
-    gitsync sync --auto-proxy --repo https://github.com/user/repo --local ~/repo
+    gitbridge sync --auto-proxy --repo https://github.com/user/repo --local ~/repo
     ```
 
 === "Configuration File"
@@ -50,7 +50,7 @@ GitSync can automatically detect proxy settings from:
     sync:
       auto_proxy: true
       
-    # GitSync will check in order:
+    # GitBridge will check in order:
     # 1. PAC script from Chrome
     # 2. Windows system proxy
     # 3. HTTP_PROXY environment variable
@@ -111,7 +111,7 @@ network:
 #### Command Line
 
 ```bash
-gitsync sync \
+gitbridge sync \
   --proxy http://proxy.company.com:8080 \
   --proxy-auth username:password \
   --repo https://github.com/user/repo \
@@ -131,14 +131,14 @@ network:
     
     # Cache PAC script locally
     cache: true
-    cache_dir: ~/.gitsync/pac_cache
+    cache_dir: ~/.gitbridge/pac_cache
 ```
 
 ## SSL Certificate Configuration
 
 ### Automatic Certificate Detection
 
-GitSync can extract certificates from:
+GitBridge can extract certificates from:
 
 1. **Windows Certificate Store**
 2. **System Certificate Bundle**
@@ -149,7 +149,7 @@ GitSync can extract certificates from:
 === "Command Line"
 
     ```bash
-    gitsync sync --auto-cert --repo https://github.com/user/repo --local ~/repo
+    gitbridge sync --auto-cert --repo https://github.com/user/repo --local ~/repo
     ```
 
 === "Configuration File"
@@ -158,7 +158,7 @@ GitSync can extract certificates from:
     sync:
       auto_cert: true
       
-    # GitSync will:
+    # GitBridge will:
     # 1. Extract from Windows store (if on Windows)
     # 2. Combine with certifi bundle
     # 3. Create temporary combined bundle
@@ -189,14 +189,14 @@ network:
    # 3. Export root certificate
    ```
 
-2. **Add to GitSync:**
+2. **Add to GitBridge:**
    ```bash
    # Option 1: Append to certifi bundle
    cat company-root.crt >> $(python -m certifi)
    
    # Option 2: Use custom bundle
    export REQUESTS_CA_BUNDLE=/path/to/company-bundle.crt
-   gitsync sync --config config.yaml
+   gitbridge sync --config config.yaml
    ```
 
 ### Disable SSL Verification (Last Resort)
@@ -206,7 +206,7 @@ network:
 
 ```bash
 # Command line
-gitsync sync --no-ssl-verify --repo https://github.com/user/repo --local ~/repo
+gitbridge sync --no-ssl-verify --repo https://github.com/user/repo --local ~/repo
 
 # Configuration file
 network:
@@ -218,17 +218,17 @@ network:
 
 ### PowerShell Script for Windows Users
 
-Create `setup-gitsync.ps1`:
+Create `setup-gitbridge.ps1`:
 
 ```powershell
-# GitSync Windows Setup Script
+# GitBridge Windows Setup Script
 
 # Set up environment variables
 $env:GITHUB_TOKEN = Read-Host "Enter GitHub Token" -AsSecureString
-$env:GITSYNC_CONFIG = "$HOME\.gitsync\config.yaml"
+$env:GITSYNC_CONFIG = "$HOME\.gitbridge\config.yaml"
 
 # Create config directory
-New-Item -ItemType Directory -Force -Path "$HOME\.gitsync"
+New-Item -ItemType Directory -Force -Path "$HOME\.gitbridge"
 
 # Auto-detect proxy from IE/Edge
 $proxy = (Get-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings').ProxyServer
@@ -237,18 +237,18 @@ if ($proxy) {
     Write-Host "Proxy detected: $proxy"
 }
 
-# Install GitSync with Windows support
-pip install "gitsync[win,pac]"
+# Install GitBridge with Windows support
+pip install "gitbridge[win,pac]"
 
 # Test configuration
-gitsync status --auto-proxy --auto-cert
+gitbridge status --auto-proxy --auto-cert
 
-Write-Host "Setup complete! Run 'gitsync sync --config $env:GITSYNC_CONFIG' to start"
+Write-Host "Setup complete! Run 'gitbridge sync --config $env:GITSYNC_CONFIG' to start"
 ```
 
 ### Windows Certificate Store Integration
 
-GitSync automatically uses Windows certificates when `--auto-cert` is enabled:
+GitBridge automatically uses Windows certificates when `--auto-cert` is enabled:
 
 ```python
 # What happens internally:
@@ -319,7 +319,7 @@ For networks with no direct internet access:
 1. **On machine with internet access:**
    ```bash
    # Download repository as ZIP
-   gitsync export --repo https://github.com/user/repo --output repo.zip
+   gitbridge export --repo https://github.com/user/repo --output repo.zip
    ```
 
 2. **Transfer `repo.zip` to air-gapped network**
@@ -327,7 +327,7 @@ For networks with no direct internet access:
 3. **On air-gapped machine:**
    ```bash
    # Import from ZIP
-   gitsync import --input repo.zip --local /path/to/local
+   gitbridge import --input repo.zip --local /path/to/local
    ```
 
 ## Troubleshooting Corporate Issues
@@ -337,11 +337,11 @@ For networks with no direct internet access:
 Use the diagnostic command:
 
 ```bash
-gitsync diagnose --verbose
+gitbridge diagnose --verbose
 
 # Output will show:
 # ✓ Python version: 3.11.0
-# ✓ GitSync version: 0.1.0
+# ✓ GitBridge version: 0.1.0
 # ✓ Proxy detected: http://proxy.company.com:8080
 # ✓ Certificates: Using custom bundle (42 certificates)
 # ✓ GitHub API accessible: Yes
@@ -353,20 +353,20 @@ gitsync diagnose --verbose
 !!! error "SSL: CERTIFICATE_VERIFY_FAILED"
     **Solution**: Use `--auto-cert` or provide company certificate bundle:
     ```bash
-    gitsync sync --auto-cert --config config.yaml
+    gitbridge sync --auto-cert --config config.yaml
     ```
 
 !!! error "ProxyError: 407 Proxy Authentication Required"
     **Solution**: Provide proxy credentials:
     ```bash
     export HTTPS_PROXY=http://domain\\username:password@proxy:8080
-    gitsync sync --config config.yaml
+    gitbridge sync --config config.yaml
     ```
 
 !!! error "ConnectTimeout: Unable to connect to api.github.com"
     **Solution**: Check if API is blocked, try browser method:
     ```bash
-    gitsync sync --method browser --config config.yaml
+    gitbridge sync --method browser --config config.yaml
     ```
 
 ### Network Testing Script
@@ -375,7 +375,7 @@ Test your network configuration:
 
 ```python
 #!/usr/bin/env python3
-"""Test corporate network configuration for GitSync."""
+"""Test corporate network configuration for GitBridge."""
 
 import requests
 import os
@@ -426,31 +426,31 @@ if __name__ == "__main__":
 2. **Cache Credentials**: Use secure credential managers for tokens and passwords
 3. **Test Incrementally**: Test each component (proxy, certs) separately
 4. **Document Settings**: Keep a record of working configuration for your team
-5. **Use Auto-Detection**: Let GitSync detect settings when possible
+5. **Use Auto-Detection**: Let GitBridge detect settings when possible
 6. **Have Fallbacks**: Configure both API and browser methods
 
 ## Quick Reference Card
 
 ```bash
 # Windows corporate setup (most common)
-gitsync sync --auto-proxy --auto-cert --config config.yaml
+gitbridge sync --auto-proxy --auto-cert --config config.yaml
 
 # Manual proxy with auth
 export HTTPS_PROXY=http://DOMAIN\\username:password@proxy:8080
-gitsync sync --config config.yaml
+gitbridge sync --config config.yaml
 
 # Custom certificate bundle
 export REQUESTS_CA_BUNDLE=/path/to/company-certs.pem
-gitsync sync --config config.yaml
+gitbridge sync --config config.yaml
 
 # Browser method when API is blocked
-gitsync sync --method browser --config config.yaml
+gitbridge sync --method browser --config config.yaml
 
 # Debug mode for troubleshooting
-gitsync sync --verbose --debug --config config.yaml
+gitbridge sync --verbose --debug --config config.yaml
 
 # Last resort (insecure!)
-gitsync sync --no-ssl-verify --config config.yaml
+gitbridge sync --no-ssl-verify --config config.yaml
 ```
 
 ## Next Steps

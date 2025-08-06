@@ -26,8 +26,8 @@ class TestPACProxyDetectorMocked:
     def setup_method(self):
         """Set up test fixtures by mocking the entire module."""
         # Clear any existing imports
-        if "gitsync.pac_support" in sys.modules:
-            del sys.modules["gitsync.pac_support"]
+        if "gitbridge.pac_support" in sys.modules:
+            del sys.modules["gitbridge.pac_support"]
 
         # Mock winreg module
         self.mock_winreg = MagicMock()
@@ -45,7 +45,7 @@ class TestPACProxyDetectorMocked:
             "sys.modules", {"winreg": self.mock_winreg, "pypac": self.mock_pypac, "pypac.parser": MagicMock()}
         ):
             # Import and create instance
-            from gitsync.pac_support import PACProxyDetector, detect_and_configure_proxy
+            from gitbridge.pac_support import PACProxyDetector, detect_and_configure_proxy
 
             self.PACProxyDetector = PACProxyDetector
             self.detect_and_configure_proxy = detect_and_configure_proxy
@@ -59,16 +59,16 @@ class TestPACProxyDetectorMocked:
         assert detector.pac_object is None
 
     @pytest.mark.windows
-    @patch("gitsync.pac_support.platform.system")
+    @patch("gitbridge.pac_support.platform.system")
     def test_is_available_windows(self, mock_platform):
         """Test availability check on Windows."""
         mock_platform.return_value = "Windows"
 
-        with patch("gitsync.pac_support.WINDOWS_AVAILABLE", True):
+        with patch("gitbridge.pac_support.WINDOWS_AVAILABLE", True):
             detector = self.PACProxyDetector()
             assert detector.is_available() is True
 
-    @patch("gitsync.pac_support.platform.system")
+    @patch("gitbridge.pac_support.platform.system")
     def test_is_available_linux(self, mock_platform):
         """Test availability check on Linux."""
         mock_platform.return_value = "Linux"
@@ -82,7 +82,7 @@ class TestPACProxyDetectorMocked:
         self.mock_winreg.OpenKey.return_value.__enter__.return_value = mock_key
         self.mock_winreg.QueryValueEx.return_value = ("http://proxy.example.com/pac.js", "REG_SZ")
 
-        with patch("gitsync.pac_support.WINDOWS_AVAILABLE", True):
+        with patch("gitbridge.pac_support.WINDOWS_AVAILABLE", True):
             result = self.detector.get_pac_url_from_registry()
 
         assert result == "http://proxy.example.com/pac.js"
@@ -93,14 +93,14 @@ class TestPACProxyDetectorMocked:
         self.mock_winreg.OpenKey.return_value.__enter__.return_value = mock_key
         self.mock_winreg.QueryValueEx.side_effect = FileNotFoundError("AutoConfigURL not found")
 
-        with patch("gitsync.pac_support.WINDOWS_AVAILABLE", True):
+        with patch("gitbridge.pac_support.WINDOWS_AVAILABLE", True):
             result = self.detector.get_pac_url_from_registry()
 
         assert result is None
 
     def test_get_pac_url_from_registry_no_winreg(self):
         """Test PAC URL extraction when winreg is not available."""
-        with patch("gitsync.pac_support.WINDOWS_AVAILABLE", False):
+        with patch("gitbridge.pac_support.WINDOWS_AVAILABLE", False):
             result = self.detector.get_pac_url_from_registry()
 
         assert result is None
@@ -116,7 +116,7 @@ class TestPACProxyDetectorMocked:
             ("ProxyServer", "proxy.example.com:8080", "REG_SZ"),
         ]
 
-        with patch("gitsync.pac_support.WINDOWS_AVAILABLE", True):
+        with patch("gitbridge.pac_support.WINDOWS_AVAILABLE", True):
             result = self.detector.get_all_proxy_settings()
 
         expected = {
@@ -127,13 +127,13 @@ class TestPACProxyDetectorMocked:
 
     def test_get_all_proxy_settings_no_winreg(self):
         """Test proxy settings extraction when winreg is not available."""
-        with patch("gitsync.pac_support.WINDOWS_AVAILABLE", False):
+        with patch("gitbridge.pac_support.WINDOWS_AVAILABLE", False):
             result = self.detector.get_all_proxy_settings()
 
         assert result == {}
 
     @patch("builtins.open", mock_open(read_data="PAC script content"))
-    @patch("gitsync.pac_support.platform.system")
+    @patch("gitbridge.pac_support.platform.system")
     def test_download_pac_content_local_file(self, mock_platform):
         """Test successful PAC content download from local file."""
         mock_platform.return_value = "Windows"
@@ -164,7 +164,7 @@ class TestPACProxyDetectorMocked:
         mock_pac.url = "http://proxy.example.com/pac.js"
         self.mock_pypac.get_pac.return_value = mock_pac
 
-        with patch("gitsync.pac_support.PYPAC_AVAILABLE", True):
+        with patch("gitbridge.pac_support.PYPAC_AVAILABLE", True):
             result = self.detector.detect_pac_using_pypac()
 
         assert result == mock_pac
@@ -198,7 +198,7 @@ class TestPACProxyDetectorMocked:
             delattr(mock_pac, "url")
         self.mock_pypac.get_pac.return_value = mock_pac
 
-        with patch("gitsync.pac_support.PYPAC_AVAILABLE", True):
+        with patch("gitbridge.pac_support.PYPAC_AVAILABLE", True):
             result = self.detector.detect_pac_using_pypac()
 
         assert result == mock_pac
@@ -209,7 +209,7 @@ class TestPACProxyDetectorMocked:
         """Test PAC detection when no PAC is found."""
         self.mock_pypac.get_pac.return_value = None
 
-        with patch("gitsync.pac_support.PYPAC_AVAILABLE", True):
+        with patch("gitbridge.pac_support.PYPAC_AVAILABLE", True):
             result = self.detector.detect_pac_using_pypac()
 
         assert result is None
@@ -218,7 +218,7 @@ class TestPACProxyDetectorMocked:
         """Test PAC detection with exception."""
         self.mock_pypac.get_pac.side_effect = Exception("pypac error")
 
-        with patch("gitsync.pac_support.PYPAC_AVAILABLE", True):
+        with patch("gitbridge.pac_support.PYPAC_AVAILABLE", True):
             result = self.detector.detect_pac_using_pypac()
 
         assert result is None
@@ -229,7 +229,7 @@ class TestPACProxyDetectorMocked:
         mock_pac.find_proxy_for_url.return_value = "PROXY proxy.example.com:8080"
         self.detector.pac_object = mock_pac
 
-        with patch("gitsync.pac_support.PYPAC_AVAILABLE", True):
+        with patch("gitbridge.pac_support.PYPAC_AVAILABLE", True):
             result = self.detector.extract_proxy_from_pac("https://api.github.com")
 
         assert result == "http://proxy.example.com:8080"
@@ -240,7 +240,7 @@ class TestPACProxyDetectorMocked:
         mock_pac.find_proxy_for_url.return_value = "DIRECT"
         self.detector.pac_object = mock_pac
 
-        with patch("gitsync.pac_support.PYPAC_AVAILABLE", True):
+        with patch("gitbridge.pac_support.PYPAC_AVAILABLE", True):
             result = self.detector.extract_proxy_from_pac("https://api.github.com")
 
         assert result is None
@@ -251,7 +251,7 @@ class TestPACProxyDetectorMocked:
         mock_pac.find_proxy_for_url.return_value = "PROXY proxy1.example.com:8080; PROXY proxy2.example.com:8080"
         self.detector.pac_object = mock_pac
 
-        with patch("gitsync.pac_support.PYPAC_AVAILABLE", True):
+        with patch("gitbridge.pac_support.PYPAC_AVAILABLE", True):
             result = self.detector.extract_proxy_from_pac("https://api.github.com")
 
         assert result == "http://proxy1.example.com:8080"
@@ -262,14 +262,14 @@ class TestPACProxyDetectorMocked:
         mock_pac.find_proxy_for_url.return_value = "SOCKS proxy.example.com:1080"
         self.detector.pac_object = mock_pac
 
-        with patch("gitsync.pac_support.PYPAC_AVAILABLE", True):
+        with patch("gitbridge.pac_support.PYPAC_AVAILABLE", True):
             result = self.detector.extract_proxy_from_pac("https://api.github.com")
 
         assert result == "socks://proxy.example.com:1080"
 
     def test_extract_proxy_from_pac_not_available(self):
         """Test proxy extraction when pypac is not available."""
-        with patch("gitsync.pac_support.PYPAC_AVAILABLE", False):
+        with patch("gitbridge.pac_support.PYPAC_AVAILABLE", False):
             result = self.detector.extract_proxy_from_pac("https://api.github.com")
 
         assert result is None
@@ -359,7 +359,7 @@ class TestPACProxyDetectorMocked:
         mock_session = Mock()
 
         with (
-            patch("gitsync.pac_support.PYPAC_AVAILABLE", True),
+            patch("gitbridge.pac_support.PYPAC_AVAILABLE", True),
             patch.object(self.detector, "get_pac_url_from_registry", return_value=None),
         ):
             # Mock the PACSession import inside the function
@@ -375,7 +375,7 @@ class TestPACProxyDetectorMocked:
         pac_content = "function FindProxyForURL(url, host) { return 'DIRECT'; }"
 
         with (
-            patch("gitsync.pac_support.PYPAC_AVAILABLE", True),
+            patch("gitbridge.pac_support.PYPAC_AVAILABLE", True),
             patch.object(self.detector, "get_pac_url_from_registry", return_value="http://pac.example.com/pac.js"),
             patch.object(self.detector, "download_pac_content", return_value=pac_content),
         ):
@@ -388,7 +388,7 @@ class TestPACProxyDetectorMocked:
     def test_create_pac_session_error(self):
         """Test PAC session creation with error."""
         with (
-            patch("gitsync.pac_support.PYPAC_AVAILABLE", True),
+            patch("gitbridge.pac_support.PYPAC_AVAILABLE", True),
             patch.object(self.detector, "get_pac_url_from_registry", return_value=None),
         ):
             with patch("pypac.PACSession", side_effect=Exception("PACSession error")):
@@ -431,15 +431,15 @@ class TestPACProxyDetectorEdgeCases:
     def setup_method(self):
         """Set up test fixtures."""
         # Clear any existing imports
-        if "gitsync.pac_support" in sys.modules:
-            del sys.modules["gitsync.pac_support"]
+        if "gitbridge.pac_support" in sys.modules:
+            del sys.modules["gitbridge.pac_support"]
 
         # Mock modules
         mock_winreg = MagicMock()
         mock_pypac = MagicMock()
 
         with patch.dict("sys.modules", {"winreg": mock_winreg, "pypac": mock_pypac, "pypac.parser": MagicMock()}):
-            from gitsync.pac_support import PACProxyDetector
+            from gitbridge.pac_support import PACProxyDetector
 
             self.detector = PACProxyDetector()
 
@@ -459,7 +459,7 @@ class TestPACProxyDetectorEdgeCases:
         mock_pac.find_proxy_for_url.return_value = "   "
         self.detector.pac_object = mock_pac
 
-        with patch("gitsync.pac_support.PYPAC_AVAILABLE", True):
+        with patch("gitbridge.pac_support.PYPAC_AVAILABLE", True):
             result = self.detector.extract_proxy_from_pac("https://api.github.com")
 
         assert result is None
@@ -470,7 +470,7 @@ class TestPACProxyDetectorEdgeCases:
         mock_pac.find_proxy_for_url.return_value = "Proxy proxy.example.com:8080"
         self.detector.pac_object = mock_pac
 
-        with patch("gitsync.pac_support.PYPAC_AVAILABLE", True):
+        with patch("gitbridge.pac_support.PYPAC_AVAILABLE", True):
             result = self.detector.extract_proxy_from_pac("https://api.github.com")
 
         # Should not work as it expects uppercase "PROXY"
@@ -482,7 +482,7 @@ class TestPACProxyDetectorEdgeCases:
         mock_pac.find_proxy_for_url.return_value = "  PROXY   proxy.example.com:8080  ; DIRECT  "
         self.detector.pac_object = mock_pac
 
-        with patch("gitsync.pac_support.PYPAC_AVAILABLE", True):
+        with patch("gitbridge.pac_support.PYPAC_AVAILABLE", True):
             result = self.detector.extract_proxy_from_pac("https://api.github.com")
 
         assert result == "http://proxy.example.com:8080"
@@ -493,7 +493,7 @@ class TestPACProxyDetectorEdgeCases:
         mock_pac.find_proxy_for_url.return_value = "PROXY http://proxy.example.com:8080"
         self.detector.pac_object = mock_pac
 
-        with patch("gitsync.pac_support.PYPAC_AVAILABLE", True):
+        with patch("gitbridge.pac_support.PYPAC_AVAILABLE", True):
             result = self.detector.extract_proxy_from_pac("https://api.github.com")
 
         assert result == "http://proxy.example.com:8080"
@@ -511,12 +511,12 @@ class TestPACProxyDetectorEdgeCases:
         mock_pac.find_proxy_for_url.side_effect = Exception("PAC evaluation error")
         self.detector.pac_object = mock_pac
 
-        with patch("gitsync.pac_support.PYPAC_AVAILABLE", True):
+        with patch("gitbridge.pac_support.PYPAC_AVAILABLE", True):
             result = self.detector.extract_proxy_from_pac("https://api.github.com")
 
         assert result is None
 
-    @patch("gitsync.pac_support.platform.system")
+    @patch("gitbridge.pac_support.platform.system")
     def test_file_path_conversion_linux(self, mock_platform):
         """Test file URL path conversion on Linux."""
         mock_platform.return_value = "Linux"
@@ -531,14 +531,14 @@ class TestURLParsing:
 
     def setup_method(self):
         """Set up test fixtures."""
-        if "gitsync.pac_support" in sys.modules:
-            del sys.modules["gitsync.pac_support"]
+        if "gitbridge.pac_support" in sys.modules:
+            del sys.modules["gitbridge.pac_support"]
 
         mock_winreg = MagicMock()
         mock_pypac = MagicMock()
 
         with patch.dict("sys.modules", {"winreg": mock_winreg, "pypac": mock_pypac, "pypac.parser": MagicMock()}):
-            from gitsync.pac_support import PACProxyDetector
+            from gitbridge.pac_support import PACProxyDetector
 
             self.detector = PACProxyDetector()
 
@@ -555,7 +555,7 @@ class TestURLParsing:
             "http://internal.company.com",
         ]
 
-        with patch("gitsync.pac_support.PYPAC_AVAILABLE", True):
+        with patch("gitbridge.pac_support.PYPAC_AVAILABLE", True):
             for url in test_urls:
                 result = self.detector.extract_proxy_from_pac(url)
                 assert result == "http://proxy.example.com:8080"
@@ -568,8 +568,8 @@ class TestRegistryMocking:
 
     def setup_method(self):
         """Set up test fixtures with registry mocking."""
-        if "gitsync.pac_support" in sys.modules:
-            del sys.modules["gitsync.pac_support"]
+        if "gitbridge.pac_support" in sys.modules:
+            del sys.modules["gitbridge.pac_support"]
 
         # Create detailed winreg mock
         self.mock_winreg = MagicMock()
@@ -578,7 +578,7 @@ class TestRegistryMocking:
         mock_pypac = MagicMock()
 
         with patch.dict("sys.modules", {"winreg": self.mock_winreg, "pypac": mock_pypac, "pypac.parser": MagicMock()}):
-            from gitsync.pac_support import PACProxyDetector
+            from gitbridge.pac_support import PACProxyDetector
 
             self.detector = PACProxyDetector()
 
@@ -586,7 +586,7 @@ class TestRegistryMocking:
         """Test registry access error handling."""
         self.mock_winreg.OpenKey.side_effect = OSError("Access denied")
 
-        with patch("gitsync.pac_support.WINDOWS_AVAILABLE", True):
+        with patch("gitbridge.pac_support.WINDOWS_AVAILABLE", True):
             result = self.detector.get_pac_url_from_registry()
 
         assert result is None
@@ -597,7 +597,7 @@ class TestRegistryMocking:
         self.mock_winreg.OpenKey.return_value.__enter__.return_value = mock_key
         self.mock_winreg.QueryValueEx.side_effect = Exception("Query failed")
 
-        with patch("gitsync.pac_support.WINDOWS_AVAILABLE", True):
+        with patch("gitbridge.pac_support.WINDOWS_AVAILABLE", True):
             result = self.detector.get_pac_url_from_registry()
 
         assert result is None
@@ -609,7 +609,7 @@ class TestRegistryMocking:
         self.mock_winreg.QueryInfoKey.return_value = (None, 2, None)
         self.mock_winreg.EnumValue.side_effect = [("ProxyEnable", 1, "REG_DWORD"), Exception("Enum error")]
 
-        with patch("gitsync.pac_support.WINDOWS_AVAILABLE", True):
+        with patch("gitbridge.pac_support.WINDOWS_AVAILABLE", True):
             result = self.detector.get_all_proxy_settings()
 
         # Should return partial results
@@ -626,7 +626,7 @@ class TestRegistryMocking:
             ("ProxyServer", "proxy.example.com:8080", "REG_SZ"),
         ]
 
-        with patch("gitsync.pac_support.WINDOWS_AVAILABLE", True):
+        with patch("gitbridge.pac_support.WINDOWS_AVAILABLE", True):
             result = self.detector.get_all_proxy_settings()
 
         expected = {
@@ -641,14 +641,14 @@ class TestProxyConfiguration:
 
     def setup_method(self):
         """Set up test fixtures."""
-        if "gitsync.pac_support" in sys.modules:
-            del sys.modules["gitsync.pac_support"]
+        if "gitbridge.pac_support" in sys.modules:
+            del sys.modules["gitbridge.pac_support"]
 
         mock_winreg = MagicMock()
         mock_pypac = MagicMock()
 
         with patch.dict("sys.modules", {"winreg": mock_winreg, "pypac": mock_pypac, "pypac.parser": MagicMock()}):
-            from gitsync.pac_support import PACProxyDetector
+            from gitbridge.pac_support import PACProxyDetector
 
             self.detector = PACProxyDetector()
 
@@ -691,8 +691,8 @@ class TestIntegrationScenarios:
 
     def setup_method(self):
         """Set up test fixtures."""
-        if "gitsync.pac_support" in sys.modules:
-            del sys.modules["gitsync.pac_support"]
+        if "gitbridge.pac_support" in sys.modules:
+            del sys.modules["gitbridge.pac_support"]
 
         # Create comprehensive mocks
         self.mock_winreg = MagicMock()
@@ -703,7 +703,7 @@ class TestIntegrationScenarios:
         with patch.dict(
             "sys.modules", {"winreg": self.mock_winreg, "pypac": self.mock_pypac, "pypac.parser": MagicMock()}
         ):
-            from gitsync.pac_support import PACProxyDetector
+            from gitbridge.pac_support import PACProxyDetector
 
             self.PACProxyDetector = PACProxyDetector
 
@@ -725,12 +725,12 @@ class TestIntegrationScenarios:
         mock_pac_obj.find_proxy_for_url.return_value = "PROXY proxy.company.com:8080"
 
         with (
-            patch("gitsync.pac_support.WINDOWS_AVAILABLE", True),
-            patch("gitsync.pac_support.PYPAC_AVAILABLE", True),
+            patch("gitbridge.pac_support.WINDOWS_AVAILABLE", True),
+            patch("gitbridge.pac_support.PYPAC_AVAILABLE", True),
             patch("requests.get", return_value=mock_response),
         ):
             # Mock the pypac.parser.PACFile inside the module
-            with patch("gitsync.pac_support.pypac.parser.PACFile", return_value=mock_pac_obj):
+            with patch("gitbridge.pac_support.pypac.parser.PACFile", return_value=mock_pac_obj):
                 detector = self.PACProxyDetector()
                 http_proxy, https_proxy = detector.get_proxy_for_url("https://api.github.com")
 
@@ -751,7 +751,10 @@ class TestIntegrationScenarios:
             ("ProxyServer", "manual-proxy.company.com:8080", "REG_SZ"),
         ]
 
-        with patch("gitsync.pac_support.WINDOWS_AVAILABLE", True), patch("gitsync.pac_support.PYPAC_AVAILABLE", False):
+        with (
+            patch("gitbridge.pac_support.WINDOWS_AVAILABLE", True),
+            patch("gitbridge.pac_support.PYPAC_AVAILABLE", False),
+        ):
             detector = self.PACProxyDetector()
             http_proxy, https_proxy = detector.get_proxy_for_url("https://api.github.com")
 
@@ -766,7 +769,10 @@ class TestIntegrationScenarios:
         self.mock_winreg.QueryValueEx.side_effect = FileNotFoundError("AutoConfigURL not found")
         self.mock_winreg.QueryInfoKey.return_value = (None, 0, None)
 
-        with patch("gitsync.pac_support.WINDOWS_AVAILABLE", True), patch("gitsync.pac_support.PYPAC_AVAILABLE", True):
+        with (
+            patch("gitbridge.pac_support.WINDOWS_AVAILABLE", True),
+            patch("gitbridge.pac_support.PYPAC_AVAILABLE", True),
+        ):
             detector = self.PACProxyDetector()
             http_proxy, https_proxy = detector.get_proxy_for_url("https://api.github.com")
 
@@ -779,14 +785,14 @@ class TestAdditionalCoverage:
 
     def setup_method(self):
         """Set up test fixtures."""
-        if "gitsync.pac_support" in sys.modules:
-            del sys.modules["gitsync.pac_support"]
+        if "gitbridge.pac_support" in sys.modules:
+            del sys.modules["gitbridge.pac_support"]
 
         mock_winreg = MagicMock()
         mock_pypac = MagicMock()
 
         with patch.dict("sys.modules", {"winreg": mock_winreg, "pypac": mock_pypac, "pypac.parser": MagicMock()}):
-            from gitsync.pac_support import PACProxyDetector
+            from gitbridge.pac_support import PACProxyDetector
 
             self.detector = PACProxyDetector()
 
@@ -794,7 +800,7 @@ class TestAdditionalCoverage:
         """Test PAC content download from UNC path."""
         with (
             patch("builtins.open", mock_open(read_data="PAC UNC content")),
-            patch("gitsync.pac_support.platform.system", return_value="Windows"),
+            patch("gitbridge.pac_support.platform.system", return_value="Windows"),
         ):
             result = self.detector.download_pac_content("file://server/share/pac.js")
             assert result == "PAC UNC content"
@@ -811,7 +817,7 @@ class TestAdditionalCoverage:
         mock_pac.find_proxy_for_url.return_value = ""
         self.detector.pac_object = mock_pac
 
-        with patch("gitsync.pac_support.PYPAC_AVAILABLE", True):
+        with patch("gitbridge.pac_support.PYPAC_AVAILABLE", True):
             result = self.detector.extract_proxy_from_pac("https://api.github.com")
 
         assert result is None
@@ -820,7 +826,7 @@ class TestAdditionalCoverage:
         """Test proxy extraction when no PAC object exists."""
         self.detector.pac_object = None
 
-        with patch("gitsync.pac_support.PYPAC_AVAILABLE", True):
+        with patch("gitbridge.pac_support.PYPAC_AVAILABLE", True):
             result = self.detector.extract_proxy_from_pac("https://api.github.com")
 
         assert result is None
@@ -832,9 +838,9 @@ class TestAdditionalCoverage:
             patch.object(self.detector, "get_pac_url_from_registry", return_value="http://pac.example.com/pac.js"),
             patch.object(self.detector, "download_pac_content", return_value="invalid pac content"),
         ):
-            with patch("gitsync.pac_support.PYPAC_AVAILABLE", True):
+            with patch("gitbridge.pac_support.PYPAC_AVAILABLE", True):
                 # Mock pypac.parser.PACFile to raise an exception
-                with patch("gitsync.pac_support.pypac.parser.PACFile", side_effect=Exception("Parse error")):
+                with patch("gitbridge.pac_support.pypac.parser.PACFile", side_effect=Exception("Parse error")):
                     http_proxy, https_proxy = self.detector.get_proxy_for_url("https://api.github.com")
 
             # Should fall back to manual proxy detection
@@ -849,7 +855,7 @@ class TestAdditionalCoverage:
 
         # Mock the methods that might be called before using the cached pac_object
         with (
-            patch("gitsync.pac_support.PYPAC_AVAILABLE", True),
+            patch("gitbridge.pac_support.PYPAC_AVAILABLE", True),
             patch.object(self.detector, "get_pac_url_from_registry", return_value=None),
             patch.object(self.detector, "detect_pac_using_pypac", return_value=None),
             patch.object(self.detector, "extract_proxy_from_pac", return_value="http://cached.proxy.com:8080"),
@@ -866,7 +872,7 @@ class TestAdditionalCoverage:
         self.detector.pac_content = "cached pac content"
 
         with (
-            patch("gitsync.pac_support.PYPAC_AVAILABLE", True),
+            patch("gitbridge.pac_support.PYPAC_AVAILABLE", True),
             patch.object(self.detector, "get_pac_url_from_registry", return_value="http://pac.example.com/pac.js"),
         ):
             with patch("pypac.PACSession", return_value=mock_session):
@@ -878,17 +884,17 @@ class TestAdditionalCoverage:
         """Test is_available with different combinations of availability flags."""
         # Test Windows with only PYPAC available
         with (
-            patch("gitsync.pac_support.platform.system", return_value="Windows"),
-            patch("gitsync.pac_support.WINDOWS_AVAILABLE", False),
-            patch("gitsync.pac_support.PYPAC_AVAILABLE", True),
+            patch("gitbridge.pac_support.platform.system", return_value="Windows"),
+            patch("gitbridge.pac_support.WINDOWS_AVAILABLE", False),
+            patch("gitbridge.pac_support.PYPAC_AVAILABLE", True),
         ):
             assert self.detector.is_available() is True
 
     def test_detect_and_configure_proxy_with_settings_logged(self):
         """Test detect_and_configure_proxy with settings that get logged."""
-        from gitsync.pac_support import detect_and_configure_proxy
+        from gitbridge.pac_support import detect_and_configure_proxy
 
-        with patch("gitsync.pac_support.PACProxyDetector") as mock_detector_class:
+        with patch("gitbridge.pac_support.PACProxyDetector") as mock_detector_class:
             mock_detector = Mock()
             mock_detector.is_available.return_value = True
             mock_detector.get_all_proxy_settings.return_value = {

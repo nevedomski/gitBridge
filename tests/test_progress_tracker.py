@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from gitsync.progress_tracker import ProgressTracker
+from gitbridge.progress_tracker import ProgressTracker
 
 
 class TestProgressTracker:
@@ -17,7 +17,7 @@ class TestProgressTracker:
 
     def test_init_with_progress_bar(self) -> None:
         """Test initialization with progress bar"""
-        with patch("gitsync.progress_tracker.tqdm") as mock_tqdm:
+        with patch("gitbridge.progress_tracker.tqdm") as mock_tqdm:
             mock_progress_bar = Mock()
             mock_tqdm.return_value = mock_progress_bar
 
@@ -53,7 +53,7 @@ class TestProgressTracker:
 
     def test_update_progress_downloaded(self) -> None:
         """Test updating progress for downloaded file"""
-        with patch("gitsync.progress_tracker.tqdm") as mock_tqdm:
+        with patch("gitbridge.progress_tracker.tqdm") as mock_tqdm:
             mock_progress_bar = Mock()
             mock_tqdm.return_value = mock_progress_bar
 
@@ -72,7 +72,7 @@ class TestProgressTracker:
 
     def test_update_progress_skipped(self) -> None:
         """Test updating progress for skipped file"""
-        with patch("gitsync.progress_tracker.tqdm") as mock_tqdm:
+        with patch("gitbridge.progress_tracker.tqdm") as mock_tqdm:
             mock_progress_bar = Mock()
             mock_tqdm.return_value = mock_progress_bar
 
@@ -89,7 +89,7 @@ class TestProgressTracker:
 
     def test_update_progress_failed(self) -> None:
         """Test updating progress for failed file"""
-        with patch("gitsync.progress_tracker.tqdm") as mock_tqdm:
+        with patch("gitbridge.progress_tracker.tqdm") as mock_tqdm:
             mock_progress_bar = Mock()
             mock_tqdm.return_value = mock_progress_bar
 
@@ -116,7 +116,7 @@ class TestProgressTracker:
 
     def test_set_total_files(self) -> None:
         """Test setting total files"""
-        with patch("gitsync.progress_tracker.tqdm") as mock_tqdm:
+        with patch("gitbridge.progress_tracker.tqdm") as mock_tqdm:
             mock_progress_bar = Mock()
             mock_tqdm.return_value = mock_progress_bar
 
@@ -129,7 +129,7 @@ class TestProgressTracker:
 
     def test_update_postfix(self) -> None:
         """Test updating progress bar postfix"""
-        with patch("gitsync.progress_tracker.tqdm") as mock_tqdm:
+        with patch("gitbridge.progress_tracker.tqdm") as mock_tqdm:
             mock_progress_bar = Mock()
             mock_tqdm.return_value = mock_progress_bar
 
@@ -140,7 +140,7 @@ class TestProgressTracker:
 
     def test_set_description(self) -> None:
         """Test setting progress bar description"""
-        with patch("gitsync.progress_tracker.tqdm") as mock_tqdm:
+        with patch("gitbridge.progress_tracker.tqdm") as mock_tqdm:
             mock_progress_bar = Mock()
             mock_tqdm.return_value = mock_progress_bar
 
@@ -151,7 +151,7 @@ class TestProgressTracker:
 
     def test_close(self) -> None:
         """Test closing progress tracker"""
-        with patch("gitsync.progress_tracker.tqdm") as mock_tqdm:
+        with patch("gitbridge.progress_tracker.tqdm") as mock_tqdm:
             mock_progress_bar = Mock()
             mock_tqdm.return_value = mock_progress_bar
 
@@ -273,10 +273,10 @@ class TestProgressTracker:
         # Test zero case
         assert tracker.should_throttle(0, throttle_interval=100) is False
 
-    @patch("gitsync.progress_tracker.time.sleep")
+    @patch("gitbridge.progress_tracker.time.sleep")
     def test_log_throttle_pause(self, mock_sleep: Mock) -> None:
         """Test logging throttle pause"""
-        with patch("gitsync.progress_tracker.tqdm") as mock_tqdm:
+        with patch("gitbridge.progress_tracker.tqdm") as mock_tqdm:
             mock_progress_bar = Mock()
             mock_tqdm.return_value = mock_progress_bar
 

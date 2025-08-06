@@ -1,12 +1,12 @@
 # Branch Management Guide
 
-GitSync provides flexible options for synchronizing specific branches, tags, or commits from your GitHub repository. This guide covers all aspects of managing different repository references.
+GitBridge provides flexible options for synchronizing specific branches, tags, or commits from your GitHub repository. This guide covers all aspects of managing different repository references.
 
 ## Understanding References
 
 ### Reference Types
 
-GitSync supports three types of Git references:
+GitBridge supports three types of Git references:
 
 | Type | Format | Example | Use Case |
 |------|--------|---------|----------|
@@ -16,7 +16,7 @@ GitSync supports three types of Git references:
 
 ### Default Behavior
 
-If no reference is specified, GitSync uses these defaults in order:
+If no reference is specified, GitBridge uses these defaults in order:
 
 1. `main` branch
 2. `master` branch (if `main` doesn't exist)
@@ -38,17 +38,17 @@ repository:
 
 ```bash
 # Sync specific branch
-gitsync sync --repo https://github.com/user/repo \
+gitbridge sync --repo https://github.com/user/repo \
              --local ~/projects/repo \
              --ref develop
 
 # Sync specific tag
-gitsync sync --repo https://github.com/user/repo \
+gitbridge sync --repo https://github.com/user/repo \
              --local ~/projects/repo \
              --ref v1.2.3
 
 # Sync specific commit
-gitsync sync --repo https://github.com/user/repo \
+gitbridge sync --repo https://github.com/user/repo \
              --local ~/projects/repo \
              --ref abc123def456789
 ```
@@ -56,7 +56,7 @@ gitsync sync --repo https://github.com/user/repo \
 ### Python API
 
 ```python
-from gitsync.api_sync import GitHubAPISync
+from gitbridge.api_sync import GitHubAPISync
 
 # Sync branch
 sync = GitHubAPISync(repo_url, local_path)
@@ -75,7 +75,7 @@ sync.sync(ref="abc123def456789")
 
 ```bash
 # List all branches
-gitsync list-branches --repo https://github.com/user/repo
+gitbridge list-branches --repo https://github.com/user/repo
 
 # Output:
 # Available branches:
@@ -89,7 +89,7 @@ gitsync list-branches --repo https://github.com/user/repo
 
 ```bash
 # Switch to different branch
-gitsync sync --config config.yaml --ref feature/new-feature
+gitbridge sync --config config.yaml --ref feature/new-feature
 
 # This will:
 # 1. Fetch the new branch
@@ -99,10 +99,10 @@ gitsync sync --config config.yaml --ref feature/new-feature
 
 ### Branch Tracking
 
-GitSync tracks which branch you're syncing:
+GitBridge tracks which branch you're syncing:
 
 ```json
-// .gitsync/metadata.json
+// .gitbridge/metadata.json
 {
   "repository": {
     "url": "https://github.com/user/repo",
@@ -131,10 +131,10 @@ auth:
 
 ```bash
 # List all tags
-gitsync list-tags --repo https://github.com/user/repo
+gitbridge list-tags --repo https://github.com/user/repo
 
 # List tags with pattern
-gitsync list-tags --repo https://github.com/user/repo --pattern "v*"
+gitbridge list-tags --repo https://github.com/user/repo --pattern "v*"
 
 # Output:
 # Available tags:
@@ -159,7 +159,7 @@ repository:
 ### Semantic Version Support
 
 ```python
-from gitsync import GitHubAPISync
+from gitbridge import GitHubAPISync
 
 # Sync latest v1.x release
 sync = GitHubAPISync(repo_url, local_path)
@@ -173,17 +173,17 @@ sync.sync(ref=latest_v1)
 
 ```bash
 # Full SHA
-gitsync sync --ref abc123def456789012345678901234567890abcd
+gitbridge sync --ref abc123def456789012345678901234567890abcd
 
 # Short SHA (minimum 7 characters)
-gitsync sync --ref abc123d
+gitbridge sync --ref abc123d
 ```
 
 ### Finding Commits
 
 ```bash
 # Get latest commit on branch
-gitsync show-ref --repo https://github.com/user/repo --ref main
+gitbridge show-ref --repo https://github.com/user/repo --ref main
 
 # Output:
 # Reference: main
@@ -201,8 +201,8 @@ Use commits for reproducible syncs:
 ```yaml
 # Dockerfile example
 FROM python:3.11
-RUN pip install gitsync
-RUN gitsync sync \
+RUN pip install gitbridge
+RUN gitbridge sync \
     --repo https://github.com/user/repo \
     --local /app \
     --ref abc123def456  # Pin to specific commit
@@ -213,8 +213,8 @@ RUN gitsync sync \
 ### Dynamic Reference Resolution
 
 ```python
-from gitsync.repository_manager import RepositoryManager
-from gitsync.api_client import GitHubAPIClient
+from gitbridge.repository_manager import RepositoryManager
+from gitbridge.api_client import GitHubAPIClient
 
 # Create managers
 client = GitHubAPIClient(session, repo_url)
@@ -266,7 +266,7 @@ repository:
 branches=("main" "develop" "staging")
 
 for branch in "${branches[@]}"; do
-    gitsync sync \
+    gitbridge sync \
         --repo https://github.com/user/repo \
         --local ~/projects/repo-$branch \
         --ref $branch
@@ -293,14 +293,14 @@ Use based on environment:
 
 ```bash
 ENV=${ENV:-development}
-gitsync sync --config ${ENV}.yaml
+gitbridge sync --config ${ENV}.yaml
 ```
 
 ### A/B Testing Setup
 
 ```python
 import random
-from gitsync import GitHubAPISync
+from gitbridge import GitHubAPISync
 
 # A/B test between branches
 branch = random.choice(['feature-a', 'feature-b'])
@@ -314,7 +314,7 @@ sync.sync(ref=branch)
 
 ```bash
 # Validate reference before sync
-gitsync validate-ref \
+gitbridge validate-ref \
     --repo https://github.com/user/repo \
     --ref feature/new-feature
 
@@ -328,7 +328,7 @@ gitsync validate-ref \
 ### Handling Invalid References
 
 ```python
-from gitsync.exceptions import InvalidRefError
+from gitbridge.exceptions import InvalidRefError
 
 try:
     sync.sync(ref="non-existent-branch")
@@ -398,8 +398,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          pip install gitsync
-          gitsync sync \
+          pip install gitbridge
+          gitbridge sync \
             --repo ${{ github.repository }} \
             --local ./repo \
             --ref ${{ steps.ref.outputs.REF }}
@@ -421,7 +421,7 @@ pipeline {
         stage('Sync') {
             steps {
                 sh """
-                    gitsync sync \
+                    gitbridge sync \
                         --repo https://github.com/user/repo \
                         --local ./repo \
                         --ref ${params.BRANCH}
@@ -443,10 +443,10 @@ pipeline {
 **Solutions**:
 ```bash
 # Check if reference exists
-gitsync list-branches --repo https://github.com/user/repo | grep xyz
+gitbridge list-branches --repo https://github.com/user/repo | grep xyz
 
 # Use full reference name
-gitsync sync --ref refs/heads/feature/xyz
+gitbridge sync --ref refs/heads/feature/xyz
 ```
 
 #### Ambiguous Reference
@@ -468,7 +468,7 @@ repository:
 **Solutions**:
 ```bash
 # Ensure token has appropriate permissions
-gitsync validate --config config.yaml --check-auth
+gitbridge validate --config config.yaml --check-auth
 
 # Check branch protection rules on GitHub
 ```
@@ -477,10 +477,10 @@ gitsync validate --config config.yaml --check-auth
 
 ```bash
 # Enable debug logging for references
-GITSYNC_DEBUG=refs gitsync sync --config config.yaml -v
+GITSYNC_DEBUG=refs gitbridge sync --config config.yaml -v
 
 # Trace reference resolution
-gitsync sync --config config.yaml --trace-refs
+gitbridge sync --config config.yaml --trace-refs
 ```
 
 ## Best Practices
@@ -524,7 +524,7 @@ def validate_ref(ref):
 
 ```bash
 # Set up notifications for reference updates
-gitsync watch \
+gitbridge watch \
     --repo https://github.com/user/repo \
     --ref main \
     --notify-on-change

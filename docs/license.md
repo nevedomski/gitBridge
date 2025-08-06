@@ -1,10 +1,10 @@
 # License
 
-GitSync is released under the MIT License.
+GitBridge is released under the MIT License.
 
 ## MIT License
 
-Copyright (c) 2025 GitSync Team
+Copyright (c) 2025 GitBridge Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ SOFTWARE.
 
 ## Third-Party Licenses
 
-GitSync makes use of several open-source libraries. Each of these libraries comes with its own license:
+GitBridge makes use of several open-source libraries. Each of these libraries comes with its own license:
 
 - **requests** - Apache License 2.0
 - **click** - BSD License

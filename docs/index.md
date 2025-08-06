@@ -1,8 +1,8 @@
-# GitSync - GitHub Repository Synchronization Tool
+# GitBridge - GitHub Repository Synchronization Tool
 
 <div align="center">
 
-![GitSync Logo](assets/banner.png)
+![GitBridge Logo](assets/banner.png)
 
 **Synchronize GitHub repositories when direct git access is blocked**
 
@@ -12,13 +12,13 @@
 [![Coverage](https://img.shields.io/badge/coverage-94%25-brightgreen)](troubleshooting/index.md)
 
 [Get Started](getting-started/quick-start.md){ .md-button .md-button--primary }
-[View on GitHub](https://github.com/nevedomski/gitsync){ .md-button }
+[View on GitHub](https://github.com/nevedomski/gitbridge){ .md-button }
 
 </div>
 
 ## Overview
 
-GitSync is a powerful Python tool designed to synchronize GitHub repositories to local folders when direct git access is blocked. It provides two synchronization methods - GitHub API and browser automation - ensuring you can always access your code, even in restricted network environments.
+GitBridge is a powerful Python tool designed to synchronize GitHub repositories to local folders when direct git access is blocked. It provides two synchronization methods - GitHub API and browser automation - ensuring you can always access your code, even in restricted network environments.
 
 ## Key Features
 
@@ -50,15 +50,15 @@ GitSync is a powerful Python tool designed to synchronize GitHub repositories to
 
     ```bash
     # Basic sync
-    gitsync sync --repo https://github.com/user/repo --local ~/projects/repo
+    gitbridge sync --repo https://github.com/user/repo --local ~/projects/repo
 
     # With authentication
-    gitsync sync --repo https://github.com/user/repo \
+    gitbridge sync --repo https://github.com/user/repo \
                  --local ~/projects/repo \
                  --token YOUR_GITHUB_TOKEN
 
     # Corporate environment with auto-detection
-    gitsync sync --config config.yaml --auto-proxy --auto-cert
+    gitbridge sync --config config.yaml --auto-proxy --auto-cert
     ```
 
 === "Configuration File"
@@ -82,7 +82,7 @@ GitSync is a powerful Python tool designed to synchronize GitHub repositories to
 === "Python API"
 
     ```python
-    from gitsync import GitHubAPISync
+    from gitbridge import GitHubAPISync
 
     sync = GitHubAPISync(
         repo_url="https://github.com/user/repo",
@@ -95,7 +95,7 @@ GitSync is a powerful Python tool designed to synchronize GitHub repositories to
     print(f"Synced {changes['updated']} files")
     ```
 
-## Why GitSync?
+## Why GitBridge?
 
 ### The Problem
 
@@ -103,7 +103,7 @@ Many corporate and institutional networks block direct git access (SSH and HTTPS
 
 ### The Solution
 
-GitSync provides two robust methods to synchronize repositories:
+GitBridge provides two robust methods to synchronize repositories:
 
 1. **API Method**: Uses GitHub's REST API over HTTPS (same as browser traffic)
 2. **Browser Method**: Automates a real browser to download files when API is blocked
@@ -120,14 +120,14 @@ Both methods support:
 
 ```bash
 # Using pip
-pip install gitsync
+pip install gitbridge
 
 # Using uv (recommended)
-uv pip install gitsync
+uv pip install gitbridge
 
 # From source
-git clone https://github.com/nevedomski/gitsync
-cd gitsync
+git clone https://github.com/nevedomski/gitbridge
+cd gitbridge
 uv pip install -e .
 ```
 
@@ -147,7 +147,7 @@ uv pip install -e .
   Complete command-line interface documentation
 
 - :material-architecture: **[Architecture](architecture/index.md)**  
-  Technical details about how GitSync works
+  Technical details about how GitBridge works
 
 - :material-api: **[API Reference](api/index.md)**  
   Python API documentation for developers
@@ -166,13 +166,13 @@ uv pip install -e .
 
 ## Support
 
-- :material-github: [GitHub Issues](https://github.com/nevedomski/gitsync/issues)
+- :material-github: [GitHub Issues](https://github.com/nevedomski/gitbridge/issues)
 - :material-book: [Documentation](index.md)
 - :material-email: [Email Support](mailto:info@nevedomski.us)
 
 ## License
 
-GitSync is open source software licensed under the [MIT License](license.md).
+GitBridge is open source software licensed under the [MIT License](license.md).
 
 ---
 

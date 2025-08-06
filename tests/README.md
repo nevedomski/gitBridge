@@ -1,10 +1,10 @@
-# Testing Architecture for gitSync
+# Testing Architecture for gitBridge
 
-This document explains how to use the cross-platform testing architecture for the gitSync project.
+This document explains how to use the cross-platform testing architecture for the gitBridge project.
 
 ## Overview
 
-The gitSync project includes platform-specific functionality for Windows (PAC proxy support, Windows certificate store access) that needs to work reliably across all platforms during testing. Our testing architecture uses comprehensive mocking and platform detection to ensure:
+The gitBridge project includes platform-specific functionality for Windows (PAC proxy support, Windows certificate store access) that needs to work reliably across all platforms during testing. Our testing architecture uses comprehensive mocking and platform detection to ensure:
 
 - Tests pass on all platforms (Windows, Linux, macOS)
 - Windows-specific functionality is thoroughly tested via mocking on all platforms
@@ -101,7 +101,7 @@ The `conftest.py` file provides several platform-specific fixtures:
 def test_pac_detection(windows_mock_modules):
     """Test PAC detection with mocked Windows modules."""
     with patch.dict("sys.modules", windows_mock_modules):
-        from gitsync.pac_support import PACProxyDetector
+        from gitbridge.pac_support import PACProxyDetector
         detector = PACProxyDetector()
         # Test logic here
 ```
@@ -118,7 +118,7 @@ from tests.platform_utils import skip_on_non_windows
 def test_windows_certificates():
     """Test Windows certificate store access."""
     # This test runs only on Windows
-    from gitsync.cert_support import WindowsCertificateDetector
+    from gitbridge.cert_support import WindowsCertificateDetector
     detector = WindowsCertificateDetector()
     assert detector.is_available()
 ```

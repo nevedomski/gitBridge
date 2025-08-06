@@ -1,4 +1,4 @@
-# Pre-commit configuration for gitSync project
+# Pre-commit configuration for gitBridge project
 # Run `pre-commit install` to set up the git hooks
 # Run `pre-commit run --all-files` to run hooks on all files
 

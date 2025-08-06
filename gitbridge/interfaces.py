@@ -1,7 +1,7 @@
 """Abstract interfaces for better abstraction and extensibility.
 
 This module defines abstract base classes that provide clear contracts for different
-components of the gitSync system. These interfaces enable better separation of concerns,
+components of the gitBridge system. These interfaces enable better separation of concerns,
 easier testing, and future extensibility.
 
 Key Interfaces:
@@ -17,8 +17,8 @@ Design Principles:
     - Error handling is delegated to implementations
 
 Typical Usage:
-    >>> from gitsync.interfaces import SyncProvider
-    >>> from gitsync.api_sync import GitHubAPISync
+    >>> from gitbridge.interfaces import SyncProvider
+    >>> from gitbridge.api_sync import GitHubAPISync
     >>>
     >>> sync_provider: SyncProvider = GitHubAPISync(...)
     >>> if sync_provider.test_connection():
@@ -52,7 +52,7 @@ class SyncProvider(ABC):
 
     DOCDEV-NOTE: Future Implementations
         Planned implementations include:
-        - GitSyncProvider: Direct git operations when available
+        - GitBridgeProvider: Direct git operations when available
         - S3SyncProvider: Sync from S3-hosted repositories
         - BitbucketSyncProvider: Support for Bitbucket repositories
         - GitLabSyncProvider: Support for GitLab repositories

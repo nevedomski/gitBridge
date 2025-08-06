@@ -4,7 +4,7 @@ import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from gitsync.api_sync import GitHubAPISync
+from gitbridge.api_sync import GitHubAPISync
 
 
 class TestGitHubAPISync:
@@ -16,9 +16,9 @@ class TestGitHubAPISync:
         self.repo_url = "https://github.com/owner/repo"
         self.token = "test_token"
 
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.FileSynchronizer")
     def test_init_basic(self, mock_file_sync, mock_repo_mgr, mock_client):
         """Test basic initialization without optional parameters"""
         sync = GitHubAPISync(self.repo_url, self.temp_dir)
@@ -41,9 +41,9 @@ class TestGitHubAPISync:
         mock_repo_mgr.assert_called_once_with(mock_client.return_value)
         mock_file_sync.assert_called_once_with(mock_client.return_value, Path(self.temp_dir))
 
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.FileSynchronizer")
     def test_init_with_token(self, mock_file_sync, mock_repo_mgr, mock_client):
         """Test initialization with authentication token"""
         sync = GitHubAPISync(self.repo_url, self.temp_dir, token=self.token)
@@ -60,9 +60,9 @@ class TestGitHubAPISync:
             auto_cert=False,
         )
 
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.FileSynchronizer")
     def test_init_ssl_disabled(self, mock_file_sync, mock_repo_mgr, mock_client):
         """Test initialization with SSL verification disabled"""
         GitHubAPISync(self.repo_url, self.temp_dir, verify_ssl=False)
@@ -77,9 +77,9 @@ class TestGitHubAPISync:
             auto_cert=False,
         )
 
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.FileSynchronizer")
     def test_init_with_ca_bundle(self, mock_file_sync, mock_repo_mgr, mock_client):
         """Test initialization with custom CA bundle"""
         ca_bundle_path = "/path/to/ca-bundle.crt"
@@ -96,9 +96,9 @@ class TestGitHubAPISync:
             auto_cert=False,
         )
 
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.FileSynchronizer")
     def test_init_auto_cert(self, mock_file_sync, mock_repo_mgr, mock_client):
         """Test initialization with auto certificate detection"""
         GitHubAPISync(self.repo_url, self.temp_dir, auto_cert=True)
@@ -113,9 +113,9 @@ class TestGitHubAPISync:
             auto_cert=True,
         )
 
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.FileSynchronizer")
     def test_init_auto_proxy(self, mock_file_sync, mock_repo_mgr, mock_client):
         """Test initialization with auto proxy detection"""
         GitHubAPISync(self.repo_url, self.temp_dir, auto_proxy=True)
@@ -130,9 +130,9 @@ class TestGitHubAPISync:
             auto_cert=False,
         )
 
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.FileSynchronizer")
     def test_test_connection_success(self, mock_file_sync, mock_repo_mgr, mock_client):
         """Test successful connection test"""
         mock_client_instance = Mock()
@@ -145,9 +145,9 @@ class TestGitHubAPISync:
         assert result is True
         mock_client_instance.test_connection.assert_called_once()
 
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.FileSynchronizer")
     def test_test_connection_failure(self, mock_file_sync, mock_repo_mgr, mock_client):
         """Test connection test failure"""
         mock_client_instance = Mock()
@@ -159,9 +159,9 @@ class TestGitHubAPISync:
 
         assert result is False
 
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.FileSynchronizer")
     def test_get_rate_limit(self, mock_file_sync, mock_repo_mgr, mock_client):
         """Test getting rate limit information"""
         mock_client_instance = Mock()
@@ -175,9 +175,9 @@ class TestGitHubAPISync:
         assert result == rate_limit_data
         mock_client_instance.get_rate_limit.assert_called_once()
 
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.FileSynchronizer")
     def test_resolve_ref(self, mock_file_sync, mock_repo_mgr, mock_client):
         """Test resolving a reference to a commit SHA"""
         mock_client_instance = Mock()
@@ -194,9 +194,9 @@ class TestGitHubAPISync:
         assert result == sha
         mock_repo_instance.resolve_ref.assert_called_once_with("main")
 
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.FileSynchronizer")
     def test_get_repository_tree(self, mock_file_sync, mock_repo_mgr, mock_client):
         """Test getting repository tree structure"""
         mock_client_instance = Mock()
@@ -216,11 +216,11 @@ class TestGitHubAPISync:
         assert result == tree_data
         mock_repo_instance.get_repository_tree.assert_called_once_with("sha123", True)
 
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.FileSynchronizer")
-    @patch("gitsync.api_sync.ProgressTracker")
-    @patch("gitsync.api_sync.ensure_dir")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.ProgressTracker")
+    @patch("gitbridge.api_sync.ensure_dir")
     def test_sync_success(self, mock_ensure_dir, mock_progress_tracker, mock_file_sync, mock_repo_mgr, mock_client):
         """Test successful repository sync"""
         mock_client_instance = Mock()
@@ -250,11 +250,11 @@ class TestGitHubAPISync:
         mock_repo_instance.get_repository_tree.assert_called_once_with("main", True)
         mock_sync_instance.sync_file.assert_called_once()
 
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.FileSynchronizer")
-    @patch("gitsync.api_sync.ProgressTracker")
-    @patch("gitsync.api_sync.ensure_dir")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.ProgressTracker")
+    @patch("gitbridge.api_sync.ensure_dir")
     def test_sync_with_ref(self, mock_ensure_dir, mock_progress_tracker, mock_file_sync, mock_repo_mgr, mock_client):
         """Test sync with specific reference"""
         mock_client_instance = Mock()
@@ -278,9 +278,9 @@ class TestGitHubAPISync:
         assert result is True
         mock_repo_instance.get_repository_tree.assert_called_once_with("develop", True)
 
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.FileSynchronizer")
     def test_sync_ref_not_found(self, mock_file_sync, mock_repo_mgr, mock_client):
         """Test sync when reference is not found"""
         mock_client_instance = Mock()
@@ -299,9 +299,9 @@ class TestGitHubAPISync:
 
         assert result is False
 
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.FileSynchronizer")
     def test_sync_tree_error(self, mock_file_sync, mock_repo_mgr, mock_client):
         """Test sync when getting tree fails"""
         mock_client_instance = Mock()
@@ -320,11 +320,11 @@ class TestGitHubAPISync:
 
         assert result is False
 
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.FileSynchronizer")
-    @patch("gitsync.api_sync.ProgressTracker")
-    @patch("gitsync.api_sync.ensure_dir")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.ProgressTracker")
+    @patch("gitbridge.api_sync.ensure_dir")
     def test_sync_with_progress(
         self, mock_ensure_dir, mock_progress_tracker, mock_file_sync, mock_repo_mgr, mock_client
     ):
@@ -355,11 +355,11 @@ class TestGitHubAPISync:
         assert result is True
         mock_progress_tracker.assert_called_once_with(total_files=1, show_progress=True, desc="Syncing files")
 
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.FileSynchronizer")
-    @patch("gitsync.api_sync.ProgressTracker")
-    @patch("gitsync.api_sync.ensure_dir")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.ProgressTracker")
+    @patch("gitbridge.api_sync.ensure_dir")
     def test_sync_skip_existing(
         self, mock_ensure_dir, mock_progress_tracker, mock_file_sync, mock_repo_mgr, mock_client
     ):
@@ -391,9 +391,9 @@ class TestGitHubAPISync:
         mock_sync_instance.sync_file.assert_not_called()
         mock_tracker_instance.update_progress.assert_called_once_with("existing.txt", skipped=True)
 
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.FileSynchronizer")
     def test_sync_connection_failure(self, mock_file_sync, mock_repo_mgr, mock_client):
         """Test sync fails when connection test fails"""
         mock_client_instance = Mock()

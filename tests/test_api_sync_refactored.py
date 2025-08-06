@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from gitsync.api_sync import GitHubAPISync
+from gitbridge.api_sync import GitHubAPISync
 
 
 class TestGitHubAPISyncFacade:
@@ -18,10 +18,10 @@ class TestGitHubAPISyncFacade:
         self.repo_url = "https://github.com/owner/repo"
         self.token = "test_token"
 
-    @patch("gitsync.api_sync.FileSynchronizer")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.parse_github_url")
+    @patch("gitbridge.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.parse_github_url")
     def test_init_basic(self, mock_parse_url, mock_api_client, mock_repo_manager, mock_file_sync):
         """Test basic initialization of facade"""
         mock_parse_url.return_value = ("owner", "repo")
@@ -53,10 +53,10 @@ class TestGitHubAPISyncFacade:
             auto_cert=False,
         )
 
-    @patch("gitsync.api_sync.FileSynchronizer")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.parse_github_url")
+    @patch("gitbridge.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.parse_github_url")
     def test_init_with_options(self, mock_parse_url, mock_api_client, mock_repo_manager, mock_file_sync):
         """Test initialization with all options"""
         mock_parse_url.return_value = ("owner", "repo")
@@ -88,10 +88,10 @@ class TestGitHubAPISyncFacade:
             auto_cert=True,
         )
 
-    @patch("gitsync.api_sync.FileSynchronizer")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.parse_github_url")
+    @patch("gitbridge.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.parse_github_url")
     def test_test_connection_success(self, mock_parse_url, mock_api_client, mock_repo_manager, mock_file_sync):
         """Test successful connection test delegation"""
         mock_parse_url.return_value = ("owner", "repo")
@@ -107,10 +107,10 @@ class TestGitHubAPISyncFacade:
         assert result is True
         mock_client.test_connection.assert_called_once()
 
-    @patch("gitsync.api_sync.FileSynchronizer")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.parse_github_url")
+    @patch("gitbridge.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.parse_github_url")
     def test_test_connection_exception(self, mock_parse_url, mock_api_client, mock_repo_manager, mock_file_sync):
         """Test connection test with exception handling"""
         mock_parse_url.return_value = ("owner", "repo")
@@ -125,10 +125,10 @@ class TestGitHubAPISyncFacade:
 
         assert result is False
 
-    @patch("gitsync.api_sync.FileSynchronizer")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.parse_github_url")
+    @patch("gitbridge.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.parse_github_url")
     def test_get_rate_limit(self, mock_parse_url, mock_api_client, mock_repo_manager, mock_file_sync):
         """Test rate limit delegation"""
         mock_parse_url.return_value = ("owner", "repo")
@@ -145,10 +145,10 @@ class TestGitHubAPISyncFacade:
         assert result == expected_rate_limit
         mock_client.get_rate_limit.assert_called_once()
 
-    @patch("gitsync.api_sync.FileSynchronizer")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.parse_github_url")
+    @patch("gitbridge.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.parse_github_url")
     def test_resolve_ref(self, mock_parse_url, mock_api_client, mock_repo_manager, mock_file_sync):
         """Test reference resolution delegation"""
         mock_parse_url.return_value = ("owner", "repo")
@@ -165,10 +165,10 @@ class TestGitHubAPISyncFacade:
         assert result == expected_sha
         mock_repository.resolve_ref.assert_called_once_with("main")
 
-    @patch("gitsync.api_sync.FileSynchronizer")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.parse_github_url")
+    @patch("gitbridge.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.parse_github_url")
     def test_get_repository_tree(self, mock_parse_url, mock_api_client, mock_repo_manager, mock_file_sync):
         """Test repository tree delegation"""
         mock_parse_url.return_value = ("owner", "repo")
@@ -185,12 +185,12 @@ class TestGitHubAPISyncFacade:
         assert result == expected_tree
         mock_repository.get_repository_tree.assert_called_once_with("main", False)
 
-    @patch("gitsync.api_sync.ensure_dir")
-    @patch("gitsync.api_sync.ProgressTracker")
-    @patch("gitsync.api_sync.FileSynchronizer")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.parse_github_url")
+    @patch("gitbridge.api_sync.ensure_dir")
+    @patch("gitbridge.api_sync.ProgressTracker")
+    @patch("gitbridge.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.parse_github_url")
     def test_sync_success(
         self, mock_parse_url, mock_api_client, mock_repo_manager, mock_file_sync, mock_progress_tracker, mock_ensure_dir
     ):
@@ -234,10 +234,10 @@ class TestGitHubAPISyncFacade:
         mock_synchronizer.save_hash_cache.assert_called_once()
         mock_tracker.print_summary.assert_called_once()
 
-    @patch("gitsync.api_sync.FileSynchronizer")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.parse_github_url")
+    @patch("gitbridge.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.parse_github_url")
     def test_sync_connection_failure(self, mock_parse_url, mock_api_client, mock_repo_manager, mock_file_sync):
         """Test sync with connection failure"""
         mock_parse_url.return_value = ("owner", "repo")
@@ -255,10 +255,10 @@ class TestGitHubAPISyncFacade:
         assert result is False
         mock_client.test_connection.assert_called_once()
 
-    @patch("gitsync.api_sync.FileSynchronizer")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.parse_github_url")
+    @patch("gitbridge.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.parse_github_url")
     def test_sync_tree_failure(self, mock_parse_url, mock_api_client, mock_repo_manager, mock_file_sync):
         """Test sync with tree retrieval failure"""
         mock_parse_url.return_value = ("owner", "repo")
@@ -279,10 +279,10 @@ class TestGitHubAPISyncFacade:
 
         assert result is False
 
-    @patch("gitsync.api_sync.FileSynchronizer")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.parse_github_url")
+    @patch("gitbridge.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.parse_github_url")
     def test_backward_compatibility_methods(self, mock_parse_url, mock_api_client, mock_repo_manager, mock_file_sync):
         """Test backward compatibility delegation methods"""
         mock_parse_url.return_value = ("owner", "repo")
@@ -319,10 +319,10 @@ class TestGitHubAPISyncFacade:
         assert result is True
         mock_synchronizer.sync_file.assert_called_once_with(entry)
 
-    @patch("gitsync.api_sync.FileSynchronizer")
-    @patch("gitsync.api_sync.RepositoryManager")
-    @patch("gitsync.api_sync.GitHubAPIClient")
-    @patch("gitsync.api_sync.parse_github_url")
+    @patch("gitbridge.api_sync.FileSynchronizer")
+    @patch("gitbridge.api_sync.RepositoryManager")
+    @patch("gitbridge.api_sync.GitHubAPIClient")
+    @patch("gitbridge.api_sync.parse_github_url")
     def test_close_and_context_manager(self, mock_parse_url, mock_api_client, mock_repo_manager, mock_file_sync):
         """Test resource cleanup and context manager usage"""
         mock_parse_url.return_value = ("owner", "repo")
@@ -343,7 +343,7 @@ class TestGitHubAPISyncFacade:
         # Close should be called when exiting context
         assert mock_client.close.call_count == 2  # Once from explicit close, once from context manager
 
-    @patch("gitsync.api_sync.parse_github_url")
+    @patch("gitbridge.api_sync.parse_github_url")
     def test_invalid_github_url(self, mock_parse_url):
         """Test initialization with invalid GitHub URL"""
         mock_parse_url.side_effect = ValueError("Invalid URL")

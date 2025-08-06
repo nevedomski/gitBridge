@@ -1,6 +1,6 @@
 # User Guide
 
-Welcome to the GitSync User Guide. This comprehensive guide will help you understand and use all features of GitSync effectively.
+Welcome to the GitBridge User Guide. This comprehensive guide will help you understand and use all features of GitBridge effectively.
 
 ## What You'll Learn
 
@@ -19,7 +19,7 @@ This guide covers everything from basic usage to advanced configurations:
 Learn about the two synchronization methods (API and Browser) and when to use each one.
 
 ### [Configuration](configuration.md)
-Detailed guide to configuring GitSync using YAML files, environment variables, and command-line options.
+Detailed guide to configuring GitBridge using YAML files, environment variables, and command-line options.
 
 ### [Authentication](authentication.md)
 Set up authentication for both API and browser methods, including token management and security best practices.
@@ -31,7 +31,7 @@ Understand how incremental synchronization works and how to optimize sync perfor
 Learn how to sync specific branches, tags, or commits from your repository.
 
 ### [Corporate Setup](corporate-setup.md)
-Configure GitSync for corporate environments with proxies, PAC scripts, and custom certificates.
+Configure GitBridge for corporate environments with proxies, PAC scripts, and custom certificates.
 
 ### [Proxy Configuration](proxy-configuration.md)
 Detailed guide to configuring various proxy types including HTTP, HTTPS, SOCKS, and PAC scripts.
@@ -46,7 +46,7 @@ Handle custom SSL certificates and certificate verification in restricted enviro
 Sync a public repository:
 
 ```bash
-gitsync sync --repo https://github.com/user/repo --local ~/projects/repo
+gitbridge sync --repo https://github.com/user/repo --local ~/projects/repo
 ```
 
 ### Authenticated Sync
@@ -56,10 +56,10 @@ Sync a private repository with authentication:
 ```bash
 # Using environment variable
 export GITHUB_TOKEN=your_token_here
-gitsync sync --repo https://github.com/user/private-repo --local ~/projects/repo
+gitbridge sync --repo https://github.com/user/private-repo --local ~/projects/repo
 
 # Or directly in command
-gitsync sync --repo https://github.com/user/private-repo \
+gitbridge sync --repo https://github.com/user/private-repo \
              --local ~/projects/repo \
              --token your_token_here
 ```
@@ -70,10 +70,10 @@ Sync in a corporate environment with auto-detection:
 
 ```bash
 # Windows with auto-detection
-gitsync sync --config config.yaml --auto-proxy --auto-cert
+gitbridge sync --config config.yaml --auto-proxy --auto-cert
 
 # Manual proxy configuration
-gitsync sync --repo https://github.com/user/repo \
+gitbridge sync --repo https://github.com/user/repo \
              --local ~/projects/repo \
              --proxy http://proxy.company.com:8080
 ```
@@ -105,7 +105,7 @@ network:
 Then run:
 
 ```bash
-gitsync sync --config config.yaml
+gitbridge sync --config config.yaml
 ```
 
 ## Best Practices
@@ -140,7 +140,7 @@ This only downloads changed files after the initial sync.
 
 - Use `--auto-proxy` and `--auto-cert` on Windows
 - Configure specific proxy settings if auto-detection fails
-- Test connectivity with `gitsync status` before syncing
+- Test connectivity with `gitbridge status` before syncing
 
 ### 5. Monitor Sync Operations
 
@@ -156,7 +156,7 @@ Sync repositories in CI/CD pipelines:
 
 ```bash
 # In your CI script
-gitsync sync --repo $REPO_URL --local ./source --token $CI_TOKEN
+gitbridge sync --repo $REPO_URL --local ./source --token $CI_TOKEN
 ```
 
 ### Backup Solution
@@ -165,7 +165,7 @@ Create regular backups of repositories:
 
 ```bash
 # Cron job for daily backup
-0 2 * * * gitsync sync --config /path/to/backup-config.yaml
+0 2 * * * gitbridge sync --config /path/to/backup-config.yaml
 ```
 
 ### Development Environment
@@ -175,7 +175,7 @@ Keep local copies synchronized:
 ```bash
 # Sync multiple repositories
 for repo in repo1 repo2 repo3; do
-    gitsync sync --config configs/$repo.yaml
+    gitbridge sync --config configs/$repo.yaml
 done
 ```
 
@@ -210,7 +210,7 @@ If you encounter issues:
 
 1. Check the [Troubleshooting Guide](../troubleshooting/index.md)
 2. Run with verbose mode (`-v`) for detailed output
-3. Check the [GitHub Issues](https://github.com/nevedomski/gitsync/issues)
+3. Check the [GitHub Issues](https://github.com/nevedomski/gitbridge/issues)
 4. Contact support if needed
 
 ## Next Steps

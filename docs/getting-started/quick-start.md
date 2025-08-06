@@ -1,12 +1,12 @@
 # Quick Start Guide
 
-Get up and running with GitSync in under 5 minutes! This guide will walk you through syncing your first repository.
+Get up and running with GitBridge in under 5 minutes! This guide will walk you through syncing your first repository.
 
 ## Prerequisites
 
 Before starting, ensure you have:
 
-- [x] GitSync installed ([Installation Guide](installation.md))
+- [x] GitBridge installed ([Installation Guide](installation.md))
 - [x] Network access to GitHub.com
 - [x] A target directory for the synced repository
 
@@ -15,15 +15,15 @@ Before starting, ensure you have:
 Let's start by syncing a public repository:
 
 ```bash
-gitsync sync --repo https://github.com/python/cpython --local ~/projects/cpython
+gitbridge sync --repo https://github.com/python/cpython --local ~/projects/cpython
 ```
 
 What happens:
 
-1. GitSync connects to the GitHub repository
+1. GitBridge connects to the GitHub repository
 2. Downloads the entire repository structure
 3. Saves files to `~/projects/cpython`
-4. Creates `.gitsync/metadata.json` for tracking
+4. Creates `.gitbridge/metadata.json` for tracking
 
 !!! success "Success!"
     You've synced your first repository! The output will show:
@@ -38,10 +38,10 @@ What happens:
 Run the same command again:
 
 ```bash
-gitsync sync --repo https://github.com/python/cpython --local ~/projects/cpython
+gitbridge sync --repo https://github.com/python/cpython --local ~/projects/cpython
 ```
 
-Notice how it's much faster! GitSync only downloads changed files:
+Notice how it's much faster! GitBridge only downloads changed files:
 
 ```
 ✓ Repository synced successfully  
@@ -72,7 +72,7 @@ Instead of typing long commands, create a configuration file:
 
     ```bash
     # Now just run:
-    gitsync sync --config config.yaml
+    gitbridge sync --config config.yaml
     ```
 
 ## Step 4: Syncing Private Repositories
@@ -91,7 +91,7 @@ For private repositories, you need authentication:
 === "Command Line"
 
     ```bash
-    gitsync sync \
+    gitbridge sync \
       --repo https://github.com/yourusername/private-repo \
       --local ~/projects/private-repo \
       --token ghp_YourGitHubTokenHere
@@ -101,7 +101,7 @@ For private repositories, you need authentication:
 
     ```bash
     export GITHUB_TOKEN=ghp_YourGitHubTokenHere
-    gitsync sync \
+    gitbridge sync \
       --repo https://github.com/yourusername/private-repo \
       --local ~/projects/private-repo
     ```
@@ -125,13 +125,13 @@ Sync a specific branch, tag, or commit:
 
 ```bash
 # Sync a branch
-gitsync sync --repo https://github.com/user/repo --local ~/repo --ref develop
+gitbridge sync --repo https://github.com/user/repo --local ~/repo --ref develop
 
 # Sync a tag
-gitsync sync --repo https://github.com/user/repo --local ~/repo --ref v1.0.0
+gitbridge sync --repo https://github.com/user/repo --local ~/repo --ref v1.0.0
 
 # Sync a specific commit
-gitsync sync --repo https://github.com/user/repo --local ~/repo --ref abc123def
+gitbridge sync --repo https://github.com/user/repo --local ~/repo --ref abc123def
 ```
 
 ## Common Use Cases
@@ -142,10 +142,10 @@ If you're behind a corporate proxy:
 
 ```bash
 # Auto-detect proxy from system
-gitsync sync --config config.yaml --auto-proxy
+gitbridge sync --config config.yaml --auto-proxy
 
 # Or specify manually
-gitsync sync --config config.yaml --proxy http://proxy.company.com:8080
+gitbridge sync --config config.yaml --proxy http://proxy.company.com:8080
 ```
 
 ### When API Access is Blocked
@@ -153,7 +153,7 @@ gitsync sync --config config.yaml --proxy http://proxy.company.com:8080
 Use browser automation as fallback:
 
 ```bash
-gitsync sync --repo https://github.com/user/repo --local ~/repo --method browser
+gitbridge sync --repo https://github.com/user/repo --local ~/repo --method browser
 ```
 
 !!! warning "Browser Mode"
@@ -164,7 +164,7 @@ gitsync sync --repo https://github.com/user/repo --local ~/repo --method browser
 Before syncing, check the repository status:
 
 ```bash
-gitsync status --config config.yaml
+gitbridge status --config config.yaml
 ```
 
 Output:
@@ -183,10 +183,10 @@ Status: 42 files outdated
 
 | Command | Description |
 |---------|-------------|
-| `gitsync sync` | Synchronize repository |
-| `gitsync status` | Check repository status |
-| `gitsync --help` | Show help message |
-| `gitsync --version` | Show version |
+| `gitbridge sync` | Synchronize repository |
+| `gitbridge status` | Check repository status |
+| `gitbridge --help` | Show help message |
+| `gitbridge --version` | Show version |
 
 ### Key Options
 
@@ -212,21 +212,21 @@ Status: 42 files outdated
 !!! tip "Multiple Repositories"
     Create multiple config files:
     ```bash
-    gitsync sync --config work-repo.yaml
-    gitsync sync --config personal-repo.yaml
+    gitbridge sync --config work-repo.yaml
+    gitbridge sync --config personal-repo.yaml
     ```
 
 !!! tip "Automation"
     Add to cron for automatic syncing:
     ```bash
     # Sync every hour
-    0 * * * * /usr/bin/gitsync sync --config /home/user/config.yaml
+    0 * * * * /usr/bin/gitbridge sync --config /home/user/config.yaml
     ```
 
 !!! tip "Debugging"
     Use verbose mode for troubleshooting:
     ```bash
-    gitsync sync --config config.yaml --verbose
+    gitbridge sync --config config.yaml --verbose
     ```
 
 ## What's Next?
@@ -246,4 +246,4 @@ If something doesn't work:
 1. Check the [Troubleshooting Guide](../troubleshooting/common-issues.md)
 2. Run with `--verbose` for detailed error messages
 3. Check your network access to GitHub
-4. [Create an issue](https://github.com/nevedomski/gitsync/issues/new) for support
+4. [Create an issue](https://github.com/nevedomski/gitbridge/issues/new) for support

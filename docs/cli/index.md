@@ -1,22 +1,22 @@
 # CLI Reference
 
-GitSync provides a comprehensive command-line interface for repository synchronization. This reference covers all available commands and options.
+GitBridge provides a comprehensive command-line interface for repository synchronization. This reference covers all available commands and options.
 
 ## Installation
 
-After installing GitSync, the `gitsync` command becomes available:
+After installing GitBridge, the `gitbridge` command becomes available:
 
 ```bash
 # Check installation
-gitsync --version
+gitbridge --version
 
 # Get help
-gitsync --help
+gitbridge --help
 ```
 
 ## Commands Overview
 
-GitSync provides several commands for different operations:
+GitBridge provides several commands for different operations:
 
 | Command | Description | Usage |
 |---------|-------------|--------|
@@ -47,7 +47,7 @@ These options work with all commands:
 The main command for synchronizing repositories.
 
 ```bash
-gitsync sync [OPTIONS]
+gitbridge sync [OPTIONS]
 ```
 
 #### Required Options
@@ -56,12 +56,12 @@ One of these option sets is required:
 
 **Option 1: Using configuration file**
 ```bash
-gitsync sync --config config.yaml
+gitbridge sync --config config.yaml
 ```
 
 **Option 2: Using command-line arguments**
 ```bash
-gitsync sync --repo URL --local PATH
+gitbridge sync --repo URL --local PATH
 ```
 
 #### All Options
@@ -105,30 +105,30 @@ gitsync sync --repo URL --local PATH
 
 ```bash
 # Basic sync
-gitsync sync --repo https://github.com/user/repo --local ~/projects/repo
+gitbridge sync --repo https://github.com/user/repo --local ~/projects/repo
 
 # With authentication
-gitsync sync --repo https://github.com/user/private-repo \
+gitbridge sync --repo https://github.com/user/private-repo \
              --local ~/projects/repo \
              --token ghp_xxxxxxxxxxxx
 
 # Using configuration file
-gitsync sync --config ~/configs/project.yaml
+gitbridge sync --config ~/configs/project.yaml
 
 # Force full sync with verbose output
-gitsync sync --config config.yaml --force -v
+gitbridge sync --config config.yaml --force -v
 
 # Browser method with specific browser
-gitsync sync --repo https://github.com/user/repo \
+gitbridge sync --repo https://github.com/user/repo \
              --local ~/projects/repo \
              --method browser \
              --browser-type firefox
 
 # Corporate environment with auto-detection
-gitsync sync --config config.yaml --auto-proxy --auto-cert
+gitbridge sync --config config.yaml --auto-proxy --auto-cert
 
 # Dry run to see what would be synced
-gitsync sync --config config.yaml --dry-run
+gitbridge sync --config config.yaml --dry-run
 ```
 
 ### status - Check Status
@@ -136,7 +136,7 @@ gitsync sync --config config.yaml --dry-run
 Check configuration, connectivity, and sync status.
 
 ```bash
-gitsync status [OPTIONS]
+gitbridge status [OPTIONS]
 ```
 
 #### Options
@@ -153,25 +153,25 @@ gitsync status [OPTIONS]
 
 ```bash
 # Check basic status
-gitsync status
+gitbridge status
 
 # Check with specific configuration
-gitsync status --config config.yaml
+gitbridge status --config config.yaml
 
 # Show detailed configuration
-gitsync status --config config.yaml --show-config
+gitbridge status --config config.yaml --show-config
 
 # Check API rate limits
-gitsync status --show-rate-limit
+gitbridge status --show-rate-limit
 
 # Test connection to repository
-gitsync status --config config.yaml --test-connection
+gitbridge status --config config.yaml --test-connection
 ```
 
 #### Output Example
 
 ```
-GitSync Status Report
+GitBridge Status Report
 ====================
 
 Configuration:
@@ -201,7 +201,7 @@ API Rate Limit:
 Validate configuration file syntax and values.
 
 ```bash
-gitsync validate [OPTIONS]
+gitbridge validate [OPTIONS]
 ```
 
 #### Options
@@ -218,16 +218,16 @@ gitsync validate [OPTIONS]
 
 ```bash
 # Validate configuration file
-gitsync validate --config config.yaml
+gitbridge validate --config config.yaml
 
 # Full validation with all checks
-gitsync validate --config config.yaml \
+gitbridge validate --config config.yaml \
                  --check-auth \
                  --check-network \
                  --check-paths
 
 # Strict validation (fail on warnings)
-gitsync validate --config config.yaml --strict
+gitbridge validate --config config.yaml --strict
 ```
 
 #### Output Example
@@ -264,7 +264,7 @@ Result: Configuration is valid
 Create a new configuration file interactively.
 
 ```bash
-gitsync init [OPTIONS]
+gitbridge init [OPTIONS]
 ```
 
 #### Options
@@ -280,22 +280,22 @@ gitsync init [OPTIONS]
 
 ```bash
 # Interactive initialization
-gitsync init
+gitbridge init
 
 # Create configuration with specific template
-gitsync init --template corporate --output corporate-config.yaml
+gitbridge init --template corporate --output corporate-config.yaml
 
 # Non-interactive with defaults
-gitsync init --non-interactive --output default-config.yaml
+gitbridge init --non-interactive --output default-config.yaml
 
 # Force overwrite existing
-gitsync init --force --output config.yaml
+gitbridge init --force --output config.yaml
 ```
 
 #### Interactive Example
 
 ```
-GitSync Configuration Wizard
+GitBridge Configuration Wizard
 ============================
 
 Repository URL: https://github.com/user/repo
@@ -327,8 +327,8 @@ Configuration files are loaded in this order:
 
 1. Specified with `--config` flag
 2. `./config.yaml` in current directory
-3. `~/.gitsync/config.yaml` in home directory
-4. `/etc/gitsync/config.yaml` system-wide
+3. `~/.gitbridge/config.yaml` in home directory
+4. `/etc/gitbridge/config.yaml` system-wide
 
 ### Environment Variable Expansion
 
@@ -348,18 +348,18 @@ Use different configurations for different repositories:
 
 ```bash
 # Personal projects
-gitsync sync --config ~/.gitsync/personal.yaml
+gitbridge sync --config ~/.gitbridge/personal.yaml
 
 # Work projects
-gitsync sync --config ~/.gitsync/work.yaml
+gitbridge sync --config ~/.gitbridge/work.yaml
 
 # Open source contributions
-gitsync sync --config ~/.gitsync/opensource.yaml
+gitbridge sync --config ~/.gitbridge/opensource.yaml
 ```
 
 ## Exit Codes
 
-GitSync uses standard exit codes:
+GitBridge uses standard exit codes:
 
 | Code | Meaning | Description |
 |------|---------|-------------|
@@ -381,34 +381,34 @@ Enable shell completion for better CLI experience:
 
 ```bash
 # Add to ~/.bashrc
-eval "$(_GITSYNC_COMPLETE=bash_source gitsync)"
+eval "$(_GITSYNC_COMPLETE=bash_source gitbridge)"
 ```
 
 ### Zsh
 
 ```bash
 # Add to ~/.zshrc
-eval "$(_GITSYNC_COMPLETE=zsh_source gitsync)"
+eval "$(_GITSYNC_COMPLETE=zsh_source gitbridge)"
 ```
 
 ### Fish
 
 ```fish
 # Add to ~/.config/fish/config.fish
-eval "$(_GITSYNC_COMPLETE=fish_source gitsync)"
+eval "$(_GITSYNC_COMPLETE=fish_source gitbridge)"
 ```
 
 ## Advanced Usage
 
 ### Scripting
 
-Use GitSync in scripts:
+Use GitBridge in scripts:
 
 ```bash
 #!/bin/bash
 
 # Sync with error handling
-if gitsync sync --config config.yaml --quiet; then
+if gitbridge sync --config config.yaml --quiet; then
     echo "Sync successful"
 else
     exit_code=$?
@@ -429,27 +429,27 @@ Schedule regular syncs:
 ```bash
 # Add to crontab
 # Sync every hour
-0 * * * * /usr/local/bin/gitsync sync --config /home/user/.gitsync/config.yaml --quiet
+0 * * * * /usr/local/bin/gitbridge sync --config /home/user/.gitbridge/config.yaml --quiet
 
 # Sync every day at 2 AM
-0 2 * * * /usr/local/bin/gitsync sync --config /home/user/.gitsync/config.yaml --log-file /var/log/gitsync.log
+0 2 * * * /usr/local/bin/gitbridge sync --config /home/user/.gitbridge/config.yaml --log-file /var/log/gitbridge.log
 ```
 
 ### Docker Usage
 
-Run GitSync in Docker:
+Run GitBridge in Docker:
 
 ```bash
 # Using configuration file
 docker run -v $(pwd)/config.yaml:/config.yaml \
            -v $(pwd)/repo:/repo \
-           gitsync:latest \
+           gitbridge:latest \
            sync --config /config.yaml
 
 # With environment variables
 docker run -e GITHUB_TOKEN=$GITHUB_TOKEN \
            -v $(pwd)/repo:/repo \
-           gitsync:latest \
+           gitbridge:latest \
            sync --repo https://github.com/user/repo --local /repo
 ```
 
@@ -460,7 +460,7 @@ docker run -e GITHUB_TOKEN=$GITHUB_TOKEN \
 **Command not found:**
 ```bash
 # Check installation
-pip show gitsync
+pip show gitbridge
 
 # Ensure pip bin directory is in PATH
 export PATH="$PATH:$(python -m site --user-base)/bin"
@@ -469,19 +469,19 @@ export PATH="$PATH:$(python -m site --user-base)/bin"
 **Permission denied:**
 ```bash
 # Check file permissions
-ls -la ~/.gitsync/
+ls -la ~/.gitbridge/
 
 # Fix permissions
-chmod 600 ~/.gitsync/config.yaml
+chmod 600 ~/.gitbridge/config.yaml
 ```
 
 **SSL certificate errors:**
 ```bash
 # Disable SSL verification (not recommended)
-gitsync sync --config config.yaml --no-verify-ssl
+gitbridge sync --config config.yaml --no-verify-ssl
 
 # Or use custom certificates
-gitsync sync --config config.yaml --auto-cert
+gitbridge sync --config config.yaml --auto-cert
 ```
 
 ### Debug Mode
@@ -490,10 +490,10 @@ Enable debug output for troubleshooting:
 
 ```bash
 # Maximum verbosity
-gitsync sync --config config.yaml -vvv --log-level DEBUG
+gitbridge sync --config config.yaml -vvv --log-level DEBUG
 
 # Save debug output to file
-gitsync sync --config config.yaml --log-level DEBUG --log-file debug.log
+gitbridge sync --config config.yaml --log-level DEBUG --log-file debug.log
 ```
 
 ## Next Steps

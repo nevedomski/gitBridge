@@ -1,4 +1,4 @@
-# GitSync Configuration Example
+# GitBridge Configuration Example
 # Complete reference for all available configuration options
 
 # Repository settings
@@ -29,10 +29,10 @@ local:
   # - Environment variables: ${HOME}/repos/project
   path: /path/to/local/repository
   
-  # Hash cache file name (default: .gitsync_hashes.json)
+  # Hash cache file name (default: .gitbridge_hashes.json)
   # Stores file hashes for incremental sync
   # Set to null to disable hash caching
-  hash_cache: .gitsync_hashes.json
+  hash_cache: .gitbridge_hashes.json
 
 # Authentication settings
 auth:
@@ -140,15 +140,15 @@ browser:
   timeout: 30
   
   # Download directory for browser (default: temp directory)
-  # download_dir: /tmp/gitsync_downloads
+  # download_dir: /tmp/gitbridge_downloads
 
 # Cache settings
 cache:
   # Enable caching (default: true)
   enabled: true
   
-  # Cache directory (default: ~/.cache/gitsync)
-  # directory: ~/.cache/gitsync
+  # Cache directory (default: ~/.cache/gitbridge)
+  # directory: ~/.cache/gitbridge
   
   # Cache expiration in seconds (default: 3600)
   # Set to 0 to never expire
@@ -170,7 +170,7 @@ logging:
   
   # Log file path (optional, logs to console by default)
   # Supports absolute and relative paths
-  # file: /var/log/gitsync.log
+  # file: /var/log/gitbridge.log
   
   # Log format (default: '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
   # format: '%(asctime)s - %(levelname)s - %(message)s'
@@ -232,7 +232,7 @@ advanced:
   # api_url: https://github.company.com/api/v3
   
   # User agent string for HTTP requests
-  # user_agent: GitSync/0.1.0
+  # user_agent: GitBridge/0.1.0
   
   # Enable debug mode (very verbose output)
   # debug: false

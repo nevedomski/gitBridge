@@ -1,6 +1,6 @@
 # Architecture Overview
 
-GitSync is designed with a modular architecture that provides flexibility, reliability, and extensibility. This document provides a comprehensive overview of the system architecture.
+GitBridge is designed with a modular architecture that provides flexibility, reliability, and extensibility. This document provides a comprehensive overview of the system architecture.
 
 ## System Architecture
 
@@ -71,7 +71,7 @@ Each component has a single, well-defined responsibility:
 
 ### 2. Flexibility
 
-GitSync adapts to various environments:
+GitBridge adapts to various environments:
 
 - **Dual sync methods**: API and browser automation
 - **Auto-detection**: Proxy and certificate discovery
@@ -278,7 +278,7 @@ sequenceDiagram
     participant GitHub
     participant FileSystem
     
-    User->>CLI: gitsync sync
+    User->>CLI: gitbridge sync
     CLI->>APISync: Initialize sync
     APISync->>Cache: Load metadata
     Cache-->>APISync: Previous sync data
@@ -304,7 +304,7 @@ sequenceDiagram
     participant GitHub
     participant FileSystem
     
-    User->>CLI: gitsync sync --method browser
+    User->>CLI: gitbridge sync --method browser
     CLI->>BrowserSync: Initialize sync
     BrowserSync->>Browser: Launch Chrome
     Browser->>GitHub: Navigate to repository
@@ -480,14 +480,14 @@ graph TB
 
 ```python
 # Base exceptions
-class GitSyncError(Exception):
-    """Base exception for all GitSync errors."""
+class GitBridgeError(Exception):
+    """Base exception for all GitBridge errors."""
 
-class ConfigurationError(GitSyncError):
+class ConfigurationError(GitBridgeError):
     """Configuration-related errors."""
 
 # Network exceptions
-class NetworkError(GitSyncError):
+class NetworkError(GitBridgeError):
     """Network and connectivity errors."""
 
 class RateLimitError(NetworkError):
@@ -500,28 +500,28 @@ class SSLError(NetworkError):
     """SSL/TLS certificate errors."""
 
 # Authentication exceptions
-class AuthenticationError(GitSyncError):
+class AuthenticationError(GitBridgeError):
     """Authentication and authorization errors."""
 
 class TokenError(AuthenticationError):
     """Invalid or expired token."""
 
 # Repository exceptions
-class RepositoryError(GitSyncError):
+class RepositoryError(GitBridgeError):
     """Repository access errors."""
 
 class InvalidRefError(RepositoryError):
     """Invalid branch, tag, or commit."""
 
 # File system exceptions
-class FileSystemError(GitSyncError):
+class FileSystemError(GitBridgeError):
     """Local file system errors."""
 
 class PermissionError(FileSystemError):
     """File permission errors."""
 
 # Browser exceptions
-class BrowserError(GitSyncError):
+class BrowserError(GitBridgeError):
     """Browser automation errors."""
 
 class BrowserNotFoundError(BrowserError):
@@ -629,7 +629,7 @@ class CustomSyncEngine(BaseSyncEngine):
 
 ```python
 class PluginManager:
-    """Manages GitSync plugins."""
+    """Manages GitBridge plugins."""
     
     def load_plugins(self, plugin_dir: str):
         """Load plugins from directory."""
@@ -715,7 +715,7 @@ class LogManager:
 
 ## Conclusion
 
-GitSync's architecture is designed to be:
+GitBridge's architecture is designed to be:
 
 - **Flexible**: Adapts to various network environments
 - **Reliable**: Handles failures gracefully

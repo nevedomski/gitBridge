@@ -12,8 +12,8 @@ Key Features:
     - Repository metadata management
 
 Typical Usage:
-    >>> from gitsync.repository_manager import RepositoryManager
-    >>> from gitsync.api_client import GitHubAPIClient
+    >>> from gitbridge.repository_manager import RepositoryManager
+    >>> from gitbridge.api_client import GitHubAPIClient
     >>>
     >>> client = GitHubAPIClient("owner", "repo", token="...")
     >>> repo_mgr = RepositoryManager(client)

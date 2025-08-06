@@ -1,26 +1,33 @@
-# GitSync - GitHub Repository Synchronization Tool
+# GitBridge - GitHub Repository Synchronization Tool
 
-[![CI](https://github.com/nevedomski/gitSync/workflows/CI/badge.svg)](https://github.com/nevedomski/gitSync/actions)
-[![codecov](https://codecov.io/gh/user/gitSync/branch/main/graph/badge.svg)](https://codecov.io/gh/user/gitSync)
+[![CI](https://github.com/nevedomski/gitBridge/workflows/CI/badge.svg)](https://github.com/nevedomski/gitBridge/actions)
+[![codecov](https://codecov.io/gh/user/gitBridge/branch/main/graph/badge.svg)](https://codecov.io/gh/user/gitBridge)
+[![Coverage](https://img.shields.io/badge/coverage-83%25-green.svg)](./tests/)
+[![Tests](https://img.shields.io/badge/tests-502%20passing-brightgreen.svg)](./tests/)
 [![Ruff](https://img.shields.io/badge/linter-ruff-informational?style=flat&color=orange)](https://github.com/astral-sh/ruff)
 [![Format](https://img.shields.io/badge/code%20style-ruff-black)](https://github.com/astral-sh/ruff)
 [![Type](https://img.shields.io/badge/type%20checker-mypy-blue)](https://mypy.readthedocs.io/)
 [![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Docs](https://img.shields.io/badge/docs-github%20pages-blue)](https://nevedomski.github.io/gitSync/)
+[![Docs](https://img.shields.io/badge/docs-github%20pages-blue)](https://nevedomski.github.io/gitBridge/)
+[![Security](https://img.shields.io/badge/security-monitored-yellow.svg)](./SECURITY.md)
 
-A Python tool to synchronize GitHub repositories to local folders when direct git access is blocked.
+**Production-ready tool to synchronize GitHub repositories when direct git access is blocked.**
+
+🎯 **Status**: Version 0.4.2b1 - Feature complete, pending security fixes before 1.0.0 release
 
 ## Features
 
 - **GitHub API Sync**: Uses GitHub's REST API for efficient repository synchronization
-- **Browser Automation Fallback**: Falls back to Selenium-based browser automation if API access is blocked
+- **Browser Automation Fallback**: Falls back to Playwright-based browser automation if API access is blocked
 - **Incremental Updates**: Only downloads changed files after initial sync
 - **Configuration Support**: Flexible configuration via YAML files
 - **Command-Line Interface**: Easy-to-use CLI for various sync operations
 - **Progress Tracking**: Visual progress bars and detailed logging
 - **Automatic Proxy Detection**: Auto-detects proxy settings from Windows/Chrome PAC scripts
 - **Corporate Environment Support**: Works with SSL certificates and proxy configurations
+- **Cross-Platform**: Works on Windows, Linux, and macOS
+- **Comprehensive Testing**: 502+ tests with 83% code coverage
 
 ## Installation
 
@@ -63,29 +70,29 @@ sync:
 2. Run the sync:
 
 ```bash
-gitsync sync --config config.yaml
+gitbridge sync --config config.yaml
 ```
 
 ## Usage
 
 ### Basic Sync
 ```bash
-gitsync sync --repo https://github.com/username/repo --local /path/to/local
+gitbridge sync --repo https://github.com/username/repo --local /path/to/local
 ```
 
 ### With Personal Access Token
 ```bash
-gitsync sync --repo https://github.com/username/repo --local /path/to/local --token YOUR_TOKEN
+gitbridge sync --repo https://github.com/username/repo --local /path/to/local --token YOUR_TOKEN
 ```
 
 ### Force Browser Mode
 ```bash
-gitsync sync --repo https://github.com/username/repo --local /path/to/local --method browser
+gitbridge sync --repo https://github.com/username/repo --local /path/to/local --method browser
 ```
 
 ### Check Repository Status
 ```bash
-gitsync status --config config.yaml
+gitbridge status --config config.yaml
 ```
 
 ### Corporate Environment Support
@@ -94,16 +101,16 @@ For Windows users in corporate environments:
 
 ```bash
 # Auto-detect proxy from Chrome/Windows settings
-gitsync sync --repo https://github.com/username/repo --local /path/to/local --auto-proxy
+gitbridge sync --repo https://github.com/username/repo --local /path/to/local --auto-proxy
 
 # Auto-detect certificates from Windows certificate store
-gitsync sync --repo https://github.com/username/repo --local /path/to/local --auto-cert
+gitbridge sync --repo https://github.com/username/repo --local /path/to/local --auto-cert
 
 # Use both auto-detection features together
-gitsync sync --config config.yaml --auto-proxy --auto-cert
+gitbridge sync --config config.yaml --auto-proxy --auto-cert
 
 # Last resort: disable SSL verification
-gitsync sync --config config.yaml --auto-proxy --no-ssl-verify
+gitbridge sync --config config.yaml --auto-proxy --no-ssl-verify
 ```
 
 Or add to your configuration file:

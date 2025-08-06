@@ -1,10 +1,10 @@
 # Configuration Guide
 
-GitSync provides a flexible configuration system that supports multiple sources and formats. This guide covers all configuration options and best practices.
+GitBridge provides a flexible configuration system that supports multiple sources and formats. This guide covers all configuration options and best practices.
 
 ## Configuration Sources
 
-GitSync resolves configuration from multiple sources in priority order:
+GitBridge resolves configuration from multiple sources in priority order:
 
 1. **Command-line arguments** (highest priority)
 2. **Environment variables**
@@ -13,7 +13,7 @@ GitSync resolves configuration from multiple sources in priority order:
 
 ## Configuration File
 
-The recommended way to configure GitSync is using a YAML configuration file.
+The recommended way to configure GitBridge is using a YAML configuration file.
 
 ### Basic Configuration
 
@@ -102,21 +102,21 @@ browser:
   window_size: 1920x1080
   timeout: 60
   download_timeout: 300
-  user_agent: "GitSync/1.0"
-  user_data_dir: ~/.gitsync/browser
+  user_agent: "GitBridge/1.0"
+  user_data_dir: ~/.gitbridge/browser
   args:
     - "--disable-gpu"
     - "--no-sandbox"
 
 cache:
   enabled: true
-  path: ~/.gitsync/cache
+  path: ~/.gitbridge/cache
   ttl: 3600  # Cache TTL in seconds
   max_size: 1073741824  # 1GB in bytes
 
 logging:
   level: INFO  # DEBUG, INFO, WARNING, ERROR, CRITICAL
-  file: ~/.gitsync/gitsync.log
+  file: ~/.gitbridge/gitbridge.log
   format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
   console: true
   rotate: true
@@ -126,7 +126,7 @@ logging:
 
 ## Environment Variables
 
-GitSync supports environment variable expansion in configuration files and direct environment variable configuration.
+GitBridge supports environment variable expansion in configuration files and direct environment variable configuration.
 
 ### Environment Variable Expansion
 
@@ -164,7 +164,7 @@ export GITSYNC_AUTO_CERT="true"
 
 # Logging
 export GITSYNC_LOG_LEVEL="DEBUG"
-export GITSYNC_LOG_FILE="/var/log/gitsync.log"
+export GITSYNC_LOG_FILE="/var/log/gitbridge.log"
 ```
 
 ## Command-Line Arguments
@@ -174,7 +174,7 @@ Command-line arguments override all other configuration sources.
 ### Basic Arguments
 
 ```bash
-gitsync sync \
+gitbridge sync \
   --repo https://github.com/user/repo \
   --local ~/projects/repo \
   --ref main \
@@ -184,7 +184,7 @@ gitsync sync \
 ### Advanced Arguments
 
 ```bash
-gitsync sync \
+gitbridge sync \
   --repo https://github.com/user/repo \
   --local ~/projects/repo \
   --ref develop \
@@ -245,7 +245,7 @@ gitsync sync \
 
 ## Configuration Precedence
 
-When the same setting is specified in multiple places, GitSync uses this precedence order:
+When the same setting is specified in multiple places, GitBridge uses this precedence order:
 
 1. **Command-line arguments** - Always take precedence
 2. **Environment variables** - Override config file
@@ -265,13 +265,13 @@ export GITSYNC_SYNC_METHOD="browser"
 ```
 
 ```bash
-gitsync sync --config config.yaml --method api
+gitbridge sync --config config.yaml --method api
 # Result: method = "api" (command-line wins)
 ```
 
 ## Path Expansion
 
-GitSync automatically expands paths:
+GitBridge automatically expands paths:
 
 - `~` expands to user home directory
 - Environment variables are expanded
@@ -285,7 +285,7 @@ local:
 
 ## Validation
 
-GitSync validates configuration on startup:
+GitBridge validates configuration on startup:
 
 - Required fields are present
 - URLs are valid
@@ -296,7 +296,7 @@ GitSync validates configuration on startup:
 Use the `validate` command to test configuration:
 
 ```bash
-gitsync validate --config config.yaml
+gitbridge validate --config config.yaml
 ```
 
 ## Best Practices
@@ -354,7 +354,7 @@ GITHUB_TOKEN=your_actual_token_here
 
 ### 4. Use Defaults Wisely
 
-Let GitSync use sensible defaults:
+Let GitBridge use sensible defaults:
 
 ```yaml
 # Minimal config - uses many defaults
@@ -364,7 +364,7 @@ repository:
 local:
   path: ./repo
 
-# GitSync will use default:
+# GitBridge will use default:
 # - method: api
 # - incremental: true
 # - parallel_downloads: 5
@@ -378,10 +378,10 @@ Always validate configuration changes:
 
 ```bash
 # Test configuration
-gitsync validate --config new-config.yaml
+gitbridge validate --config new-config.yaml
 
 # Dry run to see what would happen
-gitsync sync --config new-config.yaml --dry-run
+gitbridge sync --config new-config.yaml --dry-run
 ```
 
 ## Configuration Examples
@@ -476,7 +476,7 @@ browser:
 
 1. **Configuration not loading**
    ```bash
-   gitsync validate --config config.yaml -v
+   gitbridge validate --config config.yaml -v
    ```
 
 2. **Environment variables not expanding**
@@ -491,13 +491,13 @@ browser:
 3. **Path not found**
    ```bash
    # Use absolute paths for debugging
-   gitsync sync --local /absolute/path/to/repo
+   gitbridge sync --local /absolute/path/to/repo
    ```
 
 4. **Proxy not working**
    ```bash
    # Test with explicit proxy
-   gitsync sync --proxy http://proxy:8080 -v
+   gitbridge sync --proxy http://proxy:8080 -v
    ```
 
 ### Debug Configuration
@@ -505,7 +505,7 @@ browser:
 Enable debug logging to see configuration resolution:
 
 ```bash
-gitsync sync --config config.yaml --log-level DEBUG
+gitbridge sync --config config.yaml --log-level DEBUG
 ```
 
 This shows:

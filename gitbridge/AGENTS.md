@@ -1,8 +1,8 @@
-# GitSync Module Documentation
+# GitBridge Module Documentation
 
 ## Module Overview
 
-The `gitsync` package provides a robust solution for synchronizing GitHub repositories to local directories when direct git access is blocked. It's designed specifically for corporate environments with network restrictions, proxy requirements, and custom certificate configurations.
+The `gitbridge` package provides a robust solution for synchronizing GitHub repositories to local directories when direct git access is blocked. It's designed specifically for corporate environments with network restrictions, proxy requirements, and custom certificate configurations.
 
 ## Architecture
 
@@ -263,7 +263,7 @@ For developers working with the codebase:
 
 **Classic Usage (Still Works):**
 ```python
-from gitsync.api_sync import GitHubAPISync
+from gitbridge.api_sync import GitHubAPISync
 
 sync = GitHubAPISync(
     repo_url="https://github.com/owner/repo",
@@ -275,10 +275,10 @@ sync.sync(ref="main")
 
 **Component-Based Usage (Advanced):**
 ```python
-from gitsync.api_client import GitHubAPIClient
-from gitsync.repository_manager import RepositoryManager
-from gitsync.file_synchronizer import FileSynchronizer
-from gitsync.progress_tracker import ProgressTracker
+from gitbridge.api_client import GitHubAPIClient
+from gitbridge.repository_manager import RepositoryManager
+from gitbridge.file_synchronizer import FileSynchronizer
+from gitbridge.progress_tracker import ProgressTracker
 
 # Create components individually
 client = GitHubAPIClient("owner", "repo", token="...")
@@ -316,7 +316,7 @@ The refactoring significantly improves testability:
 - **Decision**: Use Git SHA comparison for change detection
 - **Rationale**: Minimizes bandwidth usage and API calls
 - **Implementation**: 
-  - Store file SHAs in `.gitsync/file_hashes.json`
+  - Store file SHAs in `.gitbridge/file_hashes.json`
   - Compare remote SHA with cached value
   - Only download changed files
 - **Trade-offs**: Requires local cache maintenance

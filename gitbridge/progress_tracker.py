@@ -12,7 +12,7 @@ Key Features:
     - Thread-safe progress updates
 
 Typical Usage:
-    >>> from gitsync.progress_tracker import ProgressTracker
+    >>> from gitbridge.progress_tracker import ProgressTracker
     >>>
     >>> tracker = ProgressTracker(total_files=100, show_progress=True)
     >>> for file in files:

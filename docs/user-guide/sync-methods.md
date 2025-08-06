@@ -1,6 +1,6 @@
 # Synchronization Methods
 
-GitSync provides two methods for synchronizing GitHub repositories, ensuring you can always access your code regardless of network restrictions.
+GitBridge provides two methods for synchronizing GitHub repositories, ensuring you can always access your code regardless of network restrictions.
 
 ## Overview
 
@@ -17,17 +17,17 @@ The API method uses GitHub's REST API to efficiently sync repositories.
 
 ```mermaid
 sequenceDiagram
-    participant GitSync
+    participant GitBridge
     participant GitHub API
     participant Local Files
     
-    GitSync->>GitHub API: Request repository tree
-    GitHub API-->>GitSync: Return file list with SHAs
-    GitSync->>Local Files: Compare with cached SHAs
-    GitSync->>GitHub API: Request changed files only
-    GitHub API-->>GitSync: Return file contents
-    GitSync->>Local Files: Save updated files
-    GitSync->>Local Files: Update metadata cache
+    GitBridge->>GitHub API: Request repository tree
+    GitHub API-->>GitBridge: Return file list with SHAs
+    GitBridge->>Local Files: Compare with cached SHAs
+    GitBridge->>GitHub API: Request changed files only
+    GitHub API-->>GitBridge: Return file contents
+    GitBridge->>Local Files: Save updated files
+    GitBridge->>Local Files: Update metadata cache
 ```
 
 ### Features
@@ -43,7 +43,7 @@ sequenceDiagram
 === "Command Line"
 
     ```bash
-    gitsync sync \
+    gitbridge sync \
       --repo https://github.com/user/repo \
       --local ~/projects/repo \
       --method api \
@@ -108,20 +108,20 @@ The browser method uses Playwright to automate a real browser, mimicking manual 
 
 ```mermaid
 sequenceDiagram
-    participant GitSync
+    participant GitBridge
     participant Chrome Browser
     participant GitHub Website
     participant Local Files
     
-    GitSync->>Browser: Launch browser (Playwright)
+    GitBridge->>Browser: Launch browser (Playwright)
     Browser->>GitHub Website: Navigate to repository
-    GitSync->>Browser: Click "Download ZIP"
+    GitBridge->>Browser: Click "Download ZIP"
     Browser->>GitHub Website: Request ZIP file
     GitHub Website-->>Browser: Return ZIP data
-    GitSync->>Browser: Extract file list from ZIP
-    GitSync->>Local Files: Compare with existing files
-    GitSync->>Browser: Download changed files
-    GitSync->>Local Files: Save updated files
+    GitBridge->>Browser: Extract file list from ZIP
+    GitBridge->>Local Files: Compare with existing files
+    GitBridge->>Browser: Download changed files
+    GitBridge->>Local Files: Save updated files
 ```
 
 ### Features
@@ -137,7 +137,7 @@ sequenceDiagram
 === "Command Line"
 
     ```bash
-    gitsync sync \
+    gitbridge sync \
       --repo https://github.com/user/repo \
       --local ~/projects/repo \
       --method browser \
@@ -221,12 +221,12 @@ browser:
   download_timeout: 300000    # File download timeout
   
   # Browser context options
-  user_agent: "GitSync/1.0"   # Custom user agent
+  user_agent: "GitBridge/1.0"   # Custom user agent
   locale: "en-US"             # Browser locale
   timezone: "America/New_York" # Browser timezone
   
   # Storage
-  user_data_dir: ~/.gitsync/browser  # Persistent browser data
+  user_data_dir: ~/.gitbridge/browser  # Persistent browser data
   
   # Proxy (if not using system proxy)
   proxy:
@@ -243,7 +243,7 @@ For private repositories with browser method:
 1. **Manual Login** (Recommended for first use):
    ```bash
    # Run in non-headless mode
-   gitsync sync --method browser --no-headless
+   gitbridge sync --method browser --no-headless
    # Log in manually when browser opens
    # Cookies will be saved for future use
    ```
@@ -251,7 +251,7 @@ For private repositories with browser method:
 2. **Cookie Reuse**:
    ```yaml
    browser:
-     user_data_dir: ~/.gitsync/browser  # Saves session data
+     user_data_dir: ~/.gitbridge/browser  # Saves session data
      # Browser will reuse saved cookies automatically
    ```
 
@@ -327,8 +327,8 @@ sync:
 Implementation in code:
 
 ```python
-from gitsync.api_sync import GitHubAPISync
-from gitsync.browser_sync import GitHubBrowserSync
+from gitbridge.api_sync import GitHubAPISync
+from gitbridge.browser_sync import GitHubBrowserSync
 
 def sync_with_fallback(repo_url, local_path, token=None):
     """Sync with automatic fallback to browser method."""

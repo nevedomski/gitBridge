@@ -1,14 +1,14 @@
 """Comprehensive unit tests for the exceptions module.
 
 This test suite provides 100% code coverage for the custom exception classes
-and utility functions in the gitsync.exceptions module.
+and utility functions in the gitbridge.exceptions module.
 """
 
 from unittest.mock import Mock
 
 import requests
 
-from gitsync.exceptions import (
+from gitbridge.exceptions import (
     # Authentication exceptions
     AuthenticationError,
     # Browser exceptions
@@ -20,7 +20,7 @@ from gitsync.exceptions import (
     FileSystemError,
     FileWriteError,
     # Base exception
-    GitSyncError,
+    GitBridgeError,
     # Network exceptions
     NetworkError,
     PageLoadError,
@@ -38,12 +38,12 @@ from gitsync.exceptions import (
 )
 
 
-class TestGitSyncError:
-    """Test the base GitSyncError class."""
+class TestGitBridgeError:
+    """Test the base GitBridgeError class."""
 
     def test_basic_initialization(self):
-        """Test basic GitSyncError initialization."""
-        error = GitSyncError("Test error")
+        """Test basic GitBridgeError initialization."""
+        error = GitBridgeError("Test error")
 
         assert str(error) == "Test error"
         assert error.message == "Test error"
@@ -51,9 +51,9 @@ class TestGitSyncError:
         assert error.original_error is None
 
     def test_initialization_with_details(self):
-        """Test GitSyncError initialization with details."""
+        """Test GitBridgeError initialization with details."""
         details = {"key1": "value1", "key2": 42}
-        error = GitSyncError("Test error", details=details)
+        error = GitBridgeError("Test error", details=details)
 
         assert error.message == "Test error"
         assert error.details == details
@@ -61,17 +61,17 @@ class TestGitSyncError:
         assert "key2=42" in str(error)
 
     def test_initialization_with_original_error(self):
-        """Test GitSyncError initialization with original error."""
+        """Test GitBridgeError initialization with original error."""
         original = ValueError("Original error")
-        error = GitSyncError("Test error", original_error=original)
+        error = GitBridgeError("Test error", original_error=original)
 
         assert error.original_error is original
 
     def test_initialization_with_all_parameters(self):
-        """Test GitSyncError initialization with all parameters."""
+        """Test GitBridgeError initialization with all parameters."""
         details = {"url": "https://example.com", "status": 500}
         original = ConnectionError("Network failed")
-        error = GitSyncError("Complete error", details=details, original_error=original)
+        error = GitBridgeError("Complete error", details=details, original_error=original)
 
         assert error.message == "Complete error"
         assert error.details == details
@@ -81,37 +81,37 @@ class TestGitSyncError:
 
     def test_str_without_details(self):
         """Test string representation without details."""
-        error = GitSyncError("Simple error")
+        error = GitBridgeError("Simple error")
         assert str(error) == "Simple error"
 
     def test_str_with_empty_details(self):
         """Test string representation with empty details."""
-        error = GitSyncError("Simple error", details={})
+        error = GitBridgeError("Simple error", details={})
         assert str(error) == "Simple error"
 
     def test_get_context_without_original_error(self):
         """Test get_context without original error."""
         details = {"key": "value"}
-        error = GitSyncError("Test error", details=details)
+        error = GitBridgeError("Test error", details=details)
         context = error.get_context()
 
-        expected = {"message": "Test error", "type": "GitSyncError", "details": {"key": "value"}}
+        expected = {"message": "Test error", "type": "GitBridgeError", "details": {"key": "value"}}
         assert context == expected
 
     def test_get_context_with_original_error(self):
         """Test get_context with original error."""
         original = ValueError("Original message")
-        error = GitSyncError("Test error", original_error=original)
+        error = GitBridgeError("Test error", original_error=original)
         context = error.get_context()
 
         assert context["message"] == "Test error"
-        assert context["type"] == "GitSyncError"
+        assert context["type"] == "GitBridgeError"
         assert context["original_error"]["type"] == "ValueError"
         assert context["original_error"]["message"] == "Original message"
 
     def test_inheritance(self):
-        """Test that GitSyncError inherits from Exception."""
-        error = GitSyncError("Test error")
+        """Test that GitBridgeError inherits from Exception."""
+        error = GitBridgeError("Test error")
         assert isinstance(error, Exception)
 
 
@@ -125,7 +125,7 @@ class TestAuthenticationError:
         assert error.message == "GitHub authentication failed"
         assert error.details["token_provided"] is False
         assert "repo_url" not in error.details
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
 
     def test_initialization_with_parameters(self):
         """Test initialization with all parameters."""
@@ -153,7 +153,7 @@ class TestAuthenticationError:
     def test_inheritance(self):
         """Test inheritance hierarchy."""
         error = AuthenticationError()
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
         assert isinstance(error, Exception)
 
 
@@ -166,7 +166,7 @@ class TestNetworkError:
 
         assert error.message == "Network error occurred"
         assert error.details == {}
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
 
     def test_initialization_with_parameters(self):
         """Test initialization with all parameters."""
@@ -192,7 +192,7 @@ class TestNetworkError:
     def test_inheritance(self):
         """Test inheritance hierarchy."""
         error = NetworkError()
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
         assert isinstance(error, Exception)
 
 
@@ -207,7 +207,7 @@ class TestRateLimitError:
         # Default initialization should not include url in details
         assert error.details == {}
         assert isinstance(error, NetworkError)
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
 
     def test_initialization_with_parameters(self):
         """Test initialization with all parameters."""
@@ -248,7 +248,7 @@ class TestRateLimitError:
         """Test inheritance hierarchy."""
         error = RateLimitError()
         assert isinstance(error, NetworkError)
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
         assert isinstance(error, Exception)
 
 
@@ -295,7 +295,7 @@ class TestProxyError:
         """Test inheritance hierarchy."""
         error = ProxyError()
         assert isinstance(error, NetworkError)
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
 
 
 class TestConfigurationError:
@@ -307,7 +307,7 @@ class TestConfigurationError:
 
         assert error.message == "Configuration error"
         assert error.details == {}
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
 
     def test_initialization_with_parameters(self):
         """Test initialization with all parameters."""
@@ -338,7 +338,7 @@ class TestConfigurationError:
     def test_inheritance(self):
         """Test inheritance hierarchy."""
         error = ConfigurationError()
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
         assert isinstance(error, Exception)
 
 
@@ -351,7 +351,7 @@ class TestRepositoryNotFoundError:
 
         assert error.message == "Repository not found or not accessible"
         assert error.details == {}
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
 
     def test_initialization_with_parameters(self):
         """Test initialization with all parameters."""
@@ -390,7 +390,7 @@ class TestRepositoryNotFoundError:
     def test_inheritance(self):
         """Test inheritance hierarchy."""
         error = RepositoryNotFoundError()
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
         assert isinstance(error, Exception)
 
 
@@ -403,7 +403,7 @@ class TestFileSystemError:
 
         assert error.message == "File system error"
         assert error.details == {}
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
 
     def test_initialization_with_parameters(self):
         """Test initialization with all parameters."""
@@ -431,7 +431,7 @@ class TestFileSystemError:
     def test_inheritance(self):
         """Test inheritance hierarchy."""
         error = FileSystemError()
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
         assert isinstance(error, Exception)
 
 
@@ -477,7 +477,7 @@ class TestFileWriteError:
         """Test inheritance hierarchy."""
         error = FileWriteError()
         assert isinstance(error, FileSystemError)
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
         assert isinstance(error, Exception)
 
 
@@ -509,7 +509,7 @@ class TestDirectoryCreateError:
         """Test inheritance hierarchy."""
         error = DirectoryCreateError()
         assert isinstance(error, FileSystemError)
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
         assert isinstance(error, Exception)
 
 
@@ -522,7 +522,7 @@ class TestBrowserError:
 
         assert error.message == "Browser automation error"
         assert error.details == {}
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
 
     def test_initialization_with_parameters(self):
         """Test initialization with all parameters."""
@@ -550,7 +550,7 @@ class TestBrowserError:
     def test_inheritance(self):
         """Test inheritance hierarchy."""
         error = BrowserError()
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
         assert isinstance(error, Exception)
 
 
@@ -597,7 +597,7 @@ class TestWebDriverError:
         """Test inheritance hierarchy."""
         error = WebDriverError()
         assert isinstance(error, BrowserError)
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
         assert isinstance(error, Exception)
 
 
@@ -642,7 +642,7 @@ class TestPageLoadError:
         """Test inheritance hierarchy."""
         error = PageLoadError()
         assert isinstance(error, BrowserError)
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
         assert isinstance(error, Exception)
 
 
@@ -655,7 +655,7 @@ class TestSyncError:
 
         assert error.message == "Synchronization error"
         assert error.details == {}
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
 
     def test_initialization_with_parameters(self):
         """Test initialization with all parameters."""
@@ -690,7 +690,7 @@ class TestSyncError:
     def test_inheritance(self):
         """Test inheritance hierarchy."""
         error = SyncError()
-        assert isinstance(error, GitSyncError)
+        assert isinstance(error, GitBridgeError)
         assert isinstance(error, Exception)
 
 
@@ -890,7 +890,7 @@ class TestExceptionCompatibility:
     def test_exception_can_be_raised_and_caught(self):
         """Test that all custom exceptions can be raised and caught."""
         exceptions_to_test = [
-            GitSyncError("test"),
+            GitBridgeError("test"),
             AuthenticationError("test"),
             NetworkError("test"),
             RateLimitError("test"),
@@ -911,7 +911,7 @@ class TestExceptionCompatibility:
                 raise exception
             except type(exception) as caught:
                 assert caught is exception
-                assert isinstance(caught, GitSyncError)
+                assert isinstance(caught, GitBridgeError)
                 assert isinstance(caught, Exception)
 
     def test_exception_inheritance_catches(self):
@@ -922,7 +922,7 @@ class TestExceptionCompatibility:
         except NetworkError as e:
             assert isinstance(e, RateLimitError)
             assert isinstance(e, NetworkError)
-            assert isinstance(e, GitSyncError)
+            assert isinstance(e, GitBridgeError)
 
         # Test that FileSystemError subclasses can be caught as FileSystemError
         try:
@@ -930,7 +930,7 @@ class TestExceptionCompatibility:
         except FileSystemError as e:
             assert isinstance(e, FileWriteError)
             assert isinstance(e, FileSystemError)
-            assert isinstance(e, GitSyncError)
+            assert isinstance(e, GitBridgeError)
 
         # Test that BrowserError subclasses can be caught as BrowserError
         try:
@@ -938,10 +938,10 @@ class TestExceptionCompatibility:
         except BrowserError as e:
             assert isinstance(e, WebDriverError)
             assert isinstance(e, BrowserError)
-            assert isinstance(e, GitSyncError)
+            assert isinstance(e, GitBridgeError)
 
     def test_all_exceptions_caught_by_base_class(self):
-        """Test that all custom exceptions can be caught by GitSyncError."""
+        """Test that all custom exceptions can be caught by GitBridgeError."""
         exceptions_to_test = [
             AuthenticationError("test"),
             RateLimitError("test"),
@@ -958,6 +958,6 @@ class TestExceptionCompatibility:
         for exception in exceptions_to_test:
             try:
                 raise exception
-            except GitSyncError as caught:
+            except GitBridgeError as caught:
                 assert caught is exception
-                assert isinstance(caught, GitSyncError)
+                assert isinstance(caught, GitBridgeError)

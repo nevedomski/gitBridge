@@ -1,12 +1,12 @@
 # Incremental Sync Guide
 
-Incremental synchronization is one of GitSync's most powerful features, allowing you to sync only changed files after the initial download. This significantly reduces bandwidth usage and sync time.
+Incremental synchronization is one of GitBridge's most powerful features, allowing you to sync only changed files after the initial download. This significantly reduces bandwidth usage and sync time.
 
 ## How Incremental Sync Works
 
 ### Overview
 
-Instead of downloading all files every time, GitSync:
+Instead of downloading all files every time, GitBridge:
 
 1. **Tracks file metadata** - Stores SHA hashes and timestamps
 2. **Compares with remote** - Checks which files changed
@@ -27,11 +27,11 @@ graph LR
 
 ## Metadata Storage
 
-GitSync stores metadata in a hidden `.gitsync` directory:
+GitBridge stores metadata in a hidden `.gitbridge` directory:
 
 ```
 your-repo/
-├── .gitsync/
+├── .gitbridge/
 │   ├── metadata.json      # File hashes and timestamps
 │   ├── config.json        # Sync configuration
 │   └── cache/            # Temporary files
@@ -88,16 +88,16 @@ sync:
 
 ```bash
 # Enable incremental sync (default)
-gitsync sync --config config.yaml --incremental
+gitbridge sync --config config.yaml --incremental
 
 # Force full sync (ignore cache)
-gitsync sync --config config.yaml --force
+gitbridge sync --config config.yaml --force
 ```
 
 ### Python API
 
 ```python
-from gitsync.api_sync import GitHubAPISync
+from gitbridge.api_sync import GitHubAPISync
 
 sync = GitHubAPISync(
     repo_url="https://github.com/user/repo",
@@ -139,7 +139,7 @@ Typical sync times for a medium-sized repository:
 
 ### SHA-Based Comparison
 
-GitSync uses SHA hashes to detect changes:
+GitBridge uses SHA hashes to detect changes:
 
 ```python
 def file_changed(local_file, remote_file):
@@ -153,7 +153,7 @@ def file_changed(local_file, remote_file):
 
 ### Supported Change Types
 
-GitSync detects and handles:
+GitBridge detects and handles:
 
 - **New files** - Added to repository
 - **Modified files** - Content changed
@@ -167,14 +167,14 @@ GitSync detects and handles:
 
 Default cache locations:
 
-- **Linux/macOS**: `~/.gitsync/cache/`
-- **Windows**: `%APPDATA%\gitsync\cache\`
+- **Linux/macOS**: `~/.gitbridge/cache/`
+- **Windows**: `%APPDATA%\gitbridge\cache\`
 - **Custom**: Set via configuration
 
 ```yaml
 cache:
   enabled: true
-  path: ~/.gitsync/cache
+  path: ~/.gitbridge/cache
   ttl: 3600  # Cache TTL in seconds
   max_size: 1073741824  # 1GB maximum cache size
 ```
@@ -183,13 +183,13 @@ cache:
 
 ```bash
 # Clear cache for specific repository
-gitsync cache clear --repo https://github.com/user/repo
+gitbridge cache clear --repo https://github.com/user/repo
 
 # Clear all cache
-gitsync cache clear --all
+gitbridge cache clear --all
 
 # Show cache statistics
-gitsync cache stats
+gitbridge cache stats
 ```
 
 ### Cache Statistics Example
@@ -198,7 +198,7 @@ gitsync cache stats
 Cache Statistics
 ================
 
-Location: ~/.gitsync/cache
+Location: ~/.gitbridge/cache
 Total size: 156.7 MB
 Repositories: 5
 Oldest entry: 2025-01-15 10:30:00
@@ -256,10 +256,10 @@ Schedule syncs based on activity:
 
 ```bash
 # Frequent syncs during work hours
-0 9-17 * * 1-5 gitsync sync --config work.yaml
+0 9-17 * * 1-5 gitbridge sync --config work.yaml
 
 # Less frequent on weekends
-0 */4 * * 0,6 gitsync sync --config work.yaml
+0 */4 * * 0,6 gitbridge sync --config work.yaml
 ```
 
 ## Handling Edge Cases
@@ -270,11 +270,11 @@ If cache becomes corrupted:
 
 ```bash
 # Force rebuild cache
-gitsync sync --config config.yaml --force --rebuild-cache
+gitbridge sync --config config.yaml --force --rebuild-cache
 
 # Or manually delete cache
-rm -rf .gitsync/metadata.json
-gitsync sync --config config.yaml
+rm -rf .gitbridge/metadata.json
+gitbridge sync --config config.yaml
 ```
 
 ### Partial Syncs
@@ -305,7 +305,7 @@ sync:
 ```yaml
 monitoring:
   enabled: true
-  metrics_file: ~/.gitsync/metrics.json
+  metrics_file: ~/.gitbridge/metrics.json
   include_timing: true
   include_bandwidth: true
 ```
@@ -314,13 +314,13 @@ monitoring:
 
 ```bash
 # Show last sync statistics
-gitsync stats --last
+gitbridge stats --last
 
 # Show historical statistics
-gitsync stats --history --days 30
+gitbridge stats --history --days 30
 
 # Export statistics
-gitsync stats --export csv --output sync-stats.csv
+gitbridge stats --export csv --output sync-stats.csv
 ```
 
 ### Sample Statistics Output
@@ -361,14 +361,14 @@ Incremental Efficiency:
 **Solutions**:
 ```bash
 # Check if incremental is enabled
-gitsync status --show-config | grep incremental
+gitbridge status --show-config | grep incremental
 
 # Check cache permissions
-ls -la .gitsync/
+ls -la .gitbridge/
 
 # Fix permissions
-chmod 755 .gitsync
-chmod 644 .gitsync/metadata.json
+chmod 755 .gitbridge
+chmod 644 .gitbridge/metadata.json
 ```
 
 #### Slow Change Detection
@@ -402,10 +402,10 @@ Enable detailed logging:
 
 ```bash
 # Debug incremental sync process
-GITSYNC_DEBUG=incremental gitsync sync --config config.yaml -v
+GITSYNC_DEBUG=incremental gitbridge sync --config config.yaml -v
 
 # Log cache operations
-gitsync sync --config config.yaml --log-level DEBUG --log-file sync.log
+gitbridge sync --config config.yaml --log-level DEBUG --log-file sync.log
 ```
 
 ## Best Practices
@@ -416,14 +416,14 @@ Keep metadata fresh with regular syncs:
 
 ```bash
 # Cron job for hourly syncs
-0 * * * * gitsync sync --config config.yaml --quiet
+0 * * * * gitbridge sync --config config.yaml --quiet
 ```
 
 ### 2. Monitor Cache Health
 
 ```bash
 # Weekly cache maintenance
-0 0 * * 0 gitsync cache maintain --config config.yaml
+0 0 * * 0 gitbridge cache maintain --config config.yaml
 ```
 
 ### 3. Backup Metadata
@@ -432,7 +432,7 @@ Preserve sync state:
 
 ```bash
 # Backup metadata before major changes
-cp .gitsync/metadata.json .gitsync/metadata.backup.json
+cp .gitbridge/metadata.json .gitbridge/metadata.backup.json
 ```
 
 ### 4. Version Control Exclusion
@@ -440,8 +440,8 @@ cp .gitsync/metadata.json .gitsync/metadata.backup.json
 Add to `.gitignore`:
 
 ```gitignore
-# GitSync metadata
-.gitsync/
+# GitBridge metadata
+.gitbridge/
 ```
 
 ## API Integration
@@ -449,7 +449,7 @@ Add to `.gitignore`:
 ### Custom Change Detection
 
 ```python
-from gitsync.api_sync import GitHubAPISync
+from gitbridge.api_sync import GitHubAPISync
 
 class CustomSync(GitHubAPISync):
     def file_changed(self, local_file, remote_file):

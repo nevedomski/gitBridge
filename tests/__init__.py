@@ -1,1 +1,1 @@
-"""GitSync Tests"""
+"""GitBridge Tests"""
