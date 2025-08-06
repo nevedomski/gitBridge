@@ -161,19 +161,19 @@ class PACProxyDetector(ProxyProvider):
                 for proxy in proxies:
                     proxy = proxy.strip()
                     if proxy.startswith("PROXY "):
-                        proxy_addr = proxy[6:].strip()
+                        http_proxy_addr: str = proxy[6:].strip()
                         # Return as http://proxy:port format
-                        if not proxy_addr.startswith("http"):
-                            proxy_addr = f"http://{proxy_addr}"
-                        logger.info(f"PAC returned proxy for {host}: {proxy_addr}")
-                        return proxy_addr
+                        if not http_proxy_addr.startswith("http"):
+                            http_proxy_addr = f"http://{http_proxy_addr}"
+                        logger.info(f"PAC returned proxy for {host}: {http_proxy_addr}")
+                        return http_proxy_addr
                     elif proxy.startswith("SOCKS "):
-                        proxy_addr = proxy[6:].strip()
+                        socks_proxy_addr: str = proxy[6:].strip()
                         # Return as socks://proxy:port format
-                        if not proxy_addr.startswith("socks"):
-                            proxy_addr = f"socks://{proxy_addr}"
-                        logger.info(f"PAC returned SOCKS proxy for {host}: {proxy_addr}")
-                        return proxy_addr
+                        if not socks_proxy_addr.startswith("socks"):
+                            socks_proxy_addr = f"socks://{socks_proxy_addr}"
+                        logger.info(f"PAC returned SOCKS proxy for {host}: {socks_proxy_addr}")
+                        return socks_proxy_addr
 
         except Exception as e:
             logger.error(f"Error extracting proxy from PAC: {e}")

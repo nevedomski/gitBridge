@@ -127,18 +127,19 @@ class RepositoryManager:
             # Try as tag
             response = self.client.get(f"repos/{self.owner}/{self.repo}/git/ref/tags/{ref}")
             if response.status_code == 200:
-                tag_data = response.json()
+                tag_data: dict[str, Any] = response.json()
                 # Tags can point to either commits or tag objects
                 # DOCDEV-NOTE: Lightweight tags point directly to commits, annotated tags need dereferencing
                 if tag_data["object"]["type"] == "commit":
-                    return tag_data["object"]["sha"]
+                    return str(tag_data["object"]["sha"])
                 else:
                     # It's an annotated tag, need to get the commit it points to
                     tag_obj_response = self.client.get(
                         f"repos/{self.owner}/{self.repo}/git/tags/{tag_data['object']['sha']}"
                     )
                     if tag_obj_response.status_code == 200:
-                        return tag_obj_response.json()["object"]["sha"]
+                        tag_obj_data: dict[str, Any] = tag_obj_response.json()
+                        return str(tag_obj_data["object"]["sha"])
                     elif tag_obj_response.status_code != 404:
                         tag_obj_response.raise_for_status()
             elif response.status_code != 404:
@@ -152,9 +153,9 @@ class RepositoryManager:
                     f"repos/{self.owner}/{self.repo}/commits", params={"sha": ref, "per_page": 1}
                 )
                 if response.status_code == 200:
-                    commits = response.json()
+                    commits: list[dict[str, Any]] = response.json()
                     if commits:
-                        full_sha = commits[0]["sha"]
+                        full_sha = str(commits[0]["sha"])
                         if full_sha.startswith(ref):
                             return full_sha
                 elif response.status_code != 404:
@@ -175,7 +176,7 @@ class RepositoryManager:
                     original_error=e,
                 ) from e
 
-    def get_repository_tree(self, ref: str = "main", recursive: bool = True) -> list[dict] | None:
+    def get_repository_tree(self, ref: str = "main", recursive: bool = True) -> list[dict[str, Any]] | None:
         """Get repository file tree.
 
         Fetches the complete file tree for a repository at a specific reference.
@@ -221,8 +222,9 @@ class RepositoryManager:
             response = self.client.get(path, params=params)
 
             if response.status_code == 200:
-                tree_data = response.json()
-                return tree_data.get("tree", [])
+                tree_data: dict[str, Any] = response.json()
+                tree_list: list[dict[str, Any]] = tree_data.get("tree", [])
+                return tree_list
             else:
                 logger.error(f"Failed to get tree: {response.status_code}")
                 return None
@@ -267,7 +269,8 @@ class RepositoryManager:
         try:
             response = self.client.get(f"repos/{self.owner}/{self.repo}/branches")
             if response.status_code == 200:
-                return response.json()
+                branches: list[dict[str, Any]] = response.json()
+                return branches
         except Exception as e:
             logger.warning(f"Failed to list branches: {e}")
 
@@ -291,7 +294,8 @@ class RepositoryManager:
         try:
             response = self.client.get(f"repos/{self.owner}/{self.repo}/tags")
             if response.status_code == 200:
-                return response.json()
+                tags: list[dict[str, Any]] = response.json()
+                return tags
         except Exception as e:
             logger.warning(f"Failed to list tags: {e}")
 
@@ -324,7 +328,8 @@ class RepositoryManager:
 
             response = self.client.get(f"repos/{self.owner}/{self.repo}/commits/{full_sha}")
             if response.status_code == 200:
-                return response.json()
+                commit_info: dict[str, Any] = response.json()
+                return commit_info
         except Exception as e:
             logger.warning(f"Failed to get commit info for {sha}: {e}")
 

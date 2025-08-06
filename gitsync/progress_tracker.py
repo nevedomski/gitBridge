@@ -28,7 +28,7 @@ from typing import Any
 
 from tqdm import tqdm
 
-from .utils import SyncStats  # type: ignore[attr-defined]
+from .utils import SyncStats
 
 logger = logging.getLogger(__name__)
 
@@ -87,7 +87,7 @@ class ProgressTracker:
         self.show_progress = show_progress
         self.total_files = total_files
         self.start_time = time.time()
-        self.progress_bar: tqdm | None = None
+        self.progress_bar: tqdm[Any] | None = None
 
         # Initialize progress bar if requested
         if self.show_progress and total_files > 0:

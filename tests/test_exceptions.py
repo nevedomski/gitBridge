@@ -204,9 +204,8 @@ class TestRateLimitError:
         error = RateLimitError()
 
         assert error.message == "GitHub API rate limit exceeded"
-        # Due to the inheritance chain, details are nested under 'url'
-        assert "url" in error.details
-        assert error.details["url"] == {}
+        # Default initialization should not include url in details
+        assert error.details == {}
         assert isinstance(error, NetworkError)
         assert isinstance(error, GitSyncError)
 
@@ -214,16 +213,22 @@ class TestRateLimitError:
         """Test initialization with all parameters."""
         original = requests.exceptions.HTTPError("HTTP 429")
         error = RateLimitError(
-            "Rate limit hit", remaining=0, limit=5000, reset_time=1609459200, original_error=original
+            "Rate limit hit",
+            remaining=0,
+            limit=5000,
+            reset_time=1609459200,
+            url="https://api.github.com",
+            status_code=429,
+            original_error=original,
         )
 
         assert error.message == "Rate limit hit"
-        # Due to inheritance chain, details are nested under 'url' and 'status_code'
-        assert error.details["url"]["remaining"] == 0
-        assert error.details["url"]["limit"] == 5000
-        assert error.details["url"]["reset_time"] == 1609459200
-        assert error.details["status_code"] is original
-        # Note: original_error handling has inheritance chain issues
+        assert error.details["remaining"] == 0
+        assert error.details["limit"] == 5000
+        assert error.details["reset_time"] == 1609459200
+        assert error.details["url"] == "https://api.github.com"
+        assert error.details["status_code"] == 429
+        assert error.original_error is original
 
     def test_initialization_with_none_values(self):
         """Test initialization with None values."""
@@ -234,10 +239,10 @@ class TestRateLimitError:
             reset_time=None,  # Should be filtered out
         )
 
-        assert error.details["url"]["limit"] == 5000
+        assert error.details["limit"] == 5000
         # None values are filtered out, so these keys shouldn't exist
-        assert "remaining" not in error.details["url"]
-        assert "reset_time" not in error.details["url"]
+        assert "remaining" not in error.details
+        assert "reset_time" not in error.details
 
     def test_inheritance(self):
         """Test inheritance hierarchy."""
@@ -255,8 +260,8 @@ class TestProxyError:
         error = ProxyError()
 
         assert error.message == "Proxy configuration error"
-        assert error.details["url"]["auto_detection_failed"] is False
-        assert "proxy_url" not in error.details["url"]
+        assert error.details["auto_detection_failed"] is False
+        assert "proxy_url" not in error.details
         assert isinstance(error, NetworkError)
 
     def test_initialization_with_parameters(self):
@@ -270,9 +275,9 @@ class TestProxyError:
         )
 
         assert error.message == "Proxy failed"
-        assert error.details["url"]["proxy_url"] == "http://proxy.company.com:8080"
-        assert error.details["url"]["auto_detection_failed"] is True
-        assert error.details["status_code"] is original
+        assert error.details["proxy_url"] == "http://proxy.company.com:8080"
+        assert error.details["auto_detection_failed"] is True
+        assert error.original_error is original
         # Note: original_error handling has inheritance chain issues
 
     def test_initialization_with_none_values(self):
@@ -283,8 +288,8 @@ class TestProxyError:
             auto_detection_failed=True,
         )
 
-        assert "proxy_url" not in error.details["url"]
-        assert error.details["url"]["auto_detection_failed"] is True
+        assert "proxy_url" not in error.details
+        assert error.details["auto_detection_failed"] is True
 
     def test_inheritance(self):
         """Test inheritance hierarchy."""
@@ -737,8 +742,9 @@ class TestWrapRequestsException:
 
         assert isinstance(wrapped, RateLimitError)
         assert wrapped.message == "API rate limit exceeded"
-        # Due to inheritance chain issue, original_error is stored in details
-        assert wrapped.details["status_code"] is original
+        assert wrapped.details["url"] == "https://api.github.com"
+        assert wrapped.details["status_code"] == 403
+        assert wrapped.original_error is original
 
     def test_http_error_403_forbidden(self):
         """Test wrapping HTTPError with 403 for access forbidden."""

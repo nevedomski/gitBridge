@@ -30,6 +30,7 @@ Typical Usage:
 import base64
 import logging
 from pathlib import Path
+from typing import Any
 
 from .api_client import GitHubAPIClient
 from .exceptions import DirectoryCreateError, FileWriteError
@@ -228,7 +229,7 @@ class FileSynchronizer:
 
         return None
 
-    def sync_file(self, entry: dict) -> bool:
+    def sync_file(self, entry: dict[str, Any]) -> bool:
         """Sync a single file.
 
         Handles the complete sync process for a single file:
@@ -297,7 +298,7 @@ class FileSynchronizer:
             logger.error(f"Unexpected error syncing file {file_path}: {e}")
             return False
 
-    def sync_files(self, files: list[dict]) -> dict[str, int]:
+    def sync_files(self, files: list[dict[str, Any]]) -> dict[str, int]:
         """Sync multiple files.
 
         Args:
@@ -365,7 +366,7 @@ class FileSynchronizer:
             except OSError as e:
                 logger.warning(f"Failed to remove hash cache file: {e}")
 
-    def get_file_info(self, file_path: str) -> dict | None:
+    def get_file_info(self, file_path: str) -> dict[str, Any] | None:
         """Get cached information about a file.
 
         Args:

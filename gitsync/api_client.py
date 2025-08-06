@@ -153,6 +153,8 @@ class GitHubAPIClient:
                         "API rate limit exceeded",
                         remaining=0,
                         reset_time=int(response.headers.get("X-RateLimit-Reset", "0")),
+                        url=url,
+                        status_code=403,
                     )
                 else:
                     raise AuthenticationError(
@@ -277,6 +279,8 @@ class GitHubAPIClient:
                         "API rate limit exceeded",
                         remaining=0,
                         reset_time=int(response.headers.get("X-RateLimit-Reset", "0")),
+                        url=url,
+                        status_code=403,
                     )
             elif response.status_code == 404:
                 raise RepositoryNotFoundError(

@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 @click.group()
 @click.version_option()
-def cli():
+def cli() -> None:
     """GitSync - Synchronize GitHub repositories when git access is blocked."""
     pass
 
@@ -55,7 +55,7 @@ def sync(
     no_ssl_verify: bool,
     auto_proxy: bool,
     auto_cert: bool,
-):
+) -> None:
     """Synchronize a GitHub repository to local directory."""
 
     # Load configuration
@@ -122,6 +122,7 @@ def sync(
 
     # Perform sync based on method
     try:
+        syncer: GitHubAPISync | GitHubBrowserSync
         if method == "api":
             syncer = GitHubAPISync(
                 repo_url,
@@ -233,7 +234,7 @@ def status(
     no_ssl_verify: bool,
     auto_proxy: bool,
     auto_cert: bool,
-):
+) -> None:
     """Check sync status and repository information."""
 
     # Load configuration
@@ -350,7 +351,7 @@ def status(
 @click.option("--ref", help="Branch, tag, or commit SHA to sync", default="main")
 @click.option("--token", "-t", help="GitHub personal access token")
 @click.option("--method", type=click.Choice(["api", "browser"]), default="api", help="Sync method")
-def init(output: str, repo: str, local: str, ref: str, token: str | None, method: str):
+def init(output: str, repo: str, local: str, ref: str, token: str | None, method: str) -> None:
     """Create a new configuration file."""
 
     # Create configuration
@@ -385,7 +386,7 @@ def init(output: str, repo: str, local: str, ref: str, token: str | None, method
 
 @cli.command()
 @click.argument("config_file", type=click.Path(exists=True))
-def validate(config_file: str):
+def validate(config_file: str) -> None:
     """Validate a configuration file."""
 
     cfg = Config(config_file)
@@ -405,7 +406,7 @@ def validate(config_file: str):
         sys.exit(1)
 
 
-def main():
+def main() -> None:
     """Main entry point."""
     cli()
 

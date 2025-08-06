@@ -83,18 +83,19 @@ class GitHubBrowserSync(SyncProvider):
         self.base_url = f"https://github.com/{self.owner}/{self.repo}"
         self.api_url = f"https://api.github.com/repos/{self.owner}/{self.repo}"
 
-    def _get_browser_launch_options(self) -> dict:
+    def _get_browser_launch_options(self) -> dict[str, Any]:
         """Get browser launch options for Playwright."""
-        launch_options = {
+        args_list: list[str] = [
+            "--no-sandbox",
+            "--disable-dev-shm-usage",
+            "--disable-gpu",
+            "--disable-extensions",
+            "--disable-plugins",
+            "--disable-images",  # Speed up loading
+        ]
+        launch_options: dict[str, Any] = {
             "headless": self.headless,
-            "args": [
-                "--no-sandbox",
-                "--disable-dev-shm-usage",
-                "--disable-gpu",
-                "--disable-extensions",
-                "--disable-plugins",
-                "--disable-images",  # Speed up loading
-            ],
+            "args": args_list,
         }
 
         # Custom browser binary
@@ -111,11 +112,13 @@ class GitHubBrowserSync(SyncProvider):
                 if detected_proxies.get("http"):
                     proxy_url = detected_proxies["http"]
                     parsed = urlparse(proxy_url)
-                    proxy_config = {"server": f"http://{parsed.hostname}:{parsed.port}"}
+                    hostname = str(parsed.hostname) if parsed.hostname else ""
+                    port = str(parsed.port) if parsed.port else ""
+                    proxy_config = {"server": f"http://{hostname}:{port}"}
                     if parsed.username and parsed.password:
-                        proxy_config["username"] = parsed.username
-                        proxy_config["password"] = parsed.password
-                    logger.info(f"Using auto-detected proxy: {parsed.hostname}:{parsed.port}")
+                        proxy_config["username"] = str(parsed.username)
+                        proxy_config["password"] = str(parsed.password)
+                    logger.info(f"Using auto-detected proxy: {hostname}:{port}")
             except Exception as e:
                 logger.warning(f"Failed to auto-detect proxy: {e}")
 
@@ -124,20 +127,21 @@ class GitHubBrowserSync(SyncProvider):
             http_proxy = os.environ.get("HTTP_PROXY") or os.environ.get("http_proxy")
             if http_proxy:
                 parsed = urlparse(http_proxy)
-                proxy_config = {"server": f"http://{parsed.hostname}:{parsed.port}"}
+                hostname = str(parsed.hostname) if parsed.hostname else ""
+                port = str(parsed.port) if parsed.port else ""
+                proxy_config = {"server": f"http://{hostname}:{port}"}
                 if parsed.username and parsed.password:
-                    proxy_config["username"] = parsed.username
-                    proxy_config["password"] = parsed.password
-                logger.info(f"Using proxy from environment: {parsed.hostname}:{parsed.port}")
+                    proxy_config["username"] = str(parsed.username)
+                    proxy_config["password"] = str(parsed.password)
+                logger.info(f"Using proxy from environment: {hostname}:{port}")
 
         if proxy_config:
             launch_options["proxy"] = proxy_config
 
         # SSL certificate handling
         if not self.verify_ssl:
-            launch_options["args"].extend(
-                ["--ignore-certificate-errors", "--ignore-ssl-errors", "--allow-running-insecure-content"]
-            )
+            ssl_args = ["--ignore-certificate-errors", "--ignore-ssl-errors", "--allow-running-insecure-content"]
+            args_list.extend(ssl_args)
             launch_options["ignore_https_errors"] = True
             logger.warning("SSL certificate verification disabled")
 
@@ -154,7 +158,7 @@ class GitHubBrowserSync(SyncProvider):
             self.browser = self.playwright.chromium.launch(**launch_options)
 
             # Create browser context with user agent
-            context_options = {"user_agent": "GitSync/1.0 (+https://github.com/browser-automation)"}
+            context_options: dict[str, Any] = {"user_agent": "GitSync/1.0 (+https://github.com/browser-automation)"}
 
             # Add CA bundle if specified
             if self.ca_bundle and os.path.exists(self.ca_bundle):
@@ -179,6 +183,10 @@ class GitHubBrowserSync(SyncProvider):
         """Login to GitHub if token is provided."""
         if not self.token:
             return True  # No login needed for public repos
+
+        if not self.page:
+            logger.error("Browser page not initialized")
+            return False
 
         try:
             # Navigate to GitHub login
@@ -215,10 +223,10 @@ class GitHubBrowserSync(SyncProvider):
                 self._setup_browser()
 
             # Navigate to repository
-            self.page.goto(self.base_url)
-
-            # Wait for page to load
-            self.page.wait_for_load_state("networkidle")
+            if self.page:
+                self.page.goto(self.base_url)
+                # Wait for page to load
+                self.page.wait_for_load_state("networkidle")
 
             # Check if repository exists and is accessible
             try:
@@ -233,7 +241,10 @@ class GitHubBrowserSync(SyncProvider):
                 found = False
                 for selector in selectors:
                     try:
-                        element = self.page.wait_for_selector(selector, timeout=5000)
+                        if self.page:
+                            element = self.page.wait_for_selector(selector, timeout=5000)
+                        else:
+                            continue
                         if element:
                             found = True
                             break
@@ -251,10 +262,13 @@ class GitHubBrowserSync(SyncProvider):
 
                     for error_selector in error_selectors:
                         try:
-                            error_element = self.page.wait_for_selector(error_selector, timeout=2000)
-                            if error_element:
-                                error_text = error_element.text_content() or ""
-                                break
+                            if self.page:
+                                error_element = self.page.wait_for_selector(error_selector, timeout=2000)
+                                if error_element:
+                                    error_text = error_element.text_content() or ""
+                                    break
+                            else:
+                                continue
                         except PlaywrightTimeoutError:
                             continue
 
@@ -293,18 +307,21 @@ class GitHubBrowserSync(SyncProvider):
 
             # Navigate to repository
             repo_url = f"{self.base_url}/tree/{ref}"
-            self.page.goto(repo_url)
-
-            # Wait for page to load
-            self.page.wait_for_load_state("networkidle")
+            if self.page:
+                self.page.goto(repo_url)
+                # Wait for page to load
+                self.page.wait_for_load_state("networkidle")
 
             # Get the download URL directly (GitHub pattern)
             download_url = f"{self.base_url}/archive/refs/heads/{ref}.zip"
 
             # Use Playwright to download the ZIP file
-            with self.page.expect_download() as download_info:
-                # Trigger download by navigating to the URL
-                self.page.goto(download_url)
+            if self.page:
+                with self.page.expect_download() as download_info:
+                    # Trigger download by navigating to the URL
+                    self.page.goto(download_url)
+            else:
+                return None
 
             download = download_info.value
 
@@ -357,7 +374,10 @@ class GitHubBrowserSync(SyncProvider):
 
             # Use Playwright's request context to download file content
             # This respects all browser settings (proxy, SSL, headers, etc.)
-            response = self.context.request.get(raw_url)
+            if self.context:
+                response = self.context.request.get(raw_url)
+            else:
+                return None
 
             if response.status == 200:
                 return response.body()
@@ -491,6 +511,7 @@ class GitHubBrowserSync(SyncProvider):
             ensure_dir(self.local_path)
 
             # Sync files with progress bar
+            file_iterator: list[str] | tqdm[str]
             if show_progress:
                 progress_bar = tqdm(file_list, desc="Syncing files", unit="file")
                 file_iterator = progress_bar

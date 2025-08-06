@@ -42,10 +42,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          uv sync --dev --extra pac
-          # Install playwright browsers for browser automation tests
-          uv run playwright install chromium
-    
+          uv sync --all
+              
       - name: 🔬 Unit tests with coverage
         shell: bash
         run: |

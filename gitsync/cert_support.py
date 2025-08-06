@@ -36,7 +36,7 @@ class WindowsCertificateDetector(CertificateProvider):
 
     def __init__(self) -> None:
         self.is_windows = platform.system() == "Windows"
-        self._temp_bundle = None
+        self._temp_bundle: str | None = None
 
     def is_available(self) -> bool:
         """Check if Windows certificate detection is available."""

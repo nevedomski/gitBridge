@@ -3,6 +3,8 @@
 import time
 from unittest.mock import Mock, patch
 
+import pytest
+
 from gitsync.progress_tracker import ProgressTracker
 
 
@@ -200,7 +202,7 @@ class TestProgressTracker:
         rate = tracker.get_file_rate()
         assert rate > 0
 
-    def test_print_summary_basic(self, capsys: 'pytest.CaptureFixture[str]') -> None:
+    def test_print_summary_basic(self, capsys: pytest.CaptureFixture[str]) -> None:
         """Test printing basic summary"""
         tracker = ProgressTracker(total_files=100, show_progress=False)
 
@@ -224,7 +226,7 @@ class TestProgressTracker:
         assert "Data downloaded:" in captured.out
         assert "Success rate:     90.0%" in captured.out
 
-    def test_print_summary_with_rate_limit(self, capsys: 'pytest.CaptureFixture[str]') -> None:
+    def test_print_summary_with_rate_limit(self, capsys: pytest.CaptureFixture[str]) -> None:
         """Test printing summary with rate limit info"""
         tracker = ProgressTracker(total_files=100, show_progress=False)
 

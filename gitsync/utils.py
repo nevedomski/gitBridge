@@ -129,11 +129,12 @@ def is_binary_file(content: bytes, sample_size: int = 8192) -> bool:
 
 def format_size(size: int) -> str:
     """Format file size in human-readable format."""
+    size_float = float(size)
     for unit in ["B", "KB", "MB", "GB"]:
-        if size < 1024.0:
-            return f"{size:.1f} {unit}"
-        size = size / 1024.0
-    return f"{size:.1f} TB"
+        if size_float < 1024.0:
+            return f"{size_float:.1f} {unit}"
+        size_float = size_float / 1024.0
+    return f"{size_float:.1f} TB"
 
 
 class SyncStats:

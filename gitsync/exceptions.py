@@ -151,6 +151,8 @@ class RateLimitError(NetworkError):
         remaining: int | None = None,
         limit: int | None = None,
         reset_time: int | None = None,
+        url: str | None = None,
+        status_code: int | None = None,
         original_error: Exception | None = None,
     ):
         """Initialize rate limit error.
@@ -160,11 +162,15 @@ class RateLimitError(NetworkError):
             remaining: Remaining API requests
             limit: Total API request limit
             reset_time: Unix timestamp when rate limit resets
+            url: URL that triggered the rate limit
+            status_code: HTTP status code (typically 403 or 429)
             original_error: Original exception
         """
-        details = {"remaining": remaining, "limit": limit, "reset_time": reset_time}
-        super().__init__(message, original_error=original_error)
-        self.details.update({k: v for k, v in details.items() if v is not None})
+        # Pass url and status_code to parent NetworkError
+        super().__init__(message, url=url, status_code=status_code, original_error=original_error)
+        # Add rate limit specific details
+        rate_limit_details = {"remaining": remaining, "limit": limit, "reset_time": reset_time}
+        self.details.update({k: v for k, v in rate_limit_details.items() if v is not None})
 
 
 class ProxyError(NetworkError):
@@ -178,6 +184,8 @@ class ProxyError(NetworkError):
         message: str = "Proxy configuration error",
         proxy_url: str | None = None,
         auto_detection_failed: bool = False,
+        url: str | None = None,
+        status_code: int | None = None,
         original_error: Exception | None = None,
     ):
         """Initialize proxy error.
@@ -186,11 +194,15 @@ class ProxyError(NetworkError):
             message: Proxy error description
             proxy_url: Proxy URL that failed
             auto_detection_failed: Whether proxy auto-detection failed
+            url: URL that triggered the proxy error
+            status_code: HTTP status code if applicable
             original_error: Original exception
         """
-        details = {"proxy_url": proxy_url, "auto_detection_failed": auto_detection_failed}
-        super().__init__(message, original_error=original_error)
-        self.details.update({k: v for k, v in details.items() if v is not None})
+        # Pass url and status_code to parent NetworkError
+        super().__init__(message, url=url, status_code=status_code, original_error=original_error)
+        # Add proxy specific details
+        proxy_details = {"proxy_url": proxy_url, "auto_detection_failed": auto_detection_failed}
+        self.details.update({k: v for k, v in proxy_details.items() if v is not None})
 
 
 class ConfigurationError(GitSyncError):
@@ -458,7 +470,7 @@ def wrap_requests_exception(error: Exception, url: str) -> GitSyncError:
         elif status_code == 403:
             # Could be rate limit or authentication
             if "rate limit" in str(error).lower():
-                return RateLimitError("API rate limit exceeded", original_error=error)
+                return RateLimitError("API rate limit exceeded", url=url, status_code=403, original_error=error)
             else:
                 return AuthenticationError("Access forbidden", repo_url=url, original_error=error)
         elif status_code == 404:

@@ -184,7 +184,7 @@ class GitHubAPISync(SyncProvider):
         """
         return self.repository.resolve_ref(ref)
 
-    def get_repository_tree(self, ref: str = "main", recursive: bool = True) -> list[dict] | None:
+    def get_repository_tree(self, ref: str = "main", recursive: bool = True) -> list[dict[str, Any]] | None:
         """Get repository file tree.
 
         Fetches the complete file tree for a repository at a specific reference.
@@ -343,7 +343,7 @@ class GitHubAPISync(SyncProvider):
         """
         return self.synchronizer.should_download_file(file_path, sha)
 
-    def sync_file(self, entry: dict) -> bool:
+    def sync_file(self, entry: dict[str, Any]) -> bool:
         """Sync a single file.
 
         Note: This method is provided for backward compatibility.
@@ -360,11 +360,11 @@ class GitHubAPISync(SyncProvider):
         if hasattr(self, "client"):
             self.client.close()
 
-    def __enter__(self):
+    def __enter__(self) -> "GitHubAPISync":
         """Context manager entry."""
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         """Context manager exit - cleanup resources."""
         self.close()
 

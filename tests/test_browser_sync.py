@@ -176,13 +176,13 @@ class TestGitHubBrowserSync:
         """Test successful Playwright browser setup"""
 
         # Mock the Playwright chain
-        mock_sync_playwright_context = Mock()
         mock_playwright = Mock()
         mock_browser = Mock()
         mock_context = Mock()
         mock_page = Mock()
 
         import gitsync.browser_sync as browser_sync_module
+
         with patch.object(browser_sync_module, "sync_playwright") as mock_sync_playwright:
             # Set up the full mock chain: sync_playwright() returns an object
             # that when start() is called returns the playwright object
@@ -213,6 +213,7 @@ class TestGitHubBrowserSync:
     def test_setup_browser_failure(self, browser_sync):
         """Test Playwright browser setup failure"""
         import gitsync.browser_sync as browser_sync_module
+
         with patch.object(browser_sync_module, "sync_playwright") as mock_sync_playwright:
             mock_sync_playwright.return_value.start.side_effect = PlaywrightError("Browser not found")
 
@@ -764,6 +765,7 @@ class TestGitHubBrowserSync:
     ):
         """Test successful repository sync"""
         import gitsync.browser_sync as browser_sync_module
+
         with patch.object(browser_sync_module, "save_file_hashes") as mock_save_hashes:
             # Mock all dependencies
             browser_sync.page = Mock()  # Set page to avoid setup
@@ -841,7 +843,8 @@ class TestGitHubBrowserSync:
     ):
         """Test sync with some file failures"""
         import gitsync.browser_sync as browser_sync_module
-        with patch.object(browser_sync_module, "save_file_hashes") as mock_save_hashes:
+
+        with patch.object(browser_sync_module, "save_file_hashes"):
             browser_sync.page = Mock()  # Set page to avoid setup
             mock_test_conn.return_value = True
             mock_login.return_value = True
@@ -881,7 +884,8 @@ class TestGitHubBrowserSync:
     ):
         """Test sync with progress bar enabled"""
         import gitsync.browser_sync as browser_sync_module
-        with patch.object(browser_sync_module, "save_file_hashes") as mock_save_hashes:
+
+        with patch.object(browser_sync_module, "save_file_hashes"):
             with patch.object(browser_sync_module, "tqdm") as mock_tqdm:
                 # Setup mocks
                 browser_sync.page = Mock()  # Set page to avoid setup
