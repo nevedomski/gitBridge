@@ -9,11 +9,11 @@ from gitsync.progress_tracker import ProgressTracker
 class TestProgressTracker:
     """Test cases for ProgressTracker class"""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test fixtures before each test method"""
         pass
 
-    def test_init_with_progress_bar(self):
+    def test_init_with_progress_bar(self) -> None:
         """Test initialization with progress bar"""
         with patch("gitsync.progress_tracker.tqdm") as mock_tqdm:
             mock_progress_bar = Mock()
@@ -33,7 +33,7 @@ class TestProgressTracker:
                 bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}]",
             )
 
-    def test_init_without_progress_bar(self):
+    def test_init_without_progress_bar(self) -> None:
         """Test initialization without progress bar"""
         tracker = ProgressTracker(total_files=0, show_progress=False)
 
@@ -41,7 +41,7 @@ class TestProgressTracker:
         assert tracker.total_files == 0
         assert tracker.progress_bar is None
 
-    def test_init_no_progress_bar_zero_files(self):
+    def test_init_no_progress_bar_zero_files(self) -> None:
         """Test initialization with zero files doesn't create progress bar"""
         tracker = ProgressTracker(total_files=0, show_progress=True)
 
@@ -49,7 +49,7 @@ class TestProgressTracker:
         assert tracker.total_files == 0
         assert tracker.progress_bar is None
 
-    def test_update_progress_downloaded(self):
+    def test_update_progress_downloaded(self) -> None:
         """Test updating progress for downloaded file"""
         with patch("gitsync.progress_tracker.tqdm") as mock_tqdm:
             mock_progress_bar = Mock()
@@ -68,7 +68,7 @@ class TestProgressTracker:
             mock_progress_bar.update.assert_called_once_with(1)
             mock_progress_bar.set_postfix_str.assert_called_once_with("Downloaded: file.txt")
 
-    def test_update_progress_skipped(self):
+    def test_update_progress_skipped(self) -> None:
         """Test updating progress for skipped file"""
         with patch("gitsync.progress_tracker.tqdm") as mock_tqdm:
             mock_progress_bar = Mock()
@@ -85,7 +85,7 @@ class TestProgressTracker:
 
             mock_progress_bar.set_postfix_str.assert_called_once_with("Skipped: file.txt")
 
-    def test_update_progress_failed(self):
+    def test_update_progress_failed(self) -> None:
         """Test updating progress for failed file"""
         with patch("gitsync.progress_tracker.tqdm") as mock_tqdm:
             mock_progress_bar = Mock()
@@ -102,7 +102,7 @@ class TestProgressTracker:
 
             mock_progress_bar.set_postfix_str.assert_called_once_with("Failed: file.txt")
 
-    def test_update_progress_no_progress_bar(self):
+    def test_update_progress_no_progress_bar(self) -> None:
         """Test updating progress without progress bar"""
         tracker = ProgressTracker(total_files=100, show_progress=False)
 
@@ -112,7 +112,7 @@ class TestProgressTracker:
         assert tracker.stats.files_downloaded == 1
         assert tracker.stats.bytes_downloaded == 1024
 
-    def test_set_total_files(self):
+    def test_set_total_files(self) -> None:
         """Test setting total files"""
         with patch("gitsync.progress_tracker.tqdm") as mock_tqdm:
             mock_progress_bar = Mock()
@@ -125,7 +125,7 @@ class TestProgressTracker:
             assert mock_progress_bar.total == 100
             mock_progress_bar.refresh.assert_called_once()
 
-    def test_update_postfix(self):
+    def test_update_postfix(self) -> None:
         """Test updating progress bar postfix"""
         with patch("gitsync.progress_tracker.tqdm") as mock_tqdm:
             mock_progress_bar = Mock()
@@ -136,7 +136,7 @@ class TestProgressTracker:
 
             mock_progress_bar.set_postfix.assert_called_once_with(custom="value", another=42)
 
-    def test_set_description(self):
+    def test_set_description(self) -> None:
         """Test setting progress bar description"""
         with patch("gitsync.progress_tracker.tqdm") as mock_tqdm:
             mock_progress_bar = Mock()
@@ -147,7 +147,7 @@ class TestProgressTracker:
 
             mock_progress_bar.set_description.assert_called_once_with("New description")
 
-    def test_close(self):
+    def test_close(self) -> None:
         """Test closing progress tracker"""
         with patch("gitsync.progress_tracker.tqdm") as mock_tqdm:
             mock_progress_bar = Mock()
@@ -159,7 +159,7 @@ class TestProgressTracker:
             mock_progress_bar.close.assert_called_once()
             assert tracker.progress_bar is None
 
-    def test_get_elapsed_time(self):
+    def test_get_elapsed_time(self) -> None:
         """Test getting elapsed time"""
         tracker = ProgressTracker(total_files=100, show_progress=False)
 
@@ -169,7 +169,7 @@ class TestProgressTracker:
         elapsed = tracker.get_elapsed_time()
         assert elapsed > 0
 
-    def test_get_download_rate(self):
+    def test_get_download_rate(self) -> None:
         """Test getting download rate"""
         tracker = ProgressTracker(total_files=100, show_progress=False)
 
@@ -180,7 +180,7 @@ class TestProgressTracker:
         rate = tracker.get_download_rate()
         assert rate > 0
 
-    def test_get_download_rate_no_time(self):
+    def test_get_download_rate_no_time(self) -> None:
         """Test getting download rate with no elapsed time"""
         with patch.object(ProgressTracker, "get_elapsed_time", return_value=0):
             tracker = ProgressTracker(total_files=100, show_progress=False)
@@ -189,7 +189,7 @@ class TestProgressTracker:
             rate = tracker.get_download_rate()
             assert rate == 0.0
 
-    def test_get_file_rate(self):
+    def test_get_file_rate(self) -> None:
         """Test getting file processing rate"""
         tracker = ProgressTracker(total_files=100, show_progress=False)
 
@@ -200,7 +200,7 @@ class TestProgressTracker:
         rate = tracker.get_file_rate()
         assert rate > 0
 
-    def test_print_summary_basic(self, capsys):
+    def test_print_summary_basic(self, capsys: 'pytest.CaptureFixture[str]') -> None:
         """Test printing basic summary"""
         tracker = ProgressTracker(total_files=100, show_progress=False)
 
@@ -224,7 +224,7 @@ class TestProgressTracker:
         assert "Data downloaded:" in captured.out
         assert "Success rate:     90.0%" in captured.out
 
-    def test_print_summary_with_rate_limit(self, capsys):
+    def test_print_summary_with_rate_limit(self, capsys: 'pytest.CaptureFixture[str]') -> None:
         """Test printing summary with rate limit info"""
         tracker = ProgressTracker(total_files=100, show_progress=False)
 
@@ -235,7 +235,7 @@ class TestProgressTracker:
         captured = capsys.readouterr()
         assert "Rate limit:       4500/5000" in captured.out
 
-    def test_get_stats_dict(self):
+    def test_get_stats_dict(self) -> None:
         """Test getting statistics as dictionary"""
         tracker = ProgressTracker(total_files=100, show_progress=False)
 
@@ -258,7 +258,7 @@ class TestProgressTracker:
         assert stats["elapsed_time"] > 0
         assert stats["success_rate"] == 90.0  # (8 + 1) / 10 * 100
 
-    def test_should_throttle(self):
+    def test_should_throttle(self) -> None:
         """Test throttling check"""
         tracker = ProgressTracker(total_files=100, show_progress=False)
 
@@ -272,7 +272,7 @@ class TestProgressTracker:
         assert tracker.should_throttle(0, throttle_interval=100) is False
 
     @patch("gitsync.progress_tracker.time.sleep")
-    def test_log_throttle_pause(self, mock_sleep):
+    def test_log_throttle_pause(self, mock_sleep: Mock) -> None:
         """Test logging throttle pause"""
         with patch("gitsync.progress_tracker.tqdm") as mock_tqdm:
             mock_progress_bar = Mock()

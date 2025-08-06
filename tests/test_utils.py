@@ -190,8 +190,9 @@ class TestLoadFileHashes:
         """Test loading valid JSON file"""
         test_data = {"file1.txt": "hash1", "file2.txt": "hash2"}
 
-        with patch("builtins.open", mock_open(read_data=json.dumps(test_data))), patch(
-            "pathlib.Path.exists", return_value=True
+        with (
+            patch("builtins.open", mock_open(read_data=json.dumps(test_data))),
+            patch("pathlib.Path.exists", return_value=True),
         ):
             result = load_file_hashes(Path("test.json"))
 
@@ -199,8 +200,9 @@ class TestLoadFileHashes:
 
     def test_load_invalid_json_file(self):
         """Test loading invalid JSON file"""
-        with patch("builtins.open", mock_open(read_data="invalid json")), patch(
-            "pathlib.Path.exists", return_value=True
+        with (
+            patch("builtins.open", mock_open(read_data="invalid json")),
+            patch("pathlib.Path.exists", return_value=True),
         ):
             result = load_file_hashes(Path("test.json"))
 

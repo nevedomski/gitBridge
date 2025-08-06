@@ -12,17 +12,21 @@ graph TB
     end
     
     subgraph "Core Components"
-        SYNC[Sync Manager]
-        API[API Sync Engine]
+        FACADE[GitHubAPISync Facade]
+        API_CLIENT[API Client]
+        REPO_MGR[Repository Manager]
+        FILE_SYNC[File Synchronizer]
+        PROGRESS[Progress Tracker]
         BROWSER[Browser Sync Engine]
-        CACHE[Cache Manager]
+        SESSION[Session Factory]
     end
     
     subgraph "Support Modules"
-        PROXY[Proxy Handler]
-        CERT[Certificate Manager]
-        AUTH[Authentication]
+        PROXY[PAC Proxy Support]
+        CERT[Certificate Support]
+        AUTH[Authentication Providers]
         UTILS[Utilities]
+        INTERFACES[Abstract Interfaces]
     end
     
     subgraph "External Services"
@@ -35,20 +39,23 @@ graph TB
         META[Metadata Cache]
     end
     
-    CLI --> SYNC
-    CONFIG --> SYNC
-    SYNC --> API
-    SYNC --> BROWSER
-    API --> PROXY
-    BROWSER --> PROXY
-    PROXY --> CERT
-    API --> AUTH
-    API --> GITHUB
+    CLI --> FACADE
+    CONFIG --> FACADE
+    FACADE --> API_CLIENT
+    FACADE --> REPO_MGR
+    FACADE --> FILE_SYNC
+    FACADE --> PROGRESS
+    API_CLIENT --> SESSION
+    REPO_MGR --> API_CLIENT
+    FILE_SYNC --> API_CLIENT
+    SESSION --> PROXY
+    SESSION --> CERT
+    SESSION --> AUTH
+    API_CLIENT --> GITHUB
     BROWSER --> WEB
-    API --> CACHE
-    BROWSER --> CACHE
-    CACHE --> META
-    SYNC --> FILES
+    FILE_SYNC --> META
+    FILE_SYNC --> FILES
+    BROWSER --> FILES
 ```
 
 ## Core Design Principles
@@ -90,69 +97,99 @@ Optimized for efficiency:
 
 ## Component Architecture
 
-### Sync Manager
+### GitHubAPISync Facade
 
-The central orchestrator that coordinates all sync operations:
-
-```python
-class SyncManager:
-    """Orchestrates synchronization operations."""
-    
-    def __init__(self, config: Config):
-        self.config = config
-        self.sync_engine = self._select_engine()
-        self.cache_manager = CacheManager()
-    
-    def sync(self) -> SyncResult:
-        """Execute synchronization."""
-        # 1. Validate configuration
-        # 2. Select sync method
-        # 3. Perform sync
-        # 4. Update cache
-        # 5. Return results
-```
-
-**Responsibilities:**
-- Configuration validation
-- Sync method selection
-- Error handling and recovery
-- Progress reporting
-- Result aggregation
-
-### API Sync Engine
-
-Implements GitHub API-based synchronization:
+The main facade that coordinates specialized components:
 
 ```python
 class GitHubAPISync:
-    """GitHub API synchronization engine."""
+    """Facade coordinating specialized sync components."""
     
-    def sync(self) -> Dict[str, Any]:
-        """Perform API-based sync."""
-        # 1. Fetch repository tree
-        # 2. Compare with local cache
-        # 3. Download changed files
-        # 4. Update metadata
+    def __init__(self, repo_url: str, local_path: str, token: Optional[str] = None):
+        self.api_client = GitHubAPIClient(session_factory, repo_url)
+        self.repo_manager = RepositoryManager(self.api_client, repo_url)
+        self.file_sync = FileSynchronizer(self.api_client, local_path)
+        self.progress = ProgressTracker()
+    
+    def sync(self, ref: str = "main") -> bool:
+        """Coordinate components for complete sync."""
+        # 1. Test connection
+        # 2. Resolve reference
+        # 3. Get repository tree
+        # 4. Synchronize files
+        # 5. Report progress
+        # 6. Return success status
 ```
 
-**Key Features:**
-- Tree API for efficient file listing
-- Blob API for content retrieval
-- Parallel download support
-- Rate limit management
-- SHA-based change detection
+**Responsibilities:**
+- Provide simple public interface
+- Coordinate component interactions
+- Maintain backward compatibility
+- Orchestrate sync workflow
+
+### Component Architecture
+
+#### API Client
+
+Handles low-level GitHub API operations:
+
+```python
+class GitHubAPIClient:
+    """Low-level GitHub API client."""
+    
+    def __init__(self, session_factory, base_url):
+        self.session = session_factory.create_session()
+        self.base_url = base_url
+    
+    def make_request(self, endpoint, **kwargs):
+        """Generic API request handling."""
+        # Handle authentication
+        # Manage rate limits
+        # Retry on failure
+```
+
+#### Repository Manager
+
+Manages repository metadata and structure:
+
+```python
+class RepositoryManager:
+    """Repository-specific operations."""
+    
+    def resolve_ref(self, ref: str) -> str:
+        """Resolve branch/tag/commit to SHA."""
+        
+    def get_tree(self, ref: str) -> List[FileInfo]:
+        """Get repository file tree."""
+```
+
+#### File Synchronizer
+
+Handles file synchronization logic:
+
+```python
+class FileSynchronizer:
+    """File sync and incremental updates."""
+    
+    def sync_files(self, files: List[FileInfo]):
+        """Synchronize files to local directory."""
+        # Compare with cache
+        # Download changed files
+        # Update local files
+        # Save metadata
+```
 
 ### Browser Sync Engine
 
-Implements browser automation fallback:
+Implements browser automation using Playwright:
 
 ```python
 class GitHubBrowserSync:
-    """Browser-based synchronization engine."""
+    """Playwright-based synchronization engine."""
     
-    def sync(self) -> Dict[str, Any]:
+    def sync(self) -> bool:
         """Perform browser-based sync."""
-        # 1. Launch browser
+        # 1. Launch browser with Playwright
         # 2. Navigate to repository
         # 3. Download ZIP archive
         # 4. Extract and compare
@@ -160,28 +197,49 @@ class GitHubBrowserSync:
 ```
 
 **Key Features:**
-- Selenium WebDriver integration
-- Chrome/Chromium support
+- Playwright automation framework
+- Multi-browser support (Chromium, Firefox, WebKit)
 - Headless mode operation
-- Cookie persistence
-- JavaScript execution
+- Automatic wait strategies
+- Network interception capabilities
 
-### Cache Manager
+### Session Factory
 
-Manages metadata for incremental updates:
+Creates configured HTTP sessions:
 
 ```python
-class CacheManager:
-    """Manages sync metadata and cache."""
+class SessionFactory:
+    """Factory for creating configured HTTP sessions."""
     
-    def get_file_metadata(self, path: str) -> FileMetadata:
-        """Get cached file metadata."""
-    
-    def update_metadata(self, files: List[FileInfo]):
-        """Update cache with new metadata."""
-    
-    def get_changed_files(self, remote_files: List[FileInfo]) -> List[FileInfo]:
-        """Identify changed files."""
+    def create_session(self, config: Config) -> requests.Session:
+        """Create session with proxy, SSL, and auth."""
+        session = requests.Session()
+        self.configure_ssl(session, config)
+        self.configure_proxy(session, config)
+        self.configure_auth(session, config)
+        return session
+```
+
+### Abstract Interfaces
+
+Define contracts for pluggable implementations:
+
+```python
+class SyncProvider(ABC):
+    """Interface for sync implementations."""
+    def sync(self, ref: str) -> bool: ...
+    def test_connection(self) -> bool: ...
+    def get_status(self) -> Dict: ...
+
+class ProxyProvider(ABC):
+    """Interface for proxy configuration."""
+    def get_proxy_config(self, url: str) -> Dict: ...
+    def detect_proxy(self) -> bool: ...
+
+class CertificateProvider(ABC):
+    """Interface for certificate handling."""
+    def get_certificates(self) -> List: ...
+    def export_certificates(self) -> str: ...
 ```
 
 **Cache Structure:**
@@ -421,23 +479,53 @@ graph TB
 ### Error Hierarchy
 
 ```python
+# Base exceptions
 class GitSyncError(Exception):
-    """Base exception for GitSync."""
+    """Base exception for all GitSync errors."""
 
 class ConfigurationError(GitSyncError):
     """Configuration-related errors."""
 
-class AuthenticationError(GitSyncError):
-    """Authentication failures."""
-
+# Network exceptions
 class NetworkError(GitSyncError):
-    """Network-related errors."""
+    """Network and connectivity errors."""
 
 class RateLimitError(NetworkError):
     """API rate limit exceeded."""
 
+class ProxyError(NetworkError):
+    """Proxy configuration errors."""
+
+class SSLError(NetworkError):
+    """SSL/TLS certificate errors."""
+
+# Authentication exceptions
+class AuthenticationError(GitSyncError):
+    """Authentication and authorization errors."""
+
+class TokenError(AuthenticationError):
+    """Invalid or expired token."""
+
+# Repository exceptions
 class RepositoryError(GitSyncError):
     """Repository access errors."""
+
+class InvalidRefError(RepositoryError):
+    """Invalid branch, tag, or commit."""
+
+# File system exceptions
+class FileSystemError(GitSyncError):
+    """Local file system errors."""
+
+class PermissionError(FileSystemError):
+    """File permission errors."""
+
+# Browser exceptions
+class BrowserError(GitSyncError):
+    """Browser automation errors."""
+
+class BrowserNotFoundError(BrowserError):
+    """Browser executable not found."""
 ```
 
 ### Retry Logic

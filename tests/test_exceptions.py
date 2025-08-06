@@ -35,7 +35,6 @@ from gitsync.exceptions import (
     wrap_playwright_exception,
     # Utility functions
     wrap_requests_exception,
-    wrap_selenium_exception,
 )
 
 
@@ -841,20 +840,6 @@ class TestWrapFileOperationException:
         assert wrapped.details["path"] == "/path/to/file"
         assert wrapped.details["operation"] == "read"
         assert wrapped.original_error is original
-
-
-class TestWrapSeleniumException:
-    """Test the wrap_selenium_exception utility function.
-
-    Note: These tests are skipped because selenium is not installed in the test environment.
-    The wrap_selenium_exception function requires selenium to be available.
-    """
-
-    def test_function_exists(self):
-        """Test that the wrap_selenium_exception function exists."""
-        # We can at least test that the function is importable
-
-        assert callable(wrap_selenium_exception)
 
 
 class TestWrapPlaywrightException:

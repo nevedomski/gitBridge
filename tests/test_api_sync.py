@@ -325,7 +325,9 @@ class TestGitHubAPISync:
     @patch("gitsync.api_sync.FileSynchronizer")
     @patch("gitsync.api_sync.ProgressTracker")
     @patch("gitsync.api_sync.ensure_dir")
-    def test_sync_with_progress(self, mock_ensure_dir, mock_progress_tracker, mock_file_sync, mock_repo_mgr, mock_client):
+    def test_sync_with_progress(
+        self, mock_ensure_dir, mock_progress_tracker, mock_file_sync, mock_repo_mgr, mock_client
+    ):
         """Test sync with progress tracking"""
         mock_client_instance = Mock()
         mock_client.return_value = mock_client_instance
@@ -351,16 +353,16 @@ class TestGitHubAPISync:
         result = sync.sync(show_progress=True)
 
         assert result is True
-        mock_progress_tracker.assert_called_once_with(
-            total_files=1, show_progress=True, desc="Syncing files"
-        )
+        mock_progress_tracker.assert_called_once_with(total_files=1, show_progress=True, desc="Syncing files")
 
     @patch("gitsync.api_sync.GitHubAPIClient")
     @patch("gitsync.api_sync.RepositoryManager")
     @patch("gitsync.api_sync.FileSynchronizer")
     @patch("gitsync.api_sync.ProgressTracker")
     @patch("gitsync.api_sync.ensure_dir")
-    def test_sync_skip_existing(self, mock_ensure_dir, mock_progress_tracker, mock_file_sync, mock_repo_mgr, mock_client):
+    def test_sync_skip_existing(
+        self, mock_ensure_dir, mock_progress_tracker, mock_file_sync, mock_repo_mgr, mock_client
+    ):
         """Test sync skips existing files"""
         mock_client_instance = Mock()
         mock_client.return_value = mock_client_instance

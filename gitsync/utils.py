@@ -5,7 +5,7 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 from urllib.parse import urlparse
 
 from .exceptions import ConfigurationError
@@ -90,20 +90,21 @@ def calculate_file_hash(content: bytes) -> str:
     return hashlib.sha256(content).hexdigest()
 
 
-def load_file_hashes(hash_file: Path) -> Dict[str, str]:
+def load_file_hashes(hash_file: Path) -> dict[str, str]:
     """Load file hashes from cache file."""
     if not hash_file.exists():
         return {}
 
     try:
         with open(hash_file) as f:
-            return json.load(f)
+            data: dict[str, str] = json.load(f)
+            return data
     except Exception as e:
         logger.warning(f"Failed to load hash cache: {e}")
         return {}
 
 
-def save_file_hashes(hash_file: Path, hashes: Dict[str, str]) -> None:
+def save_file_hashes(hash_file: Path, hashes: dict[str, str]) -> None:
     """Save file hashes to cache file."""
     hash_file.parent.mkdir(parents=True, exist_ok=True)
 
@@ -131,14 +132,14 @@ def format_size(size: int) -> str:
     for unit in ["B", "KB", "MB", "GB"]:
         if size < 1024.0:
             return f"{size:.1f} {unit}"
-        size /= 1024.0
+        size = size / 1024.0
     return f"{size:.1f} TB"
 
 
 class SyncStats:
     """Track synchronization statistics."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.files_checked = 0
         self.files_downloaded = 0
         self.files_skipped = 0
@@ -146,7 +147,7 @@ class SyncStats:
         self.bytes_downloaded = 0
         self.directories_created = 0
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert stats to dictionary."""
         return {
             "files_checked": self.files_checked,

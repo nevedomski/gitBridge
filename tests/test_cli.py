@@ -632,7 +632,7 @@ class TestStatusCommand:
     @patch("gitsync.cli.GitHubAPISync")
     @patch("gitsync.cli.Config")
     @patch("pathlib.Path.exists")
-    @patch("builtins.open", side_effect=Exception("JSON error"))
+    @patch("builtins.open", side_effect=OSError("JSON error"))
     def test_status_hash_cache_read_error(
         self, mock_file_open, mock_path_exists, mock_config_class, mock_api_sync_class
     ):

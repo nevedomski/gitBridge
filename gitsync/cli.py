@@ -3,7 +3,6 @@
 import logging
 import sys
 from pathlib import Path
-from typing import Optional
 
 import click
 import yaml
@@ -45,11 +44,11 @@ def cli():
 @click.option("--auto-proxy", is_flag=True, help="Auto-detect proxy from Windows/Chrome PAC")
 @click.option("--auto-cert", is_flag=True, help="Auto-detect certificates from Windows certificate store")
 def sync(
-    repo: Optional[str],
-    local: Optional[str],
-    ref: Optional[str],
-    token: Optional[str],
-    config: Optional[str],
+    repo: str | None,
+    local: str | None,
+    ref: str | None,
+    token: str | None,
+    config: str | None,
     method: str,
     no_progress: bool,
     verbose: bool,
@@ -226,10 +225,10 @@ def sync(
 @click.option("--auto-proxy", is_flag=True, help="Auto-detect proxy from Windows/Chrome PAC")
 @click.option("--auto-cert", is_flag=True, help="Auto-detect certificates from Windows certificate store")
 def status(
-    config: Optional[str],
-    repo: Optional[str],
-    local: Optional[str],
-    token: Optional[str],
+    config: str | None,
+    repo: str | None,
+    local: str | None,
+    token: str | None,
     verbose: bool,
     no_ssl_verify: bool,
     auto_proxy: bool,
@@ -351,7 +350,7 @@ def status(
 @click.option("--ref", help="Branch, tag, or commit SHA to sync", default="main")
 @click.option("--token", "-t", help="GitHub personal access token")
 @click.option("--method", type=click.Choice(["api", "browser"]), default="api", help="Sync method")
-def init(output: str, repo: str, local: str, ref: str, token: Optional[str], method: str):
+def init(output: str, repo: str, local: str, ref: str, token: str | None, method: str):
     """Create a new configuration file."""
 
     # Create configuration

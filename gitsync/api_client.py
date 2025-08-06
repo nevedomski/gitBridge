@@ -23,7 +23,7 @@ Typical Usage:
 """
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any
 
 import requests
 
@@ -69,9 +69,9 @@ class GitHubAPIClient:
         self,
         owner: str,
         repo: str,
-        token: Optional[str] = None,
+        token: str | None = None,
         verify_ssl: bool = True,
-        ca_bundle: Optional[str] = None,
+        ca_bundle: str | None = None,
         auto_proxy: bool = False,
         auto_cert: bool = False,
     ):
@@ -173,7 +173,7 @@ class GitHubAPIClient:
         except requests.RequestException as e:
             raise wrap_requests_exception(e, "test API connection") from e
 
-    def get_rate_limit(self) -> Dict[str, Any]:
+    def get_rate_limit(self) -> dict[str, Any]:
         """Get current API rate limit status.
 
         Queries the GitHub API rate limit endpoint to check remaining requests.
@@ -191,12 +191,13 @@ class GitHubAPIClient:
         try:
             response = self.session.get(f"{self.base_url}/rate_limit")
             if response.status_code == 200:
-                return response.json()
+                rate_data: dict[str, Any] = response.json()
+                return rate_data
         except Exception as e:
             logger.warning(f"Failed to get rate limit: {e}")
         return {}
 
-    def get_repository_info(self) -> Optional[Dict[str, Any]]:
+    def get_repository_info(self) -> dict[str, Any] | None:
         """Get basic repository information.
 
         Fetches repository metadata including default branch, description, etc.
@@ -214,7 +215,8 @@ class GitHubAPIClient:
             response = self.session.get(url)
 
             if response.status_code == 200:
-                return response.json()
+                repo_data: dict[str, Any] = response.json()
+                return repo_data
             elif response.status_code == 401:
                 raise AuthenticationError(
                     "Authentication failed while fetching repository info",
@@ -235,7 +237,7 @@ class GitHubAPIClient:
 
         return None
 
-    def get(self, path: str, params: Optional[Dict[str, Any]] = None) -> requests.Response:
+    def get(self, path: str, params: dict[str, Any] | None = None) -> requests.Response:
         """Perform GET request to GitHub API.
 
         Generic method for making GET requests to any GitHub API endpoint.

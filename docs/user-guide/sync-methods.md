@@ -7,7 +7,7 @@ GitSync provides two methods for synchronizing GitHub repositories, ensuring you
 | Method | Speed | Requirements | Use Case |
 |--------|-------|--------------|----------|
 | **API** | Fast ⚡ | GitHub token (for private repos) | Default method, most efficient |
-| **Browser** | Slow 🐢 | Chrome/Chromium browser | When API access is blocked |
+| **Browser** | Slow 🐢 | Modern browser (Chrome/Firefox/Edge) | When API access is blocked |
 
 ## API Synchronization Method
 
@@ -102,7 +102,7 @@ sync:
 
 ## Browser Automation Method
 
-The browser method uses Selenium WebDriver to automate a real browser, mimicking manual repository browsing.
+The browser method uses Playwright to automate a real browser, mimicking manual repository browsing.
 
 ### How It Works
 
@@ -113,14 +113,14 @@ sequenceDiagram
     participant GitHub Website
     participant Local Files
     
-    GitSync->>Chrome Browser: Launch browser
-    Chrome Browser->>GitHub Website: Navigate to repository
-    GitSync->>Chrome Browser: Click "Download ZIP"
-    Chrome Browser->>GitHub Website: Request ZIP file
-    GitHub Website-->>Chrome Browser: Return ZIP data
-    GitSync->>Chrome Browser: Extract file list from ZIP
+    GitSync->>Browser: Launch browser (Playwright)
+    Browser->>GitHub Website: Navigate to repository
+    GitSync->>Browser: Click "Download ZIP"
+    Browser->>GitHub Website: Request ZIP file
+    GitHub Website-->>Browser: Return ZIP data
+    GitSync->>Browser: Extract file list from ZIP
     GitSync->>Local Files: Compare with existing files
-    GitSync->>Chrome Browser: Download changed files
+    GitSync->>Browser: Download changed files
     GitSync->>Local Files: Save updated files
 ```
 
@@ -149,90 +149,91 @@ sequenceDiagram
     ```yaml
     sync:
       method: browser
-      browser:
-        type: chrome              # chrome, chromium, or edge
-        path: /usr/bin/chromium  # Optional: custom browser path
-        headless: true           # Run without GUI
-        timeout: 30              # Page load timeout
-        download_timeout: 300    # File download timeout
+    
+    browser:
+      type: chromium             # chromium, firefox, or webkit
+      executable_path: /usr/bin/chromium  # Optional: custom browser path
+      headless: true            # Run without GUI
+      timeout: 30000            # Page load timeout (ms)
+      download_timeout: 300000  # File download timeout (ms)
     ```
 
 ### Browser Setup
 
-#### Chrome/Chromium Installation
+#### Browser Installation
 
-=== "Windows"
+Playwright can automatically install browsers for you:
 
-    ```powershell
-    # Using winget
+=== "Automatic Installation"
+
+    ```bash
+    # Install Playwright browsers (recommended)
+    playwright install chromium
+    playwright install firefox
+    playwright install webkit
+    
+    # Or install all browsers
+    playwright install
+    ```
+
+=== "Manual Installation"
+
+    ```bash
+    # Windows (using winget)
     winget install Google.Chrome
+    winget install Mozilla.Firefox
     
-    # Or download from
-    # https://www.google.com/chrome/
-    ```
-
-=== "macOS"
-
-    ```bash
-    # Using Homebrew
+    # macOS (using Homebrew)
     brew install --cask google-chrome
-    # or
-    brew install chromium
-    ```
-
-=== "Linux"
-
-    ```bash
-    # Ubuntu/Debian
+    brew install --cask firefox
+    
+    # Linux (Ubuntu/Debian)
     sudo apt-get install chromium-browser
-    
-    # Fedora
-    sudo dnf install chromium
-    
-    # Arch
-    sudo pacman -S chromium
+    sudo apt-get install firefox
     ```
 
-#### ChromeDriver
+#### Browser Management
 
-ChromeDriver is automatically managed by Selenium 4+, but you can specify a custom path:
-
-```yaml
-sync:
-  browser:
-    driver_path: /usr/local/bin/chromedriver
-```
+Playwright manages browser binaries automatically. No separate driver installation needed!
 
 ### Advanced Options
 
 ```yaml
 sync:
   method: browser
-  browser:
-    type: chrome
-    headless: true            # Run without GUI (faster)
-    window_size: "1920,1080"  # Browser window size
-    
-    # Performance
-    page_load_strategy: eager  # Don't wait for all resources
-    disable_images: true       # Don't load images (faster)
-    disable_javascript: false  # Keep JS enabled for GitHub
-    
-    # Timeouts
-    implicit_wait: 10         # Wait for elements (seconds)
-    page_timeout: 30          # Page load timeout
-    script_timeout: 30        # JavaScript execution timeout
-    download_timeout: 300     # File download timeout
-    
-    # Browser options
-    user_agent: "GitSync/1.0"
-    accept_language: "en-US"
-    
-    # Proxy (if not using system proxy)
-    proxy:
-      http: "http://proxy:8080"
-      https: "http://proxy:8080"
-      no_proxy: "localhost,127.0.0.1"
+
+browser:
+  type: chromium              # chromium, firefox, or webkit
+  headless: true              # Run without GUI (faster)
+  
+  # Window settings
+  window_size: "1920x1080"    # Browser window size
+  device_scale_factor: 1      # Device pixel ratio
+  
+  # Performance
+  args:
+    - "--disable-gpu"         # Disable GPU acceleration
+    - "--no-sandbox"          # Required for some environments
+    - "--disable-dev-shm-usage"  # Overcome limited resource problems
+  
+  # Timeouts (in milliseconds)
+  timeout: 30000              # Default timeout for operations
+  download_timeout: 300000    # File download timeout
+  
+  # Browser context options
+  user_agent: "GitSync/1.0"   # Custom user agent
+  locale: "en-US"             # Browser locale
+  timezone: "America/New_York" # Browser timezone
+  
+  # Storage
+  user_data_dir: ~/.gitsync/browser  # Persistent browser data
+  
+  # Proxy (if not using system proxy)
+  proxy:
+    server: "http://proxy:8080"
+    username: "proxy_user"
+    password: "proxy_pass"
+    bypass: "localhost,127.0.0.1"
 ```
 
 ### Handling Authentication
@@ -249,10 +250,9 @@ For private repositories with browser method:
 
 2. **Cookie Reuse**:
    ```yaml
-   sync:
-     browser:
-       cookie_file: ~/.gitsync/cookies.json
-       reuse_session: true
+   browser:
+     user_data_dir: ~/.gitsync/browser  # Saves session data
+     # Browser will reuse saved cookies automatically
    ```
 
 3. **Basic Auth** (if supported):
@@ -327,7 +327,8 @@ sync:
 Implementation in code:
 
 ```python
-from gitsync import GitHubAPISync, GitHubBrowserSync
+from gitsync.api_sync import GitHubAPISync
+from gitsync.browser_sync import GitHubBrowserSync
 
 def sync_with_fallback(repo_url, local_path, token=None):
     """Sync with automatic fallback to browser method."""
@@ -335,13 +336,19 @@ def sync_with_fallback(repo_url, local_path, token=None):
     # Try API method first
     try:
         api_sync = GitHubAPISync(repo_url, local_path, token)
-        return api_sync.sync()
+        if api_sync.test_connection():
+            return api_sync.sync()
     except Exception as e:
         print(f"API sync failed: {e}")
         print("Falling back to browser method...")
         
         # Fallback to browser method
-        browser_sync = GitHubBrowserSync(repo_url, local_path)
+        browser_sync = GitHubBrowserSync(
+            repo_url=repo_url,
+            local_path=local_path,
+            browser_type="chromium",
+            headless=True
+        )
         return browser_sync.sync()
 ```
 
@@ -361,10 +368,10 @@ def sync_with_fallback(repo_url, local_path, token=None):
 
 ### Browser Method Issues
 
-!!! warning "Chrome Not Found"
-    - Install Chrome/Chromium
-    - Specify browser path explicitly
-    - Check PATH environment variable
+!!! warning "Browser Not Found"
+    - Run `playwright install chromium`
+    - Or specify executable_path explicitly
+    - Check Playwright installation
 
 !!! warning "Timeout Errors"
     - Increase timeout values

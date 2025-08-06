@@ -37,7 +37,7 @@ Typical Usage:
 
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .api_client import GitHubAPIClient
 from .exceptions import SyncError
@@ -79,9 +79,9 @@ class GitHubAPISync(SyncProvider):
         self,
         repo_url: str,
         local_path: str,
-        token: Optional[str] = None,
+        token: str | None = None,
         verify_ssl: bool = True,
-        ca_bundle: Optional[str] = None,
+        ca_bundle: str | None = None,
         auto_proxy: bool = False,
         auto_cert: bool = False,
     ):
@@ -148,7 +148,7 @@ class GitHubAPISync(SyncProvider):
             logger.error(f"Connection test failed: {e}")
             return False
 
-    def get_rate_limit(self) -> Dict[str, Any]:
+    def get_rate_limit(self) -> dict[str, Any]:
         """Get current API rate limit status.
 
         Queries the GitHub API rate limit endpoint to check remaining requests.
@@ -164,7 +164,7 @@ class GitHubAPISync(SyncProvider):
         """
         return self.client.get_rate_limit()
 
-    def resolve_ref(self, ref: str) -> Optional[str]:
+    def resolve_ref(self, ref: str) -> str | None:
         """Resolve a reference (branch, tag, or commit SHA) to a commit SHA.
 
         This method handles multiple reference types:
@@ -184,7 +184,7 @@ class GitHubAPISync(SyncProvider):
         """
         return self.repository.resolve_ref(ref)
 
-    def get_repository_tree(self, ref: str = "main", recursive: bool = True) -> Optional[List[Dict]]:
+    def get_repository_tree(self, ref: str = "main", recursive: bool = True) -> list[dict] | None:
         """Get repository file tree.
 
         Fetches the complete file tree for a repository at a specific reference.
@@ -319,7 +319,7 @@ class GitHubAPISync(SyncProvider):
             tracker.close()
 
     # Backward compatibility methods - delegate to components
-    def download_file(self, file_path: str, sha: str) -> Optional[bytes]:
+    def download_file(self, file_path: str, sha: str) -> bytes | None:
         """Download a single file from repository.
 
         Note: This method is provided for backward compatibility.
@@ -327,7 +327,7 @@ class GitHubAPISync(SyncProvider):
         """
         return self.synchronizer.download_file(file_path, sha)
 
-    def download_blob(self, sha: str) -> Optional[bytes]:
+    def download_blob(self, sha: str) -> bytes | None:
         """Download file using git blob API.
 
         Note: This method is provided for backward compatibility.
@@ -343,7 +343,7 @@ class GitHubAPISync(SyncProvider):
         """
         return self.synchronizer.should_download_file(file_path, sha)
 
-    def sync_file(self, entry: Dict) -> bool:
+    def sync_file(self, entry: dict) -> bool:
         """Sync a single file.
 
         Note: This method is provided for backward compatibility.
@@ -368,7 +368,7 @@ class GitHubAPISync(SyncProvider):
         """Context manager exit - cleanup resources."""
         self.close()
 
-    def get_status(self) -> Dict[str, Any]:
+    def get_status(self) -> dict[str, Any]:
         """Get current synchronization provider status and metadata.
 
         Returns comprehensive information about the API sync provider's current state

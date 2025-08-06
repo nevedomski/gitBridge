@@ -8,10 +8,12 @@ on:
 
 jobs:
   tests:
-    name: 🧪 Tests (Python ${{ matrix.python }})
-    runs-on: ubuntu-latest
+    name: 🧪 Tests (Python ${{ matrix.python }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
@@ -24,24 +26,47 @@ jobs:
       - name: Cache pip dependencies
         uses: actions/cache@v4
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ matrix.python }}-${{ hashFiles('**/pyproject.toml') }}
+          path: |
+            ~/.cache/pip
+            ~/.cache/uv
+            ~/AppData/Local/uv/cache
+          key: ${{ runner.os }}-${{ matrix.python }}-${{ hashFiles('**/pyproject.toml') }}
           restore-keys: |
-            ${{ runner.os }}-pip-${{ matrix.python }}-
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-${{ matrix.python }}-
+            ${{ runner.os }}-
       
+      - name: Install uv (universal installer)
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install ".[dev, docs, pac]"
+          uv sync --dev --extra pac
           # Install playwright browsers for browser automation tests
-          python -m playwright install chromium
+          uv run playwright install chromium
     
       - name: 🔬 Unit tests with coverage
-        run: python -m pytest --maxfail=1 --disable-warnings --cov=gitsync --cov-report=xml --cov-report=xml
+        shell: bash
+        run: |
+          # Run platform-specific tests based on the OS
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            # On Windows, run all tests including Windows-specific ones
+            uv run pytest --maxfail=1 --disable-warnings --cov=gitsync --cov-report=xml
+          elif [[ "${{ runner.os }}" == "Linux" ]]; then
+            # On Linux, skip Windows-specific tests
+            uv run pytest --maxfail=1 --disable-warnings --cov=gitsync --cov-report=xml -m "not windows"
+          elif [[ "${{ runner.os }}" == "macOS" ]]; then
+            # On macOS, skip Windows-specific tests
+            uv run pytest --maxfail=1 --disable-warnings --cov=gitsync --cov-report=xml -m "not windows"
+          else
+            # Fallback - skip Windows-specific tests
+            uv run pytest --maxfail=1 --disable-warnings --cov=gitsync --cov-report=xml -m "not windows"
+          fi
 
       - name: 📊 Upload coverage to Codecov
         uses: codecov/codecov-action@v5
+        if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -50,23 +75,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
             
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       
-      - name: Cache pip dependencies
+      - name: Cache dependencies
         uses: actions/cache@v4
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-3.11-${{ hashFiles('**/pyproject.toml') }}
+          path: |
+            ~/.cache/uv
+          key: ${{ runner.os }}-uv-lint-${{ hashFiles('**/pyproject.toml') }}
           restore-keys: |
-            ${{ runner.os }}-pip-3.11-
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-uv-lint-
+            ${{ runner.os }}-uv-
 
-      - name: Install tools
-        run: pip install ruff mypy
+      - name: Install dependencies
+        run: uv sync --dev
       
       - name: 🛑 Ruff check
         uses: astral-sh/ruff-action@v3 # Use the official action
@@ -81,7 +112,7 @@ jobs:
 
       # --- MyPy type‐check
       - name: 📐 MyPy
-        run: mypy .
+        run: uv run mypy .
 
   security:
     name: 🔒 Security Check

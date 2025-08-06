@@ -2,7 +2,7 @@
 
 import logging
 import platform
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 from urllib.parse import unquote, urlparse
 
 from .interfaces import ProxyProvider
@@ -30,16 +30,16 @@ except ImportError:
 class PACProxyDetector(ProxyProvider):
     """Detect and use PAC scripts from Chrome/Windows configuration."""
 
-    def __init__(self):
-        self.pac_url = None
-        self.pac_content = None
-        self.pac_object = None
+    def __init__(self) -> None:
+        self.pac_url: str | None = None
+        self.pac_content: str | None = None
+        self.pac_object: Any | None = None
 
     def is_available(self) -> bool:
         """Check if PAC detection is available on this system."""
         return platform.system() == "Windows" and (WINDOWS_AVAILABLE or PYPAC_AVAILABLE)
 
-    def get_pac_url_from_registry(self) -> Optional[str]:
+    def get_pac_url_from_registry(self) -> str | None:
         """Extract PAC URL from Windows Registry."""
         if not WINDOWS_AVAILABLE:
             return None
@@ -47,11 +47,11 @@ class PACProxyDetector(ProxyProvider):
         try:
             # Chrome uses the same proxy settings as IE from Windows Internet Options
             key_path = r"Software\Microsoft\Windows\CurrentVersion\Internet Settings"
-            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path) as key:
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path) as key:  # type: ignore
                 try:
-                    pac_url, _ = winreg.QueryValueEx(key, "AutoConfigURL")
+                    pac_url, _ = winreg.QueryValueEx(key, "AutoConfigURL")  # type: ignore
                     logger.info(f"Found PAC URL in registry: {pac_url}")
-                    return pac_url
+                    return str(pac_url)
                 except FileNotFoundError:
                     logger.debug("No AutoConfigURL in registry")
                 except Exception as e:
@@ -61,7 +61,7 @@ class PACProxyDetector(ProxyProvider):
 
         return None
 
-    def get_all_proxy_settings(self) -> Dict[str, Any]:
+    def get_all_proxy_settings(self) -> dict[str, Any]:
         """Get all proxy-related settings from Windows Registry."""
         if not WINDOWS_AVAILABLE:
             return {}
@@ -70,14 +70,14 @@ class PACProxyDetector(ProxyProvider):
 
         try:
             key_path = r"Software\Microsoft\Windows\CurrentVersion\Internet Settings"
-            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path) as key:
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path) as key:  # type: ignore
                 # Get number of values
-                _, value_count, _ = winreg.QueryInfoKey(key)
+                _, value_count, _ = winreg.QueryInfoKey(key)  # type: ignore
 
                 # Iterate through all values
                 for i in range(value_count):
                     try:
-                        name, value, _ = winreg.EnumValue(key, i)
+                        name, value, _ = winreg.EnumValue(key, i)  # type: ignore
                         if name in ["ProxyEnable", "ProxyServer", "AutoConfigURL", "ProxyOverride", "AutoDetect"]:
                             proxy_settings[name] = value
                     except Exception:
@@ -88,7 +88,7 @@ class PACProxyDetector(ProxyProvider):
 
         return proxy_settings
 
-    def download_pac_content(self, pac_url: str) -> Optional[str]:
+    def download_pac_content(self, pac_url: str) -> str | None:
         """Download PAC script content from URL."""
         try:
             if pac_url.startswith("file://"):
@@ -122,7 +122,7 @@ class PACProxyDetector(ProxyProvider):
 
         return None
 
-    def detect_pac_using_pypac(self) -> Optional[Any]:
+    def detect_pac_using_pypac(self) -> Any | None:
         """Use pypac to automatically discover PAC configuration."""
         if not PYPAC_AVAILABLE:
             return None
@@ -141,7 +141,7 @@ class PACProxyDetector(ProxyProvider):
 
         return None
 
-    def extract_proxy_from_pac(self, target_url: str) -> Optional[str]:
+    def extract_proxy_from_pac(self, target_url: str) -> str | None:
         """Extract proxy for a specific URL from PAC script."""
         if not PYPAC_AVAILABLE or not self.pac_object:
             return None
@@ -180,7 +180,7 @@ class PACProxyDetector(ProxyProvider):
 
         return None
 
-    def get_proxy_for_url(self, url: str) -> Tuple[Optional[str], Optional[str]]:
+    def get_proxy_for_url(self, url: str) -> tuple[str | None, str | None]:
         """Get HTTP and HTTPS proxy for a specific URL.
 
         Returns:
@@ -196,7 +196,9 @@ class PACProxyDetector(ProxyProvider):
 
         if pac_url and not self.pac_content:
             # Download PAC content
-            self.pac_content = self.download_pac_content(pac_url)
+            content = self.download_pac_content(pac_url)
+            if content is not None:
+                self.pac_content = content
 
         if self.pac_content and PYPAC_AVAILABLE and not self.pac_object:
             # Create PAC object from content
@@ -244,7 +246,7 @@ class PACProxyDetector(ProxyProvider):
         # Return the PAC-detected proxy for both HTTP and HTTPS
         return (proxy, proxy)
 
-    def create_pac_session(self) -> Optional[Any]:
+    def create_pac_session(self) -> Any | None:
         """Create a requests Session that uses PAC for proxy resolution."""
         if not PYPAC_AVAILABLE:
             logger.warning("pypac not available, cannot create PAC session")
@@ -257,7 +259,9 @@ class PACProxyDetector(ProxyProvider):
             if pac_url:
                 # Download PAC content if not already done
                 if not self.pac_content:
-                    self.pac_content = self.download_pac_content(pac_url)
+                    content = self.download_pac_content(pac_url)
+                    if content is not None:
+                        self.pac_content = content
 
                 if self.pac_content:
                     # Create PAC session with the content
@@ -279,7 +283,7 @@ class PACProxyDetector(ProxyProvider):
 
         return None
 
-    def get_proxy_config(self, url: str) -> Dict[str, Optional[str]]:
+    def get_proxy_config(self, url: str) -> dict[str, str | None]:
         """Get proxy configuration for a specific URL.
 
         Returns proxy configuration suitable for HTTP clients like requests.Session.
@@ -367,7 +371,7 @@ class PACProxyDetector(ProxyProvider):
                 proxies["https"] = proxy_config["https"]
 
             # Make a test request with timeout
-            response = requests.head(test_url, proxies=proxies, timeout=10, allow_redirects=True)
+            response = requests.head(test_url, proxies=proxies, timeout=10, allow_redirects=True)  # type: ignore[arg-type]
 
             # Consider 2xx, 3xx, and 405 (Method Not Allowed) as success
             # 405 is common for HEAD requests to APIs
@@ -378,7 +382,7 @@ class PACProxyDetector(ProxyProvider):
             return False
 
 
-def detect_and_configure_proxy() -> Dict[str, Optional[str]]:
+def detect_and_configure_proxy() -> dict[str, str | None]:
     """Detect and return proxy configuration from Windows/Chrome.
 
     Returns:

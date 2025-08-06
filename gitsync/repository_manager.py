@@ -26,7 +26,7 @@ Typical Usage:
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .api_client import GitHubAPIClient
 from .exceptions import SyncError
@@ -79,7 +79,7 @@ class RepositoryManager:
         self.owner = client.owner
         self.repo = client.repo
 
-    def resolve_ref(self, ref: str) -> Optional[str]:
+    def resolve_ref(self, ref: str) -> str | None:
         """Resolve a reference (branch, tag, or commit SHA) to a commit SHA.
 
         This method handles multiple reference types:
@@ -119,7 +119,8 @@ class RepositoryManager:
             # DOCDEV-NOTE: Branch refs use 'heads/' prefix in Git references API
             response = self.client.get(f"repos/{self.owner}/{self.repo}/git/ref/heads/{ref}")
             if response.status_code == 200:
-                return response.json()["object"]["sha"]
+                ref_data: dict[str, Any] = response.json()
+                return str(ref_data["object"]["sha"])
             elif response.status_code != 404:
                 response.raise_for_status()
 
@@ -174,7 +175,7 @@ class RepositoryManager:
                     original_error=e,
                 ) from e
 
-    def get_repository_tree(self, ref: str = "main", recursive: bool = True) -> Optional[List[Dict]]:
+    def get_repository_tree(self, ref: str = "main", recursive: bool = True) -> list[dict] | None:
         """Get repository file tree.
 
         Fetches the complete file tree for a repository at a specific reference.
@@ -230,7 +231,7 @@ class RepositoryManager:
             logger.error(f"Failed to get repository tree: {e}")
             return None
 
-    def get_default_branch(self) -> Optional[str]:
+    def get_default_branch(self) -> str | None:
         """Get the repository's default branch name.
 
         Returns:
@@ -249,7 +250,7 @@ class RepositoryManager:
 
         return None
 
-    def list_branches(self) -> List[Dict[str, Any]]:
+    def list_branches(self) -> list[dict[str, Any]]:
         """List all branches in the repository.
 
         Returns:
@@ -272,7 +273,7 @@ class RepositoryManager:
 
         return []
 
-    def list_tags(self) -> List[Dict[str, Any]]:
+    def list_tags(self) -> list[dict[str, Any]]:
         """List all tags in the repository.
 
         Returns:
@@ -296,7 +297,7 @@ class RepositoryManager:
 
         return []
 
-    def get_commit_info(self, sha: str) -> Optional[Dict[str, Any]]:
+    def get_commit_info(self, sha: str) -> dict[str, Any] | None:
         """Get detailed information about a specific commit.
 
         Args:

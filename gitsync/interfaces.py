@@ -28,7 +28,7 @@ Typical Usage:
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 
 class SyncProvider(ABC):
@@ -111,7 +111,7 @@ class SyncProvider(ABC):
         pass
 
     @abstractmethod
-    def get_status(self) -> Dict[str, Any]:
+    def get_status(self) -> dict[str, Any]:
         """Get current synchronization provider status and metadata.
 
         Returns comprehensive information about the provider's current state including
@@ -154,7 +154,7 @@ class ProxyProvider(ABC):
     """
 
     @abstractmethod
-    def get_proxy_config(self, url: str) -> Dict[str, Optional[str]]:
+    def get_proxy_config(self, url: str) -> dict[str, str | None]:
         """Get proxy configuration for a specific URL.
 
         Returns proxy configuration suitable for HTTP clients like requests.Session.
@@ -243,7 +243,7 @@ class CertificateProvider(ABC):
     """
 
     @abstractmethod
-    def get_certificates(self, store_names: Optional[List[str]] = None) -> List[Tuple[bytes, str, Any]]:
+    def get_certificates(self, store_names: list[str] | None = None) -> list[tuple[bytes, str, Any]]:
         """Retrieve SSL certificates from configured sources.
 
         Returns certificates from system stores, custom bundles, or other sources
@@ -269,7 +269,7 @@ class CertificateProvider(ABC):
         pass
 
     @abstractmethod
-    def export_certificates(self, output_path: Optional[str] = None, include_system: bool = True) -> Optional[str]:
+    def export_certificates(self, output_path: str | None = None, include_system: bool = True) -> str | None:
         """Export certificates to a PEM bundle file for HTTP clients.
 
         Creates a certificate bundle file containing trusted certificates from
@@ -336,7 +336,7 @@ class AuthenticationProvider(ABC):
     """
 
     @abstractmethod
-    def get_auth_headers(self) -> Dict[str, str]:
+    def get_auth_headers(self) -> dict[str, str]:
         """Get authentication headers for HTTP requests.
 
         Returns HTTP headers necessary for authenticating requests with the

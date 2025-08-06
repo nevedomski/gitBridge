@@ -5,7 +5,7 @@ import os
 import time
 import zipfile
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 from urllib.parse import urlparse
 
 from playwright._impl._errors import Error as PlaywrightError
@@ -32,14 +32,14 @@ class GitHubBrowserSync(SyncProvider):
         self,
         repo_url: str,
         local_path: str,
-        token: Optional[str] = None,
+        token: str | None = None,
         verify_ssl: bool = True,
-        ca_bundle: Optional[str] = None,
+        ca_bundle: str | None = None,
         auto_proxy: bool = False,
         auto_cert: bool = False,
         headless: bool = True,
-        browser_binary: Optional[str] = None,
-        driver_path: Optional[str] = None,  # Kept for compatibility but unused in Playwright
+        browser_binary: str | None = None,
+        driver_path: str | None = None,  # Kept for compatibility but unused in Playwright
     ):
         """Initialize GitHub browser sync.
 
@@ -67,10 +67,10 @@ class GitHubBrowserSync(SyncProvider):
         self.auto_cert = auto_cert
 
         # Playwright instances
-        self.playwright: Optional[Playwright] = None
-        self.browser: Optional[Browser] = None
-        self.context: Optional[BrowserContext] = None
-        self.page: Optional[Page] = None
+        self.playwright: Playwright | None = None
+        self.browser: Browser | None = None
+        self.context: BrowserContext | None = None
+        self.page: Page | None = None
 
         # Cache file for tracking downloaded files
         self.hash_cache_file = self.local_path / ".gitsync" / "file_hashes.json"
@@ -278,7 +278,7 @@ class GitHubBrowserSync(SyncProvider):
             logger.error(f"Connection test failed: {e}")
             return False
 
-    def get_file_list_from_zip(self, ref: str = "main") -> Optional[List[str]]:
+    def get_file_list_from_zip(self, ref: str = "main") -> list[str] | None:
         """Get list of files by downloading and inspecting repository ZIP using Playwright.
 
         Args:
@@ -338,7 +338,7 @@ class GitHubBrowserSync(SyncProvider):
             logger.error(f"Failed to get file list: {e}")
             return None
 
-    def download_file_content(self, file_path: str, ref: str = "main") -> Optional[bytes]:
+    def download_file_content(self, file_path: str, ref: str = "main") -> bytes | None:
         """Download content of a single file from GitHub using Playwright.
 
         Args:
@@ -530,7 +530,7 @@ class GitHubBrowserSync(SyncProvider):
         finally:
             self.cleanup()
 
-    def get_status(self) -> Dict[str, Any]:
+    def get_status(self) -> dict[str, Any]:
         """Get current synchronization provider status and metadata.
 
         Returns comprehensive information about the browser sync provider's current state

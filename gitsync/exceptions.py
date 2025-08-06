@@ -34,7 +34,7 @@ Usage:
         logger.error(f"Sync failed: {e}")
 """
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 
 class GitSyncError(Exception):
@@ -49,9 +49,7 @@ class GitSyncError(Exception):
         original_error (Optional[Exception]): Original exception that caused this error
     """
 
-    def __init__(
-        self, message: str, details: Optional[Dict[str, Any]] = None, original_error: Optional[Exception] = None
-    ):
+    def __init__(self, message: str, details: dict[str, Any] | None = None, original_error: Exception | None = None):
         """Initialize GitSync base exception.
 
         Args:
@@ -71,7 +69,7 @@ class GitSyncError(Exception):
             return f"{self.message} ({context})"
         return self.message
 
-    def get_context(self) -> Dict[str, Any]:
+    def get_context(self) -> dict[str, Any]:
         """Get full error context including details and original error."""
         context = {"message": self.message, "type": self.__class__.__name__, "details": self.details}
         if self.original_error:
@@ -99,8 +97,8 @@ class AuthenticationError(GitSyncError):
         self,
         message: str = "GitHub authentication failed",
         token_provided: bool = False,
-        repo_url: Optional[str] = None,
-        original_error: Optional[Exception] = None,
+        repo_url: str | None = None,
+        original_error: Exception | None = None,
     ):
         """Initialize authentication error.
 
@@ -124,9 +122,9 @@ class NetworkError(GitSyncError):
     def __init__(
         self,
         message: str = "Network error occurred",
-        url: Optional[str] = None,
-        status_code: Optional[int] = None,
-        original_error: Optional[Exception] = None,
+        url: str | None = None,
+        status_code: int | None = None,
+        original_error: Exception | None = None,
     ):
         """Initialize network error.
 
@@ -150,10 +148,10 @@ class RateLimitError(NetworkError):
     def __init__(
         self,
         message: str = "GitHub API rate limit exceeded",
-        remaining: Optional[int] = None,
-        limit: Optional[int] = None,
-        reset_time: Optional[int] = None,
-        original_error: Optional[Exception] = None,
+        remaining: int | None = None,
+        limit: int | None = None,
+        reset_time: int | None = None,
+        original_error: Exception | None = None,
     ):
         """Initialize rate limit error.
 
@@ -165,7 +163,8 @@ class RateLimitError(NetworkError):
             original_error: Original exception
         """
         details = {"remaining": remaining, "limit": limit, "reset_time": reset_time}
-        super().__init__(message, {k: v for k, v in details.items() if v is not None}, original_error)
+        super().__init__(message, original_error=original_error)
+        self.details.update({k: v for k, v in details.items() if v is not None})
 
 
 class ProxyError(NetworkError):
@@ -177,9 +176,9 @@ class ProxyError(NetworkError):
     def __init__(
         self,
         message: str = "Proxy configuration error",
-        proxy_url: Optional[str] = None,
+        proxy_url: str | None = None,
         auto_detection_failed: bool = False,
-        original_error: Optional[Exception] = None,
+        original_error: Exception | None = None,
     ):
         """Initialize proxy error.
 
@@ -190,7 +189,8 @@ class ProxyError(NetworkError):
             original_error: Original exception
         """
         details = {"proxy_url": proxy_url, "auto_detection_failed": auto_detection_failed}
-        super().__init__(message, {k: v for k, v in details.items() if v is not None}, original_error)
+        super().__init__(message, original_error=original_error)
+        self.details.update({k: v for k, v in details.items() if v is not None})
 
 
 class ConfigurationError(GitSyncError):
@@ -203,9 +203,9 @@ class ConfigurationError(GitSyncError):
     def __init__(
         self,
         message: str = "Configuration error",
-        config_file: Optional[str] = None,
-        invalid_key: Optional[str] = None,
-        original_error: Optional[Exception] = None,
+        config_file: str | None = None,
+        invalid_key: str | None = None,
+        original_error: Exception | None = None,
     ):
         """Initialize configuration error.
 
@@ -229,11 +229,11 @@ class RepositoryNotFoundError(GitSyncError):
     def __init__(
         self,
         message: str = "Repository not found or not accessible",
-        repo_url: Optional[str] = None,
-        owner: Optional[str] = None,
-        repo: Optional[str] = None,
-        is_private: Optional[bool] = None,
-        original_error: Optional[Exception] = None,
+        repo_url: str | None = None,
+        owner: str | None = None,
+        repo: str | None = None,
+        is_private: bool | None = None,
+        original_error: Exception | None = None,
     ):
         """Initialize repository not found error.
 
@@ -259,9 +259,9 @@ class FileSystemError(GitSyncError):
     def __init__(
         self,
         message: str = "File system error",
-        path: Optional[str] = None,
-        operation: Optional[str] = None,
-        original_error: Optional[Exception] = None,
+        path: str | None = None,
+        operation: str | None = None,
+        original_error: Exception | None = None,
     ):
         """Initialize file system error.
 
@@ -285,9 +285,9 @@ class FileWriteError(FileSystemError):
     def __init__(
         self,
         message: str = "Failed to write file",
-        file_path: Optional[str] = None,
-        size: Optional[int] = None,
-        original_error: Optional[Exception] = None,
+        file_path: str | None = None,
+        size: int | None = None,
+        original_error: Exception | None = None,
     ):
         """Initialize file write error.
 
@@ -312,8 +312,8 @@ class DirectoryCreateError(FileSystemError):
     def __init__(
         self,
         message: str = "Failed to create directory",
-        dir_path: Optional[str] = None,
-        original_error: Optional[Exception] = None,
+        dir_path: str | None = None,
+        original_error: Exception | None = None,
     ):
         """Initialize directory creation error.
 
@@ -335,9 +335,9 @@ class BrowserError(GitSyncError):
     def __init__(
         self,
         message: str = "Browser automation error",
-        browser: Optional[str] = None,
-        url: Optional[str] = None,
-        original_error: Optional[Exception] = None,
+        browser: str | None = None,
+        url: str | None = None,
+        original_error: Exception | None = None,
     ):
         """Initialize browser error.
 
@@ -361,9 +361,9 @@ class WebDriverError(BrowserError):
     def __init__(
         self,
         message: str = "WebDriver error",
-        driver_path: Optional[str] = None,
-        browser_binary: Optional[str] = None,
-        original_error: Optional[Exception] = None,
+        driver_path: str | None = None,
+        browser_binary: str | None = None,
+        original_error: Exception | None = None,
     ):
         """Initialize WebDriver error.
 
@@ -388,9 +388,9 @@ class PageLoadError(BrowserError):
     def __init__(
         self,
         message: str = "Page load error",
-        url: Optional[str] = None,
-        timeout: Optional[int] = None,
-        original_error: Optional[Exception] = None,
+        url: str | None = None,
+        timeout: int | None = None,
+        original_error: Exception | None = None,
     ):
         """Initialize page load error.
 
@@ -416,10 +416,10 @@ class SyncError(GitSyncError):
     def __init__(
         self,
         message: str = "Synchronization error",
-        ref: Optional[str] = None,
-        repo_url: Optional[str] = None,
-        sync_method: Optional[str] = None,
-        original_error: Optional[Exception] = None,
+        ref: str | None = None,
+        repo_url: str | None = None,
+        sync_method: str | None = None,
+        original_error: Exception | None = None,
     ):
         """Initialize sync error.
 
@@ -490,27 +490,7 @@ def wrap_file_operation_exception(error: Exception, path: str, operation: str) -
         )
 
 
-def wrap_selenium_exception(error: Exception, url: Optional[str] = None) -> BrowserError:
-    """Convert Selenium exceptions to appropriate GitSync exceptions.
-
-    Args:
-        error: Original Selenium exception
-        url: URL that caused the error
-
-    Returns:
-        Appropriate BrowserError subclass
-    """
-    from selenium.common.exceptions import NoSuchElementException, TimeoutException, WebDriverException
-
-    if isinstance(error, WebDriverException) and "driver" in str(error).lower():
-        return WebDriverError(f"WebDriver initialization failed: {error}", original_error=error)
-    elif isinstance(error, (TimeoutException, NoSuchElementException)):
-        return PageLoadError(f"Page load failed: {error}", url=url, original_error=error)
-    else:
-        return BrowserError(f"Browser automation failed: {error}", url=url, original_error=error)
-
-
-def wrap_playwright_exception(error: Exception, url: Optional[str] = None) -> BrowserError:
+def wrap_playwright_exception(error: Exception, url: str | None = None) -> BrowserError:
     """Convert Playwright exceptions to appropriate GitSync exceptions.
 
     Args:

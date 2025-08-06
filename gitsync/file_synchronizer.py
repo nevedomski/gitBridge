@@ -30,7 +30,6 @@ Typical Usage:
 import base64
 import logging
 from pathlib import Path
-from typing import Dict, List, Optional, Set
 
 from .api_client import GitHubAPIClient
 from .exceptions import DirectoryCreateError, FileWriteError
@@ -89,7 +88,7 @@ class FileSynchronizer:
         """
         self.client = client
         self.local_path = local_path
-        self.current_ref: Optional[str] = None
+        self.current_ref: str | None = None
 
         # Cache file for tracking downloaded files
         # DOCDEV-NOTE: Hash cache enables incremental updates - only changed files are downloaded
@@ -141,7 +140,7 @@ class FileSynchronizer:
 
         return False
 
-    def download_file(self, file_path: str, sha: str) -> Optional[bytes]:
+    def download_file(self, file_path: str, sha: str) -> bytes | None:
         """Download a single file from repository.
 
         Attempts to download a file using the Contents API first, falling back
@@ -199,7 +198,7 @@ class FileSynchronizer:
 
         return None
 
-    def download_blob(self, sha: str) -> Optional[bytes]:
+    def download_blob(self, sha: str) -> bytes | None:
         """Download file using git blob API.
 
         The Blob API is used for files that exceed the Contents API size limit.
@@ -229,7 +228,7 @@ class FileSynchronizer:
 
         return None
 
-    def sync_file(self, entry: Dict) -> bool:
+    def sync_file(self, entry: dict) -> bool:
         """Sync a single file.
 
         Handles the complete sync process for a single file:
@@ -298,7 +297,7 @@ class FileSynchronizer:
             logger.error(f"Unexpected error syncing file {file_path}: {e}")
             return False
 
-    def sync_files(self, files: List[Dict]) -> Dict[str, int]:
+    def sync_files(self, files: list[dict]) -> dict[str, int]:
         """Sync multiple files.
 
         Args:
@@ -341,7 +340,7 @@ class FileSynchronizer:
         """
         save_file_hashes(self.hash_cache_file, self.file_hashes)
 
-    def get_cached_files(self) -> Set[str]:
+    def get_cached_files(self) -> set[str]:
         """Get set of files that have been cached.
 
         Returns:
@@ -366,7 +365,7 @@ class FileSynchronizer:
             except OSError as e:
                 logger.warning(f"Failed to remove hash cache file: {e}")
 
-    def get_file_info(self, file_path: str) -> Optional[Dict]:
+    def get_file_info(self, file_path: str) -> dict | None:
         """Get cached information about a file.
 
         Args:

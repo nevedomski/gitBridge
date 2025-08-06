@@ -27,7 +27,6 @@ Typical Usage:
 
 import logging
 import os
-from typing import Optional
 
 import requests
 
@@ -56,9 +55,9 @@ class SessionFactory:
 
     def create_session(
         self,
-        token: Optional[str] = None,
+        token: str | None = None,
         verify_ssl: bool = True,
-        ca_bundle: Optional[str] = None,
+        ca_bundle: str | None = None,
         auto_proxy: bool = False,
         auto_cert: bool = False,
     ) -> requests.Session:
@@ -108,7 +107,7 @@ class SessionFactory:
         self,
         session: requests.Session,
         verify_ssl: bool,
-        ca_bundle: Optional[str] = None,
+        ca_bundle: str | None = None,
         auto_cert: bool = False,
     ) -> None:
         """Configure SSL/TLS certificate verification for the session.
@@ -213,7 +212,7 @@ class SessionFactory:
     def configure_auth(
         self,
         session: requests.Session,
-        token: Optional[str] = None,
+        token: str | None = None,
     ) -> None:
         """Configure GitHub authentication headers for the session.
 

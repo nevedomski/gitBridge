@@ -24,11 +24,11 @@ Typical Usage:
 
 import logging
 import time
-from typing import Any, Dict, Optional
+from typing import Any
 
 from tqdm import tqdm
 
-from .utils import SyncStats
+from .utils import SyncStats  # type: ignore[attr-defined]
 
 logger = logging.getLogger(__name__)
 
@@ -87,7 +87,7 @@ class ProgressTracker:
         self.show_progress = show_progress
         self.total_files = total_files
         self.start_time = time.time()
-        self.progress_bar: Optional[tqdm] = None
+        self.progress_bar: tqdm | None = None
 
         # Initialize progress bar if requested
         if self.show_progress and total_files > 0:
@@ -157,7 +157,7 @@ class ProgressTracker:
             self.progress_bar.total = total
             self.progress_bar.refresh()
 
-    def update_postfix(self, **kwargs) -> None:
+    def update_postfix(self, **kwargs: Any) -> None:
         """Update progress bar postfix with custom information.
 
         Args:
@@ -215,7 +215,7 @@ class ProgressTracker:
             return self.stats.files_checked / elapsed
         return 0.0
 
-    def print_summary(self, show_rate_limit: bool = False, rate_limit_info: Optional[Dict] = None) -> None:
+    def print_summary(self, show_rate_limit: bool = False, rate_limit_info: dict[str, Any] | None = None) -> None:
         """Print detailed synchronization summary.
 
         Args:
@@ -273,7 +273,7 @@ class ProgressTracker:
 
             print(f"Rate limit:       {remaining}/{limit} requests remaining")
 
-            if isinstance(reset_time, (int, float)) and reset_time > 0:
+            if isinstance(reset_time, int | float) and reset_time > 0:
                 import datetime
 
                 reset_dt = datetime.datetime.fromtimestamp(reset_time)
@@ -288,7 +288,7 @@ class ProgressTracker:
             f"in {elapsed:.1f}s"
         )
 
-    def get_stats_dict(self) -> Dict[str, Any]:
+    def get_stats_dict(self) -> dict[str, Any]:
         """Get current statistics as a dictionary.
 
         Returns:

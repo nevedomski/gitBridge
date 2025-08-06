@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "gitsync"
-version = "0.2.0"
+version = "0.4.0"
 description = "Synchronize GitHub repositories when git access is blocked"
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}
 authors = [
-    {name = "GitSync Tool"},
+    {name = "Nevedomski Sergei", email = "info@nevedomski.us"},
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -26,6 +26,13 @@ dependencies = [
     "tqdm>=4.66.0",
     "certifi>=2023.0.0",
 ]
+
+[project.urls]
+Homepage = "https://nevedomski.github.io/gitSync/"
+Documentation = "https://nevedomski.github.io/gitSync/"
+Repository = "https://github.com/nevedomski/gitSync"
+Issues = "https://github.com/nevedomski/gitSync/issues"
+Changelog = "https://nevedomski.github.io/gitSync/changelog.html"
 
 [project.scripts]
 gitsync = "gitsync.cli:main"
@@ -46,18 +53,25 @@ docs = [
     "mkdocs-material-extensions>=1.3.0",
     "pymdown-extensions>=10.5",
     "mkdocs-git-revision-date-localized-plugin>=1.2.0",
-    "mkdocs-minify-plugin>=0.8.0",
     "mkdocstrings[python]>=0.24.0",
+    "pillow>=10.0.0",
+    "cairosvg>=2.7.0",
 ]
-pac = ["pypac>=0.16.0"]
-win = [
+windows = [
+    "pypac>=0.16.0; sys_platform == 'win32'",
     "wincertstore>=0.2.0; sys_platform == 'win32'",
     "pywin32>=300; sys_platform == 'win32'",
+]
+# Combine all optional dependencies
+all = [
+    "gitsync[dev]",
+    "gitsync[docs]",
+    "gitsync[windows]",
 ]
 
 [tool.ruff]
 line-length = 120
-target-version = "py37"
+target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B"]
@@ -68,11 +82,44 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.mypy]
-python_version = "3.9"
+# Python version to type check against
+python_version = "3.11"
+
+# Enable strict type checking mode
 strict = true
-warn_return_any = true
-warn_unused_configs = true
-no_implicit_reexport = true
+
+# Additional strict checks
+warn_return_any = true        # Warn about functions that return Any
+warn_unused_configs = true    # Warn about unused [mypy-*] sections
+no_implicit_reexport = true   # Require explicit re-exports
+
+# Files to check
+files = ["gitsync/"]
+
+# Windows-specific modules that are only available on Windows
+# We need to ignore these since they're platform-specific built-in modules
+[[tool.mypy.overrides]]
+module = "winreg"
+ignore_missing_imports = true
+
+# Optional Windows-only dependencies that may not be installed
+# These are only used when running on Windows with the [windows] extra
+[[tool.mypy.overrides]]
+module = [
+    "pypac",             # PAC proxy auto-configuration (Windows-only)
+    "pypac.*",           # All pypac submodules
+    "wincertstore",      # Windows certificate store access (Windows-only)
+]
+ignore_missing_imports = true
+
+# Third-party libraries without type stubs
+# Playwright doesn't provide type stubs, but is a core dependency
+[[tool.mypy.overrides]]
+module = [
+    "playwright",        # Browser automation - no type stubs available
+    "playwright.*",      # All playwright submodules
+]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -80,6 +127,13 @@ python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
 addopts = "-v --cov=gitsync --cov-report=term-missing"
+markers = [
+    "windows: marks tests as requiring Windows platform (deselect with '-m \"not windows\"')",
+    "linux: marks tests as requiring Linux platform (deselect with '-m \"not linux\"')",
+    "macos: marks tests as requiring macOS platform (deselect with '-m \"not macos\"')", 
+    "platform_specific: marks tests that are platform-specific",
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')"
+]
 
 [tool.coverage.run]
 source = ["gitsync"]

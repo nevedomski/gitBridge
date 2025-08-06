@@ -28,21 +28,43 @@ class TestGitHubBrowserSync:
     @pytest.fixture
     def browser_sync(self, temp_dir):
         """Create a GitHubBrowserSync instance for testing"""
-        return GitHubBrowserSync(
+        sync = GitHubBrowserSync(
             repo_url="https://github.com/testuser/testrepo",
             local_path=str(temp_dir),
             token="test_token",
             headless=True,
         )
+        # Ensure clean state for each test
+        sync.playwright = None
+        sync.browser = None
+        sync.context = None
+        sync.page = None
+        yield sync
+        # Cleanup after test
+        try:
+            sync.cleanup()
+        except Exception:
+            pass  # Ignore cleanup errors in tests
 
     @pytest.fixture
     def browser_sync_no_token(self, temp_dir):
         """Create a GitHubBrowserSync instance without token"""
-        return GitHubBrowserSync(
+        sync = GitHubBrowserSync(
             repo_url="https://github.com/testuser/testrepo",
             local_path=str(temp_dir),
             headless=True,
         )
+        # Ensure clean state for each test
+        sync.playwright = None
+        sync.browser = None
+        sync.context = None
+        sync.page = None
+        yield sync
+        # Cleanup after test
+        try:
+            sync.cleanup()
+        except Exception:
+            pass  # Ignore cleanup errors in tests
 
     def test_init(self, temp_dir):
         """Test GitHubBrowserSync initialization"""
@@ -150,43 +172,57 @@ class TestGitHubBrowserSync:
         assert "--allow-running-insecure-content" in options["args"]
         assert options["ignore_https_errors"] is True
 
-    @patch("gitsync.browser_sync.sync_playwright")
-    def test_setup_browser_success(self, mock_sync_playwright, browser_sync):
+    def test_setup_browser_success(self, browser_sync):
         """Test successful Playwright browser setup"""
+
         # Mock the Playwright chain
+        mock_sync_playwright_context = Mock()
         mock_playwright = Mock()
         mock_browser = Mock()
         mock_context = Mock()
         mock_page = Mock()
 
-        mock_sync_playwright.return_value.start.return_value = mock_playwright
-        mock_playwright.chromium.launch.return_value = mock_browser
-        mock_browser.new_context.return_value = mock_context
-        mock_context.new_page.return_value = mock_page
+        import gitsync.browser_sync as browser_sync_module
+        with patch.object(browser_sync_module, "sync_playwright") as mock_sync_playwright:
+            # Set up the full mock chain: sync_playwright() returns an object
+            # that when start() is called returns the playwright object
+            mock_sync_playwright.return_value.start.return_value = mock_playwright
+            mock_playwright.chromium.launch.return_value = mock_browser
+            mock_browser.new_context.return_value = mock_context
+            mock_context.new_page.return_value = mock_page
 
-        browser_sync._setup_browser()
-
-        assert browser_sync.playwright == mock_playwright
-        assert browser_sync.browser == mock_browser
-        assert browser_sync.context == mock_context
-        assert browser_sync.page == mock_page
-
-        # Verify context configuration
-        mock_context.set_default_timeout.assert_called_with(30000)
-        mock_context.set_default_navigation_timeout.assert_called_with(30000)
-
-    @patch("gitsync.browser_sync.sync_playwright")
-    def test_setup_browser_failure(self, mock_sync_playwright, browser_sync):
-        """Test Playwright browser setup failure"""
-        mock_sync_playwright.return_value.start.side_effect = PlaywrightError("Browser not found")
-
-        with pytest.raises(PlaywrightError):
             browser_sync._setup_browser()
 
-        assert browser_sync.playwright is None
-        assert browser_sync.browser is None
-        assert browser_sync.context is None
-        assert browser_sync.page is None
+            # Verify the mock chain was called correctly
+            mock_sync_playwright.assert_called_once()
+            mock_sync_playwright.return_value.start.assert_called_once()
+            mock_playwright.chromium.launch.assert_called_once()
+            mock_browser.new_context.assert_called_once()
+            mock_context.new_page.assert_called_once()
+
+            # Verify the objects were set correctly
+            assert browser_sync.playwright == mock_playwright
+            assert browser_sync.browser == mock_browser
+            assert browser_sync.context == mock_context
+            assert browser_sync.page == mock_page
+
+            # Verify context configuration
+            mock_context.set_default_timeout.assert_called_with(30000)
+            mock_context.set_default_navigation_timeout.assert_called_with(30000)
+
+    def test_setup_browser_failure(self, browser_sync):
+        """Test Playwright browser setup failure"""
+        import gitsync.browser_sync as browser_sync_module
+        with patch.object(browser_sync_module, "sync_playwright") as mock_sync_playwright:
+            mock_sync_playwright.return_value.start.side_effect = PlaywrightError("Browser not found")
+
+            with pytest.raises(PlaywrightError):
+                browser_sync._setup_browser()
+
+            assert browser_sync.playwright is None
+            assert browser_sync.browser is None
+            assert browser_sync.context is None
+            assert browser_sync.page is None
 
     def test_login_if_needed_no_token(self, browser_sync_no_token):
         """Test login when no token is provided"""
@@ -716,10 +752,8 @@ class TestGitHubBrowserSync:
     @patch.object(GitHubBrowserSync, "get_file_list_from_zip")
     @patch.object(GitHubBrowserSync, "sync_file")
     @patch.object(GitHubBrowserSync, "cleanup")
-    @patch("gitsync.browser_sync.save_file_hashes")
     def test_sync_success(
         self,
-        mock_save_hashes,
         mock_cleanup,
         mock_sync_file,
         mock_get_files,
@@ -729,23 +763,25 @@ class TestGitHubBrowserSync:
         browser_sync,
     ):
         """Test successful repository sync"""
-        # Mock all dependencies
-        browser_sync.page = Mock()  # Set page to avoid setup
-        mock_test_conn.return_value = True
-        mock_login.return_value = True
-        mock_get_files.return_value = ["file1.txt", "file2.py"]
-        mock_sync_file.return_value = True
+        import gitsync.browser_sync as browser_sync_module
+        with patch.object(browser_sync_module, "save_file_hashes") as mock_save_hashes:
+            # Mock all dependencies
+            browser_sync.page = Mock()  # Set page to avoid setup
+            mock_test_conn.return_value = True
+            mock_login.return_value = True
+            mock_get_files.return_value = ["file1.txt", "file2.py"]
+            mock_sync_file.return_value = True
 
-        result = browser_sync.sync("main", show_progress=False)
+            result = browser_sync.sync("main", show_progress=False)
 
-        assert result is True
-        mock_test_conn.assert_called_once()
-        mock_login.assert_called_once()
-        mock_get_files.assert_called_once_with("main")
-        assert mock_sync_file.call_count == 2
-        mock_sync_file.assert_has_calls([call("file1.txt", "main"), call("file2.py", "main")])
-        mock_save_hashes.assert_called_once()
-        mock_cleanup.assert_called_once()
+            assert result is True
+            mock_test_conn.assert_called_once()
+            mock_login.assert_called_once()
+            mock_get_files.assert_called_once_with("main")
+            assert mock_sync_file.call_count == 2
+            mock_sync_file.assert_has_calls([call("file1.txt", "main"), call("file2.py", "main")])
+            mock_save_hashes.assert_called_once()
+            mock_cleanup.assert_called_once()
 
     @patch.object(GitHubBrowserSync, "test_connection")
     @patch.object(GitHubBrowserSync, "cleanup")
@@ -794,10 +830,8 @@ class TestGitHubBrowserSync:
     @patch.object(GitHubBrowserSync, "get_file_list_from_zip")
     @patch.object(GitHubBrowserSync, "sync_file")
     @patch.object(GitHubBrowserSync, "cleanup")
-    @patch("gitsync.browser_sync.save_file_hashes")
     def test_sync_partial_failure(
         self,
-        mock_save_hashes,
         mock_cleanup,
         mock_sync_file,
         mock_get_files,
@@ -806,16 +840,18 @@ class TestGitHubBrowserSync:
         browser_sync,
     ):
         """Test sync with some file failures"""
-        browser_sync.page = Mock()  # Set page to avoid setup
-        mock_test_conn.return_value = True
-        mock_login.return_value = True
-        mock_get_files.return_value = ["file1.txt", "file2.py"]
-        mock_sync_file.side_effect = [True, False]  # First succeeds, second fails
+        import gitsync.browser_sync as browser_sync_module
+        with patch.object(browser_sync_module, "save_file_hashes") as mock_save_hashes:
+            browser_sync.page = Mock()  # Set page to avoid setup
+            mock_test_conn.return_value = True
+            mock_login.return_value = True
+            mock_get_files.return_value = ["file1.txt", "file2.py"]
+            mock_sync_file.side_effect = [True, False]  # First succeeds, second fails
 
-        result = browser_sync.sync("main", show_progress=False)
+            result = browser_sync.sync("main", show_progress=False)
 
-        assert result is False  # Overall failure due to one file failing
-        mock_cleanup.assert_called_once()
+            assert result is False  # Overall failure due to one file failing
+            mock_cleanup.assert_called_once()
 
     @patch.object(GitHubBrowserSync, "_setup_browser")
     @patch.object(GitHubBrowserSync, "cleanup")
@@ -829,42 +865,41 @@ class TestGitHubBrowserSync:
         assert result is False
         mock_cleanup.assert_called_once()
 
-    @patch("gitsync.browser_sync.tqdm")
     @patch.object(GitHubBrowserSync, "test_connection")
     @patch.object(GitHubBrowserSync, "_login_if_needed")
     @patch.object(GitHubBrowserSync, "get_file_list_from_zip")
     @patch.object(GitHubBrowserSync, "sync_file")
     @patch.object(GitHubBrowserSync, "cleanup")
-    @patch("gitsync.browser_sync.save_file_hashes")
     def test_sync_with_progress(
         self,
-        mock_save_hashes,
         mock_cleanup,
         mock_sync_file,
         mock_get_files,
         mock_login,
         mock_test_conn,
-        mock_tqdm,
         browser_sync,
     ):
         """Test sync with progress bar enabled"""
-        # Setup mocks
-        browser_sync.page = Mock()  # Set page to avoid setup
-        mock_test_conn.return_value = True
-        mock_login.return_value = True
-        mock_get_files.return_value = ["file1.txt", "file2.py"]
-        mock_sync_file.return_value = True
+        import gitsync.browser_sync as browser_sync_module
+        with patch.object(browser_sync_module, "save_file_hashes") as mock_save_hashes:
+            with patch.object(browser_sync_module, "tqdm") as mock_tqdm:
+                # Setup mocks
+                browser_sync.page = Mock()  # Set page to avoid setup
+                mock_test_conn.return_value = True
+                mock_login.return_value = True
+                mock_get_files.return_value = ["file1.txt", "file2.py"]
+                mock_sync_file.return_value = True
 
-        # Mock tqdm
-        mock_progress_bar = Mock()
-        mock_tqdm.return_value = mock_progress_bar
-        mock_progress_bar.__iter__ = Mock(return_value=iter(["file1.txt", "file2.py"]))
+                # Mock tqdm
+                mock_progress_bar = Mock()
+                mock_tqdm.return_value = mock_progress_bar
+                mock_progress_bar.__iter__ = Mock(return_value=iter(["file1.txt", "file2.py"]))
 
-        result = browser_sync.sync("main", show_progress=True)
+                result = browser_sync.sync("main", show_progress=True)
 
-        assert result is True
-        mock_tqdm.assert_called_once_with(["file1.txt", "file2.py"], desc="Syncing files", unit="file")
-        assert mock_progress_bar.set_postfix.call_count == 2  # Called for each file
+                assert result is True
+                mock_tqdm.assert_called_once_with(["file1.txt", "file2.py"], desc="Syncing files", unit="file")
+                assert mock_progress_bar.set_postfix.call_count == 2  # Called for each file
 
     def test_cleanup_with_playwright_objects(self, browser_sync):
         """Test cleanup when Playwright objects exist"""

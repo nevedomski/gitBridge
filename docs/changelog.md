@@ -7,17 +7,83 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- Comprehensive MkDocs documentation with Material theme
-- GitHub Actions workflow for automated testing
-- Support for GitHub Enterprise
+## [0.3.0b1] - 2025-08-06
 
 ### Changed
-- Improved error messages for better debugging
-- Enhanced proxy detection algorithm
+
+- **CI/CD Improvements**
+  - Optimized GitHub Actions workflow for better performance
+  - Simplified test matrix configuration
+  - Improved caching strategy for faster builds
+
+- **Code Quality**
+  - Fixed linting issues across multiple modules
+  - Improved test reliability and coverage
+  - Cleaned up unused imports and variables
+  - Enhanced error handling in edge cases
+
+### Fixed
+
+- Test failures in CI environment
+- Markdown documentation formatting issues
+- Minor bugs in configuration handling
+- Type hints and mypy warnings
+
+## [0.2.0] - 2025-08-06
+
+### Added
+- **Documentation**
+  - Comprehensive MkDocs documentation with Material theme
+  - Architecture documentation with component relationships
+  - Complete user guide (configuration, authentication, proxy setup)
+  - CLI reference documentation
+  - API documentation for Python integration
+  - Troubleshooting guide with 20+ common issues
+  - GitHub Actions workflow for documentation deployment
+
+- **CI/CD**
+  - GitHub Actions workflow for automated testing
+  - Multi-version testing matrix (Python 3.9-3.12)
+  - Code coverage reporting with Codecov integration
+  - Security scanning with safety check
+  - Pre-commit hooks configuration for code quality
+
+- **Architecture Improvements**
+  - Refactored GitHubAPISync into component-based architecture
+  - Abstract base classes (interfaces) for better code organization
+  - SessionFactory for centralized HTTP session management
+  - Specialized components: GitHubAPIClient, RepositoryManager, FileSynchronizer, ProgressTracker
+  - Custom exception hierarchy with 20+ specific exception types
+
+- **Testing**
+  - 390+ comprehensive unit tests
+  - 94% code coverage for core modules
+  - Mock-based testing for external dependencies
+  - Test fixtures and configuration setup
+
+### Changed
+- **Browser Automation**
+  - Migrated from Selenium to Playwright for better performance
+  - Improved browser automation reliability
+  - Enhanced download handling with expect_download()
+  
+- **Code Quality**
+  - Improved error messages with actionable solutions
+  - Enhanced proxy detection algorithm
+  - Better separation of concerns through component architecture
+  - Comprehensive Google-style docstrings throughout
+
+- **Dependencies**
+  - Replaced Selenium with Playwright
+  - Updated to use uv package manager
+  - Added development dependencies for docs and testing
 
 ### Fixed
 - Memory leak in browser sync method for large repositories
+- Path expansion issues with home directory (~)
+- Repository ref not being used from configuration
+- SSL certificate validation in corporate environments
+- Makefile run command argument passing
 
 ## [0.1.0] - 2025-01-15
 
@@ -109,6 +175,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 0.3.0b1 | 2025-08-06 | Beta release with CI/CD improvements and bug fixes |
+| 0.2.0 | 2025-08-06 | Major refactoring with component architecture, Playwright migration, comprehensive testing |
 | 0.1.0 | 2025-01-15 | First stable release with full feature set |
 | 0.0.1 | 2025-01-01 | Initial development version |
 
@@ -131,5 +199,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Support
 
 For questions about upgrading or changelog entries:
-- Open an issue: https://github.com/nevedomski/gitsync/issues
-- Check documentation: https://nevedomski.github.io/gitSync/
+
+- Open an issue: [GitHub Issues](https://github.com/nevedomski/gitsync/issues)
+- Check documentation: [GitSync Documentation](https://nevedomski.github.io/gitSync/)

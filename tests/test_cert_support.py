@@ -2,6 +2,8 @@
 
 from unittest.mock import Mock, mock_open, patch
 
+import pytest
+
 from gitsync.cert_support import (
     WindowsCertificateDetector,
     _temp_cert_files,
@@ -12,6 +14,7 @@ from gitsync.cert_support import (
 )
 
 
+@pytest.mark.platform_specific
 class TestWindowsCertificateDetector:
     """Test cases for WindowsCertificateDetector class"""
 
@@ -69,6 +72,7 @@ class TestWindowsCertificateDetector:
 
             assert result == "/tmp/existing_bundle.pem"
 
+    @pytest.mark.windows
     @patch("gitsync.cert_support.ssl")
     def test_is_available_windows_with_ssl_support(self, mock_ssl):
         """Test is_available returns True on Windows with SSL certificate enumeration"""
@@ -88,6 +92,7 @@ class TestWindowsCertificateDetector:
             detector = WindowsCertificateDetector()
             assert detector.is_available() is False
 
+    @pytest.mark.windows
     @patch("gitsync.cert_support.ssl")
     def test_get_windows_certificates_default_stores(self, mock_ssl):
         """Test get_windows_certificates with default store names"""
@@ -401,6 +406,8 @@ class TestGetCombinedCertBundle:
             assert result is None
 
 
+@pytest.mark.windows
+@pytest.mark.platform_specific
 class TestExportWithWincertstore:
     """Test cases for export_with_wincertstore function"""
 

@@ -28,7 +28,7 @@ GitSync is a powerful Python tool designed to synchronize GitHub repositories to
   Fast and efficient synchronization using GitHub's REST API with incremental updates
 
 - :material-web: **Browser Automation**  
-  Selenium-based fallback method that works when API access is restricted
+  Playwright-based fallback method that works when API access is restricted
 
 - :material-shield-check: **Corporate Ready**  
   Built-in support for proxies, PAC scripts, and SSL certificates
@@ -161,7 +161,7 @@ uv pip install -e .
 
 - **Python**: 3.9 or higher (3.11+ recommended)
 - **Operating System**: Windows, macOS, or Linux
-- **For Browser Mode**: Chrome/Chromium and ChromeDriver
+- **For Browser Mode**: Chrome/Chromium/Firefox/Edge browser
 - **Network**: HTTPS access to GitHub (browser access)
 
 ## Support

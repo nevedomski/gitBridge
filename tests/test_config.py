@@ -42,9 +42,11 @@ class TestConfig:
 
     def test_init_calls_load_env(self):
         """Test that initialization calls load_env"""
-        with patch("gitsync.config.load_dotenv") as mock_load_dotenv, patch.object(
-            Config, "load_env"
-        ) as mock_load_env, patch.dict(os.environ, {}, clear=True):
+        with (
+            patch("gitsync.config.load_dotenv") as mock_load_dotenv,
+            patch.object(Config, "load_env") as mock_load_env,
+            patch.dict(os.environ, {}, clear=True),
+        ):
             Config()
 
             mock_load_dotenv.assert_called_once()
@@ -52,8 +54,10 @@ class TestConfig:
 
     def test_default_config_values(self):
         """Test default configuration values"""
-        with patch("gitsync.config.load_dotenv"), patch.dict(os.environ, {}, clear=True), patch(
-            "gitsync.config.Path.exists", return_value=False
+        with (
+            patch("gitsync.config.load_dotenv"),
+            patch.dict(os.environ, {}, clear=True),
+            patch("gitsync.config.Path.exists", return_value=False),
         ):
             config = Config()
 
@@ -149,9 +153,12 @@ class TestConfigLoadFile:
         """Test loading file with permission error raises ConfigurationError"""
         config_file = os.path.join(temp_dir, "restricted_config.yaml")
 
-        with patch("gitsync.config.Path.exists", return_value=True), patch(
-            "builtins.open", side_effect=PermissionError("Permission denied")
-        ), patch("gitsync.config.load_dotenv"), patch.dict(os.environ, {}, clear=True):
+        with (
+            patch("gitsync.config.Path.exists", return_value=True),
+            patch("builtins.open", side_effect=PermissionError("Permission denied")),
+            patch("gitsync.config.load_dotenv"),
+            patch.dict(os.environ, {}, clear=True),
+        ):
             config = Config()
             with pytest.raises(ConfigurationError, match="Failed to read configuration file"):
                 config.load_file(config_file)
@@ -162,8 +169,9 @@ class TestConfigLoadEnv:
 
     def test_load_env_github_repo_url(self):
         """Test loading GITHUB_REPO_URL environment variable"""
-        with patch.dict(os.environ, {"GITHUB_REPO_URL": "https://github.com/env/repo"}, clear=True), patch(
-            "gitsync.config.load_dotenv"
+        with (
+            patch.dict(os.environ, {"GITHUB_REPO_URL": "https://github.com/env/repo"}, clear=True),
+            patch("gitsync.config.load_dotenv"),
         ):
             config = Config()
             assert config.get("repository.url") == "https://github.com/env/repo"
@@ -176,8 +184,9 @@ class TestConfigLoadEnv:
 
     def test_load_env_local_path(self):
         """Test loading GITSYNC_LOCAL_PATH environment variable"""
-        with patch.dict(os.environ, {"GITSYNC_LOCAL_PATH": "/env/path"}, clear=True), patch(
-            "gitsync.config.load_dotenv"
+        with (
+            patch.dict(os.environ, {"GITSYNC_LOCAL_PATH": "/env/path"}, clear=True),
+            patch("gitsync.config.load_dotenv"),
         ):
             config = Config()
             assert config.get("local.path") == "/env/path"
@@ -197,8 +206,9 @@ class TestConfigLoadEnv:
     def test_load_env_incremental_true(self):
         """Test loading GITSYNC_INCREMENTAL environment variable (true values)"""
         for value in ["true", "1", "yes"]:
-            with patch.dict(os.environ, {"GITSYNC_INCREMENTAL": value}, clear=True), patch(
-                "gitsync.config.load_dotenv"
+            with (
+                patch.dict(os.environ, {"GITSYNC_INCREMENTAL": value}, clear=True),
+                patch("gitsync.config.load_dotenv"),
             ):
                 config = Config()
                 assert config.get("sync.incremental") is True
@@ -206,8 +216,9 @@ class TestConfigLoadEnv:
     def test_load_env_incremental_false(self):
         """Test loading GITSYNC_INCREMENTAL environment variable (false values)"""
         for value in ["false", "0", "no", "other"]:
-            with patch.dict(os.environ, {"GITSYNC_INCREMENTAL": value}, clear=True), patch(
-                "gitsync.config.load_dotenv"
+            with (
+                patch.dict(os.environ, {"GITSYNC_INCREMENTAL": value}, clear=True),
+                patch("gitsync.config.load_dotenv"),
             ):
                 config = Config()
                 assert config.get("sync.incremental") is False
@@ -220,8 +231,9 @@ class TestConfigLoadEnv:
 
     def test_load_env_log_file(self):
         """Test loading GITSYNC_LOG_FILE environment variable"""
-        with patch.dict(os.environ, {"GITSYNC_LOG_FILE": "/tmp/gitsync.log"}, clear=True), patch(
-            "gitsync.config.load_dotenv"
+        with (
+            patch.dict(os.environ, {"GITSYNC_LOG_FILE": "/tmp/gitsync.log"}, clear=True),
+            patch("gitsync.config.load_dotenv"),
         ):
             config = Config()
             assert config.get("logging.file") == "/tmp/gitsync.log"
@@ -341,9 +353,11 @@ class TestConfigGet:
 
     def test_get_path_expansion_local_path(self):
         """Test path expansion for local.path"""
-        with patch("gitsync.config.load_dotenv"), patch(
-            "os.path.expanduser", return_value="/home/user/expanded"
-        ), patch("os.path.expandvars", return_value="/home/user/expanded"):
+        with (
+            patch("gitsync.config.load_dotenv"),
+            patch("os.path.expanduser", return_value="/home/user/expanded"),
+            patch("os.path.expandvars", return_value="/home/user/expanded"),
+        ):
             config = Config()
             config.config["local"]["path"] = "~/test/path"
 
@@ -352,9 +366,11 @@ class TestConfigGet:
 
     def test_get_path_expansion_non_local_path(self):
         """Test no path expansion for non-local.path keys"""
-        with patch("gitsync.config.load_dotenv"), patch("os.path.expanduser") as mock_expand_user, patch(
-            "os.path.expandvars"
-        ) as mock_expand_vars:
+        with (
+            patch("gitsync.config.load_dotenv"),
+            patch("os.path.expanduser") as mock_expand_user,
+            patch("os.path.expandvars") as mock_expand_vars,
+        ):
             config = Config()
             config.config["other"] = {"path": "~/test/path"}
 
@@ -596,9 +612,12 @@ class TestConfigSetupLogging:
 
     def test_setup_logging_default_level(self):
         """Test setup logging with default level"""
-        with patch("gitsync.config.load_dotenv"), patch("logging.basicConfig") as mock_basic_config, patch(
-            "logging.StreamHandler"
-        ), patch.dict(os.environ, {}, clear=True):
+        with (
+            patch("gitsync.config.load_dotenv"),
+            patch("logging.basicConfig") as mock_basic_config,
+            patch("logging.StreamHandler"),
+            patch.dict(os.environ, {}, clear=True),
+        ):
             config = Config()
             config.setup_logging()
 
@@ -610,8 +629,10 @@ class TestConfigSetupLogging:
 
     def test_setup_logging_custom_level(self):
         """Test setup logging with custom level"""
-        with patch("gitsync.config.load_dotenv"), patch("logging.basicConfig") as mock_basic_config, patch.dict(
-            os.environ, {}, clear=True
+        with (
+            patch("gitsync.config.load_dotenv"),
+            patch("logging.basicConfig") as mock_basic_config,
+            patch.dict(os.environ, {}, clear=True),
         ):
             config = Config()
             config.set("logging.level", "DEBUG")
@@ -625,9 +646,12 @@ class TestConfigSetupLogging:
         """Test setup logging with file handler"""
         log_file = os.path.join(temp_dir, "test.log")
 
-        with patch("gitsync.config.load_dotenv"), patch("logging.basicConfig") as mock_basic_config, patch(
-            "logging.FileHandler"
-        ) as mock_file_handler, patch.dict(os.environ, {}, clear=True):
+        with (
+            patch("gitsync.config.load_dotenv"),
+            patch("logging.basicConfig") as mock_basic_config,
+            patch("logging.FileHandler") as mock_file_handler,
+            patch.dict(os.environ, {}, clear=True),
+        ):
             config = Config()
             config.set("logging.file", log_file)
             config.setup_logging()
@@ -639,9 +663,13 @@ class TestConfigSetupLogging:
 
     def test_setup_logging_format(self):
         """Test setup logging uses correct format"""
-        with patch("gitsync.config.load_dotenv"), patch("logging.basicConfig"), patch(
-            "logging.StreamHandler"
-        ), patch("logging.Formatter") as mock_formatter, patch.dict(os.environ, {}, clear=True):
+        with (
+            patch("gitsync.config.load_dotenv"),
+            patch("logging.basicConfig"),
+            patch("logging.StreamHandler"),
+            patch("logging.Formatter") as mock_formatter,
+            patch.dict(os.environ, {}, clear=True),
+        ):
             config = Config()
             config.setup_logging()
 

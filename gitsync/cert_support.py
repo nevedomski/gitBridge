@@ -6,17 +6,17 @@ import os
 import platform
 import ssl
 import tempfile
-from typing import Any, List, Optional, Tuple
+from typing import Any
 
 from .interfaces import CertificateProvider
 
 logger = logging.getLogger(__name__)
 
 # Track temporary files for cleanup
-_temp_cert_files = []
+_temp_cert_files: list[str] = []
 
 
-def cleanup_temp_certs():
+def cleanup_temp_certs() -> None:
     """Clean up temporary certificate files on exit."""
     for cert_file in _temp_cert_files:
         try:
@@ -34,7 +34,7 @@ atexit.register(cleanup_temp_certs)
 class WindowsCertificateDetector(CertificateProvider):
     """Detect and export certificates from Windows certificate store."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.is_windows = platform.system() == "Windows"
         self._temp_bundle = None
 
@@ -45,12 +45,12 @@ class WindowsCertificateDetector(CertificateProvider):
 
         try:
             # Test if ssl.enum_certificates is available
-            ssl.enum_certificates("ROOT")
+            ssl.enum_certificates("ROOT")  # type: ignore[attr-defined]
             return True
         except Exception:
             return False
 
-    def get_windows_certificates(self, store_names: List[str] = None) -> List[Tuple[bytes, str, any]]:
+    def get_windows_certificates(self, store_names: list[str] | None = None) -> list[tuple[bytes, str, Any]]:
         """Get certificates from Windows certificate stores.
 
         Args:
@@ -69,7 +69,7 @@ class WindowsCertificateDetector(CertificateProvider):
 
         for store_name in store_names:
             try:
-                certs = ssl.enum_certificates(store_name)
+                certs = ssl.enum_certificates(store_name)  # type: ignore[attr-defined]
                 logger.info(f"Found {len(certs)} certificates in {store_name} store")
                 all_certs.extend(certs)
             except Exception as e:
@@ -77,7 +77,7 @@ class WindowsCertificateDetector(CertificateProvider):
 
         return all_certs
 
-    def export_certificates_to_pem(self, include_certifi: bool = True) -> Optional[str]:
+    def export_certificates_to_pem(self, include_certifi: bool = True) -> str | None:
         """Export Windows certificates to a temporary PEM file.
 
         Args:
@@ -139,7 +139,7 @@ class WindowsCertificateDetector(CertificateProvider):
             logger.error(f"Failed to export certificates: {e}")
             return None
 
-    def get_cert_bundle_path(self) -> Optional[str]:
+    def get_cert_bundle_path(self) -> str | None:
         """Get path to certificate bundle, creating it if necessary.
 
         Returns:
@@ -151,7 +151,7 @@ class WindowsCertificateDetector(CertificateProvider):
         # Create new bundle
         return self.export_certificates_to_pem()
 
-    def get_certificates(self, store_names: Optional[List[str]] = None) -> List[Tuple[bytes, str, Any]]:
+    def get_certificates(self, store_names: list[str] | None = None) -> list[tuple[bytes, str, Any]]:
         """Retrieve SSL certificates from configured sources.
 
         This method implements the CertificateProvider interface by delegating
@@ -165,7 +165,7 @@ class WindowsCertificateDetector(CertificateProvider):
         """
         return self.get_windows_certificates(store_names)
 
-    def export_certificates(self, output_path: Optional[str] = None, include_system: bool = True) -> Optional[str]:
+    def export_certificates(self, output_path: str | None = None, include_system: bool = True) -> str | None:
         """Export certificates to a PEM bundle file for HTTP clients.
 
         This method implements the CertificateProvider interface by delegating
@@ -215,7 +215,7 @@ class WindowsCertificateDetector(CertificateProvider):
             return True
 
 
-def get_system_cert_bundle() -> Optional[str]:
+def get_system_cert_bundle() -> str | None:
     """Get system certificate bundle path.
 
     On Windows, this exports certificates from the Windows certificate store.
@@ -234,7 +234,7 @@ def get_system_cert_bundle() -> Optional[str]:
         return None
 
 
-def get_combined_cert_bundle() -> Optional[str]:
+def get_combined_cert_bundle() -> str | None:
     """Get a certificate bundle combining certifi and system certificates.
 
     Returns:
@@ -260,7 +260,7 @@ def get_combined_cert_bundle() -> Optional[str]:
 
 
 # Fallback support for wincertstore if ssl.enum_certificates fails
-def export_with_wincertstore() -> Optional[str]:
+def export_with_wincertstore() -> str | None:
     """Export certificates using wincertstore package (fallback method).
 
     Returns:

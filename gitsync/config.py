@@ -3,7 +3,7 @@
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import yaml
 from dotenv import load_dotenv
@@ -39,7 +39,7 @@ DEFAULT_CONFIG = {
 class Config:
     """GitSync configuration handler."""
 
-    def __init__(self, config_file: Optional[str] = None):
+    def __init__(self, config_file: str | None = None):
         """Initialize configuration.
 
         Args:
@@ -48,7 +48,7 @@ class Config:
         import copy
 
         self.config_file = config_file
-        self.config = copy.deepcopy(DEFAULT_CONFIG)
+        self.config: dict[str, Any] = copy.deepcopy(DEFAULT_CONFIG)
 
         # Load environment variables
         load_dotenv()
@@ -96,35 +96,43 @@ class Config:
     def load_env(self) -> None:
         """Load configuration from environment variables."""
         # Repository settings
-        if os.getenv("GITHUB_REPO_URL"):
-            self.config["repository"]["url"] = os.getenv("GITHUB_REPO_URL")
+        github_repo_url = os.getenv("GITHUB_REPO_URL")
+        if github_repo_url:
+            self.config["repository"]["url"] = github_repo_url
 
-        if os.getenv("GITHUB_REF"):
-            self.config["repository"]["ref"] = os.getenv("GITHUB_REF")
+        github_ref = os.getenv("GITHUB_REF")
+        if github_ref:
+            self.config["repository"]["ref"] = github_ref
 
         # Local path
-        if os.getenv("GITSYNC_LOCAL_PATH"):
-            self.config["local"]["path"] = os.getenv("GITSYNC_LOCAL_PATH")
+        local_path = os.getenv("GITSYNC_LOCAL_PATH")
+        if local_path:
+            self.config["local"]["path"] = local_path
 
         # Authentication
-        if os.getenv("GITHUB_TOKEN"):
-            self.config["auth"]["token"] = os.getenv("GITHUB_TOKEN")
+        github_token = os.getenv("GITHUB_TOKEN")
+        if github_token:
+            self.config["auth"]["token"] = github_token
 
         # Sync settings
-        if os.getenv("GITSYNC_METHOD"):
-            self.config["sync"]["method"] = os.getenv("GITSYNC_METHOD")
+        sync_method = os.getenv("GITSYNC_METHOD")
+        if sync_method:
+            self.config["sync"]["method"] = sync_method
 
-        if os.getenv("GITSYNC_INCREMENTAL"):
-            self.config["sync"]["incremental"] = os.getenv("GITSYNC_INCREMENTAL").lower() in ("true", "1", "yes")
+        incremental_env = os.getenv("GITSYNC_INCREMENTAL")
+        if incremental_env:
+            self.config["sync"]["incremental"] = incremental_env.lower() in ("true", "1", "yes")
 
         # Logging
-        if os.getenv("GITSYNC_LOG_LEVEL"):
-            self.config["logging"]["level"] = os.getenv("GITSYNC_LOG_LEVEL")
+        log_level = os.getenv("GITSYNC_LOG_LEVEL")
+        if log_level:
+            self.config["logging"]["level"] = log_level
 
-        if os.getenv("GITSYNC_LOG_FILE"):
-            self.config["logging"]["file"] = os.getenv("GITSYNC_LOG_FILE")
+        log_file = os.getenv("GITSYNC_LOG_FILE")
+        if log_file:
+            self.config["logging"]["file"] = log_file
 
-    def _deep_merge(self, target: Dict, source: Dict) -> None:
+    def _deep_merge(self, target: dict[str, Any], source: dict[str, Any]) -> None:
         """Deep merge source dictionary into target."""
         for key, value in source.items():
             if key in target and isinstance(target[key], dict) and isinstance(value, dict):
@@ -214,7 +222,7 @@ class Config:
 
         return True
 
-    def save(self, config_file: Optional[str] = None) -> None:
+    def save(self, config_file: str | None = None) -> None:
         """Save configuration to file.
 
         Args:
@@ -232,7 +240,7 @@ class Config:
 
         logger.info(f"Saved configuration to {file_path}")
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Get configuration as dictionary."""
         return self.config.copy()
 
@@ -245,7 +253,7 @@ class Config:
         log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
         # Configure handlers
-        handlers = []
+        handlers: list[logging.Handler] = []
 
         # Console handler
         console_handler = logging.StreamHandler()
