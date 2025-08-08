@@ -1,73 +1,68 @@
 # API Reference
 
-Welcome to the GitBridge API Reference. This documentation covers the Python API for programmatic use of GitBridge.
-
-## Overview
-
-GitBridge provides a comprehensive Python API for integrating repository synchronization into your applications. The API is designed to be simple for basic use cases while providing advanced features for complex scenarios.
+Welcome to the GitBridge API Reference. This page highlights the main public classes and modules. For in‑code docs, see the source in the `gitbridge/` package.
 
 ## Quick Start
 
 ```python
 from gitbridge.api_sync import GitHubAPISync
 
-# Basic synchronization
 sync = GitHubAPISync(
     repo_url="https://github.com/user/repo",
-    local_path="/path/to/local/repo"
+    local_path="/path/to/local/repo",
 )
 
-# Perform sync
 success = sync.sync()
-if success:
-    print("Synchronization completed successfully")
+print("ok" if success else "failed")
+```python
+import os
+import tempfile
+from gitbridge import GitHubAPISync
+
+def test_real_sync():
+    """Integration test with real repository."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        sync = GitHubAPISync(
+            repo_url="https://github.com/github/gitignore",
+            local_path=tmpdir,
+        )
+
+        # Test connection
+        assert sync.test_connection()
+
+        # Perform sync
+        assert sync.sync()
+
+        # Verify a known file exists
+        assert os.path.exists(os.path.join(tmpdir, "Python.gitignore"))
 ```
 
-## Core Modules
+Playwright‑based browser automation for fallback synchronization: `GitHubBrowserSync`.
 
-### [gitbridge](gitbridge.md)
-Main package initialization and version information.
+### config
 
-### [api_sync](api_sync.md)
-GitHub API-based synchronization with component architecture:
-- `GitHubAPISync` - Main facade class
-- `GitHubAPIClient` - Low-level API operations
-- `RepositoryManager` - Repository metadata management
-- `FileSynchronizer` - File synchronization engine
-- `ProgressTracker` - Progress reporting
+Configuration management utilities and data structures.
 
-### [browser_sync](browser_sync.md)
-Playwright-based browser automation for fallback synchronization:
-- `GitHubBrowserSync` - Browser automation sync
+### interfaces
 
-### [config](config.md)
-Configuration management:
-- `Config` - Configuration loader and validator
-- `ConfigValidator` - Configuration validation
-
-### [interfaces](interfaces.md)
 Abstract interfaces for extensibility:
-- `SyncProvider` - Base interface for sync implementations
-- `ProxyProvider` - Proxy configuration interface
-- `CertificateProvider` - Certificate management interface
-- `AuthenticationProvider` - Authentication interface
 
-### [utils](utils.md)
-Utility functions:
-- Path manipulation
-- File operations
-- Network utilities
-- Progress helpers
+- `SyncProvider` – Base interface for sync implementations
+- `ProxyProvider` – Proxy configuration interface
+- `CertificateProvider` – Certificate management interface
+- `AuthenticationProvider` – Authentication interface
 
-### [pac_support](pac_support.md)
-PAC (Proxy Auto-Configuration) support:
-- `PACProxyDetector` - PAC script detection and parsing
-- Windows registry integration
+### utils
 
-### [cert_support](cert_support.md)
-Certificate management:
-- `WindowsCertificateDetector` - Windows certificate store access
-- Certificate bundle creation
+Utility helpers for paths, files, networking, and progress.
+
+### pac_support
+
+PAC (Proxy Auto‑Configuration) support and proxy resolution helpers.
+
+### cert_support
+
+Windows certificate store integration and certificate bundle creation helpers.
 
 ## Basic Usage
 
@@ -328,17 +323,9 @@ def sync_repository(repo_url, local_path, ref="main"):
 ### Scheduled Sync
 
 ```python
-import schedule
-import time
-from gitbridge import GitHubAPISync
 
 def sync_job():
     """Scheduled sync job."""
-    sync = GitHubAPISync(
-        repo_url="https://github.com/user/repo",
-        local_path="/path/to/local"
-    )
-    
     if sync.sync():
         print(f"Sync completed at {time.strftime('%Y-%m-%d %H:%M:%S')}")
     else:
@@ -370,7 +357,7 @@ while True:
 
 ### Exception Hierarchy
 
-```
+```text
 GitBridgeError (base)
 ├── ConfigurationError
 ├── AuthenticationError
@@ -475,8 +462,6 @@ from gitbridge import GitHubAPISync
 def test_real_sync():
     """Integration test with real repository."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        sync = GitHubAPISync(
-            "https://github.com/github/gitignore",
             tmpdir
         )
         
@@ -503,7 +488,6 @@ def test_real_sync():
 
 ## Next Steps
 
-- Explore individual [module documentation](api_sync.md)
-- Review [interface definitions](interfaces.md)
-- Check [examples repository](https://github.com/nevedomski/gitbridge-examples)
-- Read the [developer guide](../contributing/index.md)
+- Check the source code in the `gitbridge/` package for docstrings
+- Examples repository: <https://github.com/nevedomski/gitbridge-examples>
+- Contributing: <https://github.com/nevedomski/gitbridge/blob/main/CONTRIBUTING.md>

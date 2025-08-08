@@ -1,15 +1,17 @@
 # GitBridge - GitHub Repository Synchronization Tool
 
-<div align="center">
+<div align="center" markdown>
 
-![GitBridge Logo](assets/banner.png)
+<div class="hero-card" markdown>
+![GitBridge](assets/banner.svg)
+</div>
 
 **Synchronize GitHub repositories when direct git access is blocked**
 
 [![Python Version](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green)](license.md)
 [![Documentation](https://img.shields.io/badge/docs-mkdocs-brightgreen)](index.md)
-[![Coverage](https://img.shields.io/badge/coverage-94%25-brightgreen)](troubleshooting/index.md)
+[![codecov](https://codecov.io/gh/user/gitBridge/branch/main/graph/badge.svg)](https://codecov.io/gh/user/gitBridge)
 
 [Get Started](getting-started/quick-start.md){ .md-button .md-button--primary }
 [View on GitHub](https://github.com/nevedomski/gitbridge){ .md-button }

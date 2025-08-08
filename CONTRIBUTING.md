@@ -114,7 +114,7 @@ pre-commit run --all-files
 
 ### Python Style Guide
 
-- Follow PEP 8 with 120-character line limit
+- Follow PEP 8 with 140-character line limit
 - Use Black formatting (enforced by ruff)
 - Use type hints for all function signatures
 - Write Google-style docstrings for public functions and classes

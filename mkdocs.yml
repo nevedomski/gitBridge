@@ -1,54 +1,49 @@
 site_name: GitBridge Documentation
 site_description: GitHub Repository Synchronization Tool - Documentation
-site_author: GitBridge Team
-site_url: https://nevedomski.github.io/gitBridge/
+site_author: Nevedomski Sergei
+site_url: https://nevedomski.github.io/gitbridge/   # ← ensure lowercase repo name
 repo_url: https://github.com/nevedomski/gitbridge
 repo_name: gitbridge
 edit_uri: edit/main/docs/
-copyright: Copyright &copy; 2025 GitBridge Team
+copyright: Copyright © 2025 Nevedomski Sergei
 
 theme:
   name: material
   language: en
-  
+
+  # custom_dir: docs/overrides
+
   font:
-    text: Roboto
+    text: Inter       # ← crisper body font
     code: Roboto Mono
-  
+
   palette:
-    # Light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: indigo
-      accent: deep purple
+      primary: blue grey   # ← calmer, “engineering” feel
+      accent: cyan
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
-    
-    # Dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: indigo
-      accent: deep purple
+      primary: blue grey
+      accent: cyan
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
-  
+
   features:
-    # Navigation
+    # Navigation (trim to the most useful; less clutter)
     - navigation.instant
-    - navigation.instant.prefetch
-    - navigation.instant.progress
+    # - navigation.instant.prefetch      # ← disable: can cause flicker/waste
     - navigation.tracking
     - navigation.tabs
     - navigation.tabs.sticky
-    - navigation.sections
-    - navigation.expand
-    - navigation.path
-    - navigation.prune
-    - navigation.indexes
+    - navigation.indexes                 # ← keep section index pages
     - navigation.top
     - navigation.footer
+    # - navigation.sections              # ← disable: reduces sidebar noise
     # Table of Contents
     - toc.follow
     - toc.integrate
@@ -68,7 +63,7 @@ theme:
     - content.action.view
     # Announce
     - announce.dismiss
-  
+
   icon:
     repo: fontawesome/brands/github
     edit: material/pencil
@@ -89,7 +84,7 @@ plugins:
       default_handler: python
       handlers:
         python:
-          paths: [gitbridge]
+          paths: [gitbridge]  # update if your package lives under src/
           options:
             show_source: true
             show_root_heading: true
@@ -107,9 +102,10 @@ plugins:
       enable_creation_date: true
       type: timeago
       fallback_to_build_date: true
+      enable_git_follow: false
+strict: true
 
 markdown_extensions:
-  # Python Markdown
   - abbr
   - admonition
   - attr_list
@@ -121,8 +117,6 @@ markdown_extensions:
       toc_depth: 3
       title: On this page
   - tables
-  
-  # Python Markdown Extensions
   - pymdownx.arithmatex:
       generic: true
   - pymdownx.betterem:
@@ -135,7 +129,6 @@ markdown_extensions:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.highlight:
       anchor_linenums: true
-      line_spans: __span
       pygments_lang_class: true
       use_pygments: true
       auto_title: true
@@ -167,56 +160,45 @@ markdown_extensions:
       check_paths: true
 
 extra:
-  version:
-    provider: mike
-    default: stable
   social:
-    - icon: fontawesome/brands/github
+    - icon: material/file-arrow-left-right-outline
+      link: https://github.com/nevedomski/gitbridge
+      name: Changelog
+    - icon: material/license
+      link: https://pypi.org/project/gitbridge/
+      name: License
+    - icon: material/github
       link: https://github.com/nevedomski/gitbridge
       name: GitBridge on GitHub
     - icon: fontawesome/brands/python
       link: https://pypi.org/project/gitbridge/
       name: GitBridge on PyPI
+  logo:
+    icon: images/logo-light.svg
+    icon_dark: images/logo-dark.svg
+  favicon: images/favicon.ico
+  banner:
+    light: images/banner-light.svg
+    dark: images/banner-dark.svg
   analytics:
     provider: google
     property: G-XXXXXXXXXX
-    feedback:
-      title: Was this page helpful?
-      ratings:
-        - icon: material/emoticon-happy-outline
-          name: This page was helpful
-          data: 1
-          note: >-
-            Thanks for your feedback!
-        - icon: material/emoticon-sad-outline
-          name: This page could be improved
-          data: 0
-          note: >-
-            Thanks for your feedback! Help us improve this page by
-            using our <a href="https://github.com/nevedomski/gitbridge/issues/new/?title=[Feedback]+{title}">feedback form</a>.
   consent:
     title: Cookie consent
-    description: >-
-      We use cookies to recognize your repeated visits and preferences, as well
-      as to measure the effectiveness of our documentation and whether users
-      find what they're searching for. With your consent, you're helping us to
-      make our documentation better.
-    actions:
-      - accept
-      - reject
-      - manage
+    description: |
+      We use cookies to recognize your repeated visits and preferences, and to
+      measure the effectiveness of our documentation.
+    actions: [accept, reject, manage]
   generator: false
-  status:
-    new: Recently added
-    deprecated: Deprecated
-
+  
 extra_css:
-  - stylesheets/extra.css
+  - stylesheets/extra.css?v=3
 
 extra_javascript:
   - javascripts/mathjax.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
+# Consider moving Changelog/License to footer links; keeps sidebar focused on docs.
 nav:
   - Home:
     - index.md
@@ -228,6 +210,7 @@ nav:
     - getting-started/installation.md
     - getting-started/quick-start.md
     - getting-started/first-sync.md
+    - getting-started/configuration-basics.md
   
   - User Guide:
     - user-guide/index.md
@@ -238,13 +221,15 @@ nav:
     - user-guide/branch-management.md
     - user-guide/corporate-setup.md
     - user-guide/proxy-configuration.md
+    - user-guide/ssl-certificates.md
   
   - CLI Reference:
     - cli/index.md
     - cli/sync-command.md
+    - cli/status-command.md
   
   - Architecture:
-    - architecture/overview.md
+    - architecture/index.md
   
   - API Reference:
     - api/index.md
@@ -252,3 +237,10 @@ nav:
   - Troubleshooting:
     - troubleshooting/index.md
     - troubleshooting/common-issues.md
+    - troubleshooting/network-errors.md
+    - troubleshooting/authentication-errors.md
+    - troubleshooting/proxy-issues.md
+    - troubleshooting/ssl-errors.md
+    - troubleshooting/browser-automation.md
+
+

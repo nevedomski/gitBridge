@@ -1,249 +1,26 @@
-/* GitBridge Documentation - Custom Styles */
-/* Complements Material for MkDocs theme */
-
-/* Custom CSS Variables that work with Material theme */
-:root {
-    /* Extend Material palette */
-    --gitbridge-success: #10b981;
-    --gitbridge-warning: #f59e0b;
-    --gitbridge-error: #ef4444;
-    --gitbridge-info: #3b82f6;
+/* Slightly darker code bg in dark mode for contrast */
+[data-md-color-scheme="slate"] pre,
+[data-md-color-scheme="slate"] code {
+  background-color: #16181d;
 }
 
-/* Hero Section on Homepage - Use Material's color scheme */
-.md-content .md-typeset h1.hero-title {
-    text-align: center;
-    font-size: 3rem;
-    margin-bottom: 2rem;
-    background: linear-gradient(135deg, var(--md-primary-fg-color) 0%, var(--md-accent-fg-color) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+/* Smaller top margin on H1 (hero sits tighter) */
+.md-typeset h1 {
+  margin-top: .25rem;
 }
 
-/* Feature Cards */
-.md-typeset .grid.cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1rem;
-    margin: 2rem 0;
+/* Tidy hero banner (if you wrap your banner image) */
+.hero-card img {
+  max-width: 640px;
+  width: 100%;
+  display: block;
+  margin: 0 auto;
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.18);
 }
 
-.md-typeset .grid.cards > li {
-    padding: 1.5rem;
-    border-radius: 8px;
-    background: var(--md-default-bg-color);
-    border: 1px solid var(--md-default-fg-color--lightest);
-    transition: transform 0.2s, box-shadow 0.2s;
-}
 
-.md-typeset .grid.cards > li:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
 
-/* Code Block Enhancements */
-.md-typeset pre > code {
-    font-size: 0.9rem;
-    line-height: 1.6;
-}
 
-/* Terminal Output Style - removed to avoid conflicts with Material theme */
 
-/* Custom Admonitions */
-.md-typeset .admonition.success,
-.md-typeset details.success {
-    border-color: var(--gitbridge-success);
-}
 
-.md-typeset .admonition.success > .admonition-title,
-.md-typeset details.success > summary {
-    background-color: rgba(16, 185, 129, 0.1);
-    border-color: var(--gitbridge-success);
-}
-
-.md-typeset .admonition.success > .admonition-title::before,
-.md-typeset details.success > summary::before {
-    background-color: var(--gitbridge-success);
-    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>');
-    mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>');
-}
-
-/* Table Enhancements */
-.md-typeset table {
-    font-size: 0.9rem;
-}
-
-.md-typeset table thead {
-    background-color: var(--md-default-fg-color--lightest);
-}
-
-.md-typeset table tbody tr:hover {
-    background-color: var(--md-default-fg-color--lightest);
-}
-
-/* Button Styles - Enhanced Material buttons */
-.md-typeset .md-button {
-    font-weight: 600;
-    padding: 0.75rem 1.5rem;
-    border-radius: 6px;
-    transition: all 0.2s;
-}
-
-.md-typeset .md-button--primary {
-    background-color: var(--md-primary-fg-color);
-    color: var(--md-primary-bg-color);
-    border: none;
-}
-
-.md-typeset .md-button--primary:hover {
-    background-color: var(--md-accent-fg-color);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-/* Command Syntax Highlighting - Use Material theme colors */
-.md-typeset code.language-bash .token.function {
-    color: var(--md-primary-fg-color);
-}
-
-.md-typeset code.language-bash .token.parameter {
-    color: var(--md-accent-fg-color);
-}
-
-.md-typeset code.language-bash .token.string {
-    color: var(--gitbridge-success);
-}
-
-/* Navigation Enhancements - Use Material's built-in active states */
-
-/* Search Results - Use Material's default styling */
-
-/* Footer */
-.md-footer {
-    background-color: var(--md-default-bg-color);
-    border-top: 1px solid var(--md-default-fg-color--lightest);
-}
-
-.md-footer-meta {
-    background-color: transparent;
-}
-
-/* Version Selector - Use Material theme color */
-.md-version__current {
-    color: var(--md-primary-fg-color);
-}
-
-/* Tabs Content */
-.md-typeset .tabbed-content {
-    border: 1px solid var(--md-default-fg-color--lightest);
-    border-radius: 0 4px 4px 4px;
-}
-
-/* Inline Code */
-.md-typeset code:not(pre code) {
-    background-color: var(--md-default-fg-color--lightest);
-    padding: 0.125rem 0.375rem;
-    border-radius: 4px;
-    font-size: 0.9em;
-}
-
-/* Mermaid Diagrams */
-.mermaid {
-    text-align: center;
-    margin: 2rem 0;
-}
-
-/* Responsive Design */
-@media screen and (max-width: 768px) {
-    .md-typeset .grid.cards {
-        grid-template-columns: 1fr;
-    }
-    
-    .md-content .md-typeset h1:first-child {
-        font-size: 2rem;
-    }
-}
-
-/* Dark Mode Adjustments */
-[data-md-color-scheme="slate"] {
-    --gitbridge-success: #34d399;
-    --gitbridge-warning: #fbbf24;
-    --gitbridge-error: #f87171;
-    --gitbridge-info: #60a5fa;
-}
-
-[data-md-color-scheme="slate"] .md-typeset .grid.cards > li {
-    background: var(--md-default-bg-color--light);
-    border-color: var(--md-default-fg-color--lighter);
-}
-
-/* Print Styles */
-@media print {
-    .md-tabs,
-    .md-header,
-    .md-footer,
-    .md-sidebar {
-        display: none;
-    }
-    
-    .md-content {
-        margin: 0;
-        padding: 0;
-    }
-}
-
-/* Animation for Copy Button */
-.md-clipboard {
-    transition: color 0.2s;
-}
-
-.md-clipboard:hover {
-    color: var(--md-primary-fg-color);
-}
-
-.md-clipboard::after {
-    content: "Copied!";
-    position: absolute;
-    right: 0;
-    top: -1.5rem;
-    padding: 0.25rem 0.5rem;
-    background-color: var(--gitbridge-success);
-    color: white;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
-}
-
-.md-clipboard--active::after {
-    opacity: 1;
-}
-
-/* Custom Icons */
-.md-typeset .material-icons {
-    vertical-align: middle;
-    margin-right: 0.25rem;
-}
-
-/* Progress Bar Style */
-.progress-bar {
-    width: 100%;
-    height: 20px;
-    background-color: var(--md-default-fg-color--lightest);
-    border-radius: 10px;
-    overflow: hidden;
-    margin: 1rem 0;
-}
-
-.progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--md-primary-fg-color) 0%, var(--md-accent-fg-color) 100%);
-    animation: progress 2s ease-in-out;
-}
-
-@keyframes progress {
-    from { width: 0; }
-    to { width: 100%; }
-}

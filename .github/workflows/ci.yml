@@ -50,23 +50,24 @@ jobs:
           # Run platform-specific tests based on the OS
           if [[ "${{ runner.os }}" == "Windows" ]]; then
             # On Windows, run all tests including Windows-specific ones
-            uv run pytest --maxfail=1 --disable-warnings --cov=gitbridge --cov-report=xml
+            uv run pytest --cov=gitbridge --cov-report=xml --junitxml=junit.xml
           elif [[ "${{ runner.os }}" == "Linux" ]]; then
             # On Linux, skip Windows-specific tests
-            uv run pytest --maxfail=1 --disable-warnings --cov=gitbridge --cov-report=xml -m "not windows"
+            uv run pytest --cov=gitbridge --cov-report=xml --junitxml=junit.xml -m "not windows"
           elif [[ "${{ runner.os }}" == "macOS" ]]; then
             # On macOS, skip Windows-specific tests
-            uv run pytest --maxfail=1 --disable-warnings --cov=gitbridge --cov-report=xml -m "not windows"
+            uv run pytest --cov=gitbridge --cov-report=xml --junitxml=junit.xml -m "not windows"
           else
             # Fallback - skip Windows-specific tests
-            uv run pytest --maxfail=1 --disable-warnings --cov=gitbridge --cov-report=xml -m "not windows"
+            uv run pytest --cov=gitbridge --cov-report=xml --junitxml=junit.xml -m "not windows"
           fi
 
       - name: 📊 Upload coverage to Codecov
         uses: codecov/codecov-action@v5
-        if: always()
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+      
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
 
   lint:
     name: 🧹 Lint & Typecheck

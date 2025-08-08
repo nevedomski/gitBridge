@@ -72,7 +72,7 @@ class Config:
                 logger.warning(f"Configuration file not found: {config_file}")
                 return
 
-            with open(path) as f:
+            with open(path, encoding="utf-8") as f:
                 file_config = yaml.safe_load(f) or {}
 
             # Deep merge configurations
@@ -81,17 +81,11 @@ class Config:
             logger.info(f"Loaded configuration from {config_file}")
 
         except yaml.YAMLError as e:
-            raise ConfigurationError(
-                f"Invalid YAML syntax in configuration file: {e}", config_file=config_file, original_error=e
-            ) from e
+            raise ConfigurationError(f"Invalid YAML syntax in configuration file: {e}", config_file=config_file, original_error=e) from e
         except OSError as e:
-            raise ConfigurationError(
-                f"Failed to read configuration file: {e}", config_file=config_file, original_error=e
-            ) from e
+            raise ConfigurationError(f"Failed to read configuration file: {e}", config_file=config_file, original_error=e) from e
         except Exception as e:
-            raise ConfigurationError(
-                f"Failed to load configuration file: {e}", config_file=config_file, original_error=e
-            ) from e
+            raise ConfigurationError(f"Failed to load configuration file: {e}", config_file=config_file, original_error=e) from e
 
     def load_env(self) -> None:
         """Load configuration from environment variables."""
@@ -195,9 +189,7 @@ class Config:
         """
         # Check required fields
         if not self.get("repository.url"):
-            raise ConfigurationError(
-                "Repository URL is required", config_file=self.config_file, invalid_key="repository.url"
-            )
+            raise ConfigurationError("Repository URL is required", config_file=self.config_file, invalid_key="repository.url")
 
         if not self.get("local.path"):
             raise ConfigurationError("Local path is required", config_file=self.config_file, invalid_key="local.path")
