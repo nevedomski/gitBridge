@@ -51,7 +51,7 @@ Enhancement suggestions are tracked as GitHub issues. When suggesting an enhance
 
 ### Prerequisites
 
-- Python 3.9 or higher
+- Python 3.10 or higher
 - uv package manager
 - Git
 

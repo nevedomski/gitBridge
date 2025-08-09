@@ -408,9 +408,7 @@ class TestFileSystemError:
     def test_initialization_with_parameters(self):
         """Test initialization with all parameters."""
         original = PermissionError("Permission denied")
-        error = FileSystemError(
-            "File operation failed", path="/path/to/file", operation="write", original_error=original
-        )
+        error = FileSystemError("File operation failed", path="/path/to/file", operation="write", original_error=original)
 
         assert error.message == "File operation failed"
         assert error.details["path"] == "/path/to/file"
@@ -451,9 +449,7 @@ class TestFileWriteError:
     def test_initialization_with_parameters(self):
         """Test initialization with all parameters."""
         original = OSError("Disk full")
-        error = FileWriteError(
-            "Write operation failed", file_path="/path/to/file.txt", size=2048, original_error=original
-        )
+        error = FileWriteError("Write operation failed", file_path="/path/to/file.txt", size=2048, original_error=original)
 
         assert error.message == "Write operation failed"
         assert error.details["path"] == "/path/to/file.txt"  # Set by parent class
@@ -496,9 +492,7 @@ class TestDirectoryCreateError:
     def test_initialization_with_parameters(self):
         """Test initialization with all parameters."""
         original = PermissionError("Permission denied")
-        error = DirectoryCreateError(
-            "Directory creation failed", dir_path="/path/to/directory", original_error=original
-        )
+        error = DirectoryCreateError("Directory creation failed", dir_path="/path/to/directory", original_error=original)
 
         assert error.message == "Directory creation failed"
         assert error.details["path"] == "/path/to/directory"  # Set by parent class
@@ -527,9 +521,7 @@ class TestBrowserError:
     def test_initialization_with_parameters(self):
         """Test initialization with all parameters."""
         original = Exception("Selenium error")
-        error = BrowserError(
-            "Browser failed", browser="chrome", url="https://github.com/user/repo", original_error=original
-        )
+        error = BrowserError("Browser failed", browser="chrome", url="https://github.com/user/repo", original_error=original)
 
         assert error.message == "Browser failed"
         assert error.details["browser"] == "chrome"
@@ -617,9 +609,7 @@ class TestPageLoadError:
     def test_initialization_with_parameters(self):
         """Test initialization with all parameters."""
         original = Exception("Page timeout")
-        error = PageLoadError(
-            "Page failed to load", url="https://github.com/user/repo", timeout=30, original_error=original
-        )
+        error = PageLoadError("Page failed to load", url="https://github.com/user/repo", timeout=30, original_error=original)
 
         assert error.message == "Page failed to load"
         assert error.details["browser"] == "chrome"  # Set by parent class

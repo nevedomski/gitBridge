@@ -99,9 +99,7 @@ class TestFileSynchronizer:
         result = synchronizer.download_file("test.txt", "abc123")
 
         assert result == test_content.encode()
-        self.mock_client.get.assert_called_once_with(
-            "repos/test_owner/test_repo/contents/test.txt", params={"ref": "main"}
-        )
+        self.mock_client.get.assert_called_once_with("repos/test_owner/test_repo/contents/test.txt", params={"ref": "main"})
 
     def test_download_file_large_file_fallback(self):
         """Test file download fallback to Blob API for large files"""

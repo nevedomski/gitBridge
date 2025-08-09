@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python: ["3.10", "3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
         
@@ -45,29 +45,54 @@ jobs:
           uv sync --all-extras
               
       - name: 🔬 Unit tests with coverage
+        id: tests
         shell: bash
+        continue-on-error: true  # Allow workflow to continue even if tests fail
         run: |
           # Run platform-specific tests based on the OS
           if [[ "${{ runner.os }}" == "Windows" ]]; then
             # On Windows, run all tests including Windows-specific ones
-            uv run pytest --cov=gitbridge --cov-report=xml --junitxml=junit.xml
+            uv run pytest --cov=gitbridge --cov-report=xml --cov-report=term --junitxml=junit.xml -o junit_family=legacy
           elif [[ "${{ runner.os }}" == "Linux" ]]; then
             # On Linux, skip Windows-specific tests
-            uv run pytest --cov=gitbridge --cov-report=xml --junitxml=junit.xml -m "not windows"
+            uv run pytest --cov=gitbridge --cov-report=xml --cov-report=term --junitxml=junit.xml -o junit_family=legacy -m "not windows"
           elif [[ "${{ runner.os }}" == "macOS" ]]; then
             # On macOS, skip Windows-specific tests
-            uv run pytest --cov=gitbridge --cov-report=xml --junitxml=junit.xml -m "not windows"
+            uv run pytest --cov=gitbridge --cov-report=xml --cov-report=term --junitxml=junit.xml -o junit_family=legacy -m "not windows"
           else
             # Fallback - skip Windows-specific tests
-            uv run pytest --cov=gitbridge --cov-report=xml --junitxml=junit.xml -m "not windows"
+            uv run pytest --cov=gitbridge --cov-report=xml --cov-report=term --junitxml=junit.xml -o junit_family=legacy -m "not windows"
           fi
 
       - name: 📊 Upload coverage to Codecov
+        if: always()  # Always run, even if tests fail
         uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-${{ matrix.os }}-py${{ matrix.python }}
+          fail_ci_if_error: false  # Don't fail CI if upload fails
+          verbose: true
+          env_vars: OS,PYTHON
+        env:
+          OS: ${{ matrix.os }}
+          PYTHON: ${{ matrix.python }}
       
-      - name: Upload test results to Codecov
-        if: ${{ !cancelled() }}
+      - name: 📈 Upload test results to Codecov
+        if: always()  # Always run, even if tests fail
         uses: codecov/test-results-action@v1
+        with:
+          files: ./junit.xml
+          flags: test-results
+          name: test-results-${{ matrix.os }}-py${{ matrix.python }}
+          fail_ci_if_error: false
+          verbose: true
+      
+      - name: Check test results
+        if: steps.tests.outcome == 'failure'
+        run: |
+          echo "Tests failed but coverage was uploaded successfully"
+          exit 1
 
   lint:
     name: 🧹 Lint & Typecheck

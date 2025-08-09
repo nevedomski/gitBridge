@@ -182,6 +182,23 @@ class TestConfigLoadEnv:
             config = Config()
             assert config.get("repository.ref") == "develop"
 
+    def test_load_env_github_ref_normalization(self):
+        """Test GITHUB_REF normalization for GitHub Actions format"""
+        # Test refs/heads/ format
+        with patch.dict(os.environ, {"GITHUB_REF": "refs/heads/main"}, clear=True), patch("gitbridge.config.load_dotenv"):
+            config = Config()
+            assert config.get("repository.ref") == "main"
+
+        # Test refs/tags/ format
+        with patch.dict(os.environ, {"GITHUB_REF": "refs/tags/v1.0.0"}, clear=True), patch("gitbridge.config.load_dotenv"):
+            config = Config()
+            assert config.get("repository.ref") == "v1.0.0"
+
+        # Test plain branch name (no normalization needed)
+        with patch.dict(os.environ, {"GITHUB_REF": "feature-branch"}, clear=True), patch("gitbridge.config.load_dotenv"):
+            config = Config()
+            assert config.get("repository.ref") == "feature-branch"
+
     def test_load_env_local_path(self):
         """Test loading GITBRIDGE_LOCAL_PATH environment variable"""
         with (

@@ -191,9 +191,7 @@ class TestGitHubAPISyncFacade:
     @patch("gitbridge.api_sync.RepositoryManager")
     @patch("gitbridge.api_sync.GitHubAPIClient")
     @patch("gitbridge.api_sync.parse_github_url")
-    def test_sync_success(
-        self, mock_parse_url, mock_api_client, mock_repo_manager, mock_file_sync, mock_progress_tracker, mock_ensure_dir
-    ):
+    def test_sync_success(self, mock_parse_url, mock_api_client, mock_repo_manager, mock_file_sync, mock_progress_tracker, mock_ensure_dir):
         """Test successful synchronization"""
         mock_parse_url.return_value = ("owner", "repo")
 

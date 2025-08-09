@@ -6,7 +6,7 @@ This guide covers all installation methods for GitBridge, including optional com
 
 ### Minimum Requirements
 
-- **Python**: 3.9 or higher
+- **Python**: 3.10 or higher
 - **Operating System**: Windows 10+, macOS 10.14+, or Linux (Ubuntu 18.04+)
 - **Memory**: 512 MB RAM
 - **Disk Space**: 100 MB for GitBridge + space for repositories
@@ -310,7 +310,7 @@ rm -rf ~/.cache/gitbridge
     ```
 
 !!! warning "Python Version Error"
-    GitBridge requires Python 3.9+. Check your version:
+    GitBridge requires Python 3.10+. Check your version:
     ```bash
     python --version
     ```

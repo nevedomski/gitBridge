@@ -1,0 +1,99 @@
+# Codecov configuration
+# https://docs.codecov.com/docs/codecov-yaml
+
+# Coverage configuration
+coverage:
+  precision: 2
+  round: down
+  range: "70...100"
+  
+  status:
+    project:
+      default:
+        # Basic settings
+        target: 80%  # Target coverage percentage
+        threshold: 2%  # Allow coverage to drop by 2%
+        base: auto
+        if_ci_failed: error  # How to handle CI failures
+        informational: false
+        only_pulls: false
+        
+    patch:
+      default:
+        # Coverage for new/modified code
+        target: 80%
+        threshold: 5%
+        base: auto
+        if_ci_failed: error
+        informational: false
+        
+    changes: false  # Disable change status
+
+# Parse additional coverage formats
+parsers:
+  gcov:
+    branch_detection:
+      conditional: yes
+      loop: yes
+      method: no
+      macro: no
+
+# Comment configuration
+comment:
+  layout: "reach,diff,flags,tree,reach"
+  behavior: default
+  require_changes: false
+  require_base: false
+  require_head: true
+  show_carryforward_flags: true
+  show_critical_paths: true
+
+# Ignore certain files/paths
+ignore:
+  - "tests/**"
+  - "docs/**"
+  - "setup.py"
+  - "**/__pycache__/**"
+  - "**/test_*.py"
+  - "**/*_test.py"
+
+# Flag configuration for different test types
+flags:
+  unittests:
+    paths:
+      - gitbridge/
+    carryforward: true
+    
+  test-results:
+    carryforward: true
+
+# GitHub integration
+github_checks:
+  annotations: true
+
+# Test analytics configuration
+test_analytics:
+  enabled: true
+  
+# Component configuration
+component_management:
+  default_rules:
+    statuses:
+      - type: project
+        target: auto
+        threshold: 1%
+  individual_components:
+    - component_id: api
+      name: API Module
+      paths:
+        - gitbridge/api_*.py
+    - component_id: browser
+      name: Browser Module
+      paths:
+        - gitbridge/browser_*.py
+    - component_id: core
+      name: Core Module
+      paths:
+        - gitbridge/config.py
+        - gitbridge/utils.py
+        - gitbridge/exceptions.py

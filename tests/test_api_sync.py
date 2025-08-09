@@ -325,9 +325,7 @@ class TestGitHubAPISync:
     @patch("gitbridge.api_sync.FileSynchronizer")
     @patch("gitbridge.api_sync.ProgressTracker")
     @patch("gitbridge.api_sync.ensure_dir")
-    def test_sync_with_progress(
-        self, mock_ensure_dir, mock_progress_tracker, mock_file_sync, mock_repo_mgr, mock_client
-    ):
+    def test_sync_with_progress(self, mock_ensure_dir, mock_progress_tracker, mock_file_sync, mock_repo_mgr, mock_client):
         """Test sync with progress tracking"""
         mock_client_instance = Mock()
         mock_client.return_value = mock_client_instance
@@ -336,9 +334,7 @@ class TestGitHubAPISync:
 
         mock_repo_instance = Mock()
         mock_repo_mgr.return_value = mock_repo_instance
-        mock_repo_instance.get_repository_tree.return_value = [
-            {"path": "file.txt", "type": "blob", "sha": "abc123", "size": 100}
-        ]
+        mock_repo_instance.get_repository_tree.return_value = [{"path": "file.txt", "type": "blob", "sha": "abc123", "size": 100}]
 
         mock_sync_instance = Mock()
         mock_file_sync.return_value = mock_sync_instance
@@ -360,9 +356,7 @@ class TestGitHubAPISync:
     @patch("gitbridge.api_sync.FileSynchronizer")
     @patch("gitbridge.api_sync.ProgressTracker")
     @patch("gitbridge.api_sync.ensure_dir")
-    def test_sync_skip_existing(
-        self, mock_ensure_dir, mock_progress_tracker, mock_file_sync, mock_repo_mgr, mock_client
-    ):
+    def test_sync_skip_existing(self, mock_ensure_dir, mock_progress_tracker, mock_file_sync, mock_repo_mgr, mock_client):
         """Test sync skips existing files"""
         mock_client_instance = Mock()
         mock_client.return_value = mock_client_instance
@@ -371,9 +365,7 @@ class TestGitHubAPISync:
 
         mock_repo_instance = Mock()
         mock_repo_mgr.return_value = mock_repo_instance
-        mock_repo_instance.get_repository_tree.return_value = [
-            {"path": "existing.txt", "type": "blob", "sha": "abc123"}
-        ]
+        mock_repo_instance.get_repository_tree.return_value = [{"path": "existing.txt", "type": "blob", "sha": "abc123"}]
 
         mock_sync_instance = Mock()
         mock_file_sync.return_value = mock_sync_instance

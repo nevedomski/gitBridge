@@ -11,12 +11,23 @@
 
 /* Tidy hero banner (if you wrap your banner image) */
 .hero-card img {
-  max-width: 640px;
+  max-width: 1000px;
   width: 100%;
   display: block;
   margin: 0 auto;
   border-radius: 16px;
   box-shadow: 0 6px 24px rgba(0,0,0,.18);
+}
+
+.md-header__button.md-logo {
+  margin: 0;
+  padding: 0;
+}
+
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 3rem; /* Example: adjust to desired height */
+  width: 3rem;  /* Example: adjust to desired width */
 }
 
 

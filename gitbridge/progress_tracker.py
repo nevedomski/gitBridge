@@ -305,10 +305,7 @@ class ProgressTracker:
             "elapsed_time": elapsed,
             "download_rate": self.get_download_rate(),
             "file_rate": self.get_file_rate(),
-            "success_rate": (
-                (self.stats.files_downloaded + self.stats.files_skipped) / max(1, self.stats.files_checked)
-            )
-            * 100,
+            "success_rate": ((self.stats.files_downloaded + self.stats.files_skipped) / max(1, self.stats.files_checked)) * 100,
         }
 
     def should_throttle(self, files_processed: int, throttle_interval: int = 100) -> bool:

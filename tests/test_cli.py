@@ -122,9 +122,7 @@ class TestInitCommand:
         mock_config_class.return_value = mock_config
 
         with self.runner.isolated_filesystem():
-            result = self.runner.invoke(
-                init, ["--repo", "https://github.com/owner/repo", "--local", "/home/user/local"]
-            )
+            result = self.runner.invoke(init, ["--repo", "https://github.com/owner/repo", "--local", "/home/user/local"])
 
         assert result.exit_code == 0
         assert "No token provided" in result.output
@@ -633,9 +631,7 @@ class TestStatusCommand:
     @patch("gitbridge.cli.Config")
     @patch("pathlib.Path.exists")
     @patch("builtins.open", side_effect=OSError("JSON error"))
-    def test_status_hash_cache_read_error(
-        self, mock_file_open, mock_path_exists, mock_config_class, mock_api_sync_class
-    ):
+    def test_status_hash_cache_read_error(self, mock_file_open, mock_path_exists, mock_config_class, mock_api_sync_class):
         """Test status command when hash cache file exists but can't be read"""
         mock_config = Mock()
         mock_config_class.return_value = mock_config

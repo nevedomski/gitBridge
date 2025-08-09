@@ -61,17 +61,23 @@ jobs:
         run: |
           uv sync --extra docs --frozen
 
+      - name: Extract version from pyproject.toml
+        id: extract_version
+        run: |
+          VERSION=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
 
       - name: Build MkDocs site
         run: |
-          # Set the site URL for proper canonical URLs
-          uv run mkdocs build --config-file mkdocs.yml --site-dir _site --strict --site-url "$SITE_URL"
+          uv run mkdocs build --config-file mkdocs.yml --site-dir _site --strict
         env:
-          # Override site_url in mkdocs.yml with the actual GitHub Pages URL
-          SITE_URL: ${{ steps.pages.outputs.base_url }}
+          # Pass the copyright with version to MkDocs
+          GITBRIDGE_COPYRIGHT: "Copyright © 2025 Nevedomski Sergei • Version ${{ steps.extract_version.outputs.VERSION }}"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

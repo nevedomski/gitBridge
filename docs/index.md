@@ -3,12 +3,12 @@
 <div align="center" markdown>
 
 <div class="hero-card" markdown>
-![GitBridge](assets/banner.svg)
+![GitBridge](images/banner.svg)
 </div>
 
 **Synchronize GitHub repositories when direct git access is blocked**
 
-[![Python Version](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/downloads/)
+[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green)](license.md)
 [![Documentation](https://img.shields.io/badge/docs-mkdocs-brightgreen)](index.md)
 [![codecov](https://codecov.io/gh/user/gitBridge/branch/main/graph/badge.svg)](https://codecov.io/gh/user/gitBridge)
@@ -161,7 +161,7 @@ uv pip install -e .
 
 ## System Requirements
 
-- **Python**: 3.9 or higher (3.11+ recommended)
+- **Python**: 3.10 or higher (3.11+ recommended)
 - **Operating System**: Windows, macOS, or Linux
 - **For Browser Mode**: Chrome/Chromium/Firefox/Edge browser
 - **Network**: HTTPS access to GitHub (browser access)

@@ -154,9 +154,7 @@ class TestRepositoryManager:
 
         assert result == expected_tree
         self.manager.resolve_ref.assert_called_once_with(ref)
-        self.mock_client.get.assert_called_once_with(
-            f"repos/test_owner/test_repo/git/trees/{commit_sha}", params={"recursive": "1"}
-        )
+        self.mock_client.get.assert_called_once_with(f"repos/test_owner/test_repo/git/trees/{commit_sha}", params={"recursive": "1"})
 
     def test_get_repository_tree_fallback_to_master(self):
         """Test repository tree fallback from main to master"""

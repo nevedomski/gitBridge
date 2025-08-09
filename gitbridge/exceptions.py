@@ -497,9 +497,7 @@ def wrap_file_operation_exception(error: Exception, path: str, operation: str) -
     elif operation == "create" and "directory" in str(error).lower():
         return DirectoryCreateError(f"Failed to create directory: {error}", dir_path=path, original_error=error)
     else:
-        return FileSystemError(
-            f"File system operation failed: {error}", path=path, operation=operation, original_error=error
-        )
+        return FileSystemError(f"File system operation failed: {error}", path=path, operation=operation, original_error=error)
 
 
 def wrap_playwright_exception(error: Exception, url: str | None = None) -> BrowserError:

@@ -57,9 +57,7 @@ def parse_github_url(url: str) -> tuple[str, str]:
         parsed = urlparse(url)
 
         if parsed.netloc not in ["github.com", "www.github.com"]:
-            raise ConfigurationError(
-                f"Not a GitHub URL: {url}. Must be a github.com URL.", invalid_key="repository.url"
-            )
+            raise ConfigurationError(f"Not a GitHub URL: {url}. Must be a github.com URL.", invalid_key="repository.url")
 
         path_parts = parsed.path.strip("/").split("/")
 
@@ -80,9 +78,7 @@ def parse_github_url(url: str) -> tuple[str, str]:
         # Re-raise our custom exceptions
         raise
     except Exception as e:
-        raise ConfigurationError(
-            f"Failed to parse GitHub URL: {url}", invalid_key="repository.url", original_error=e
-        ) from e
+        raise ConfigurationError(f"Failed to parse GitHub URL: {url}", invalid_key="repository.url", original_error=e) from e
 
 
 def calculate_file_hash(content: bytes) -> str:

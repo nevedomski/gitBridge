@@ -18,6 +18,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PyPI package distribution
 - Windows installer
 
+## [0.5.0b1] - 2025-08-09
+
+### Changed
+- **Breaking**: Minimum Python version requirement changed from 3.9 to 3.10
+- Fixed GITHUB_REF environment variable normalization for GitHub Actions compatibility
+- Added project version display in MkDocs documentation footer (displays as "Copyright © 2025 Nevedomski Sergei • Version X.X.X")
+
+### Fixed
+- CI workflow: Removed incorrect `--site-url` option from mkdocs build command
+- Test suite: Fixed branch name assertion to handle GitHub Actions ref format (refs/heads/main → main)
+
 ## [0.4.2b1] - 2025-08-06
 
 ### Added

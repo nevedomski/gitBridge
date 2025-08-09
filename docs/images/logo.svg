@@ -1,0 +1,17 @@
+<svg class="logo-small" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <!-- Simplified version for small sizes -->
+    <path d="M 40 100 Q 60 80, 80 80 T 120 80 T 160 100" 
+            stroke="url(#gradientMain2)" stroke-width="12" fill="none" stroke-linecap="round"/>
+    <path d="M 40 120 Q 60 100, 80 100 T 120 100 T 160 120" 
+            stroke="url(#gradientMain2)" stroke-width="12" fill="none" stroke-linecap="round"/>
+    <circle cx="60" cy="100" r="10" fill="#0969da"/>
+    <circle cx="100" cy="90" r="12" fill="#10b981"/>
+    <circle cx="140" cy="100" r="10" fill="#0969da"/>
+    
+    <defs>
+        <linearGradient id="gradientMain2" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#0969da;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+</svg>

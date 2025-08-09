@@ -41,9 +41,7 @@ class TestPACProxyDetectorMocked:
         self.mock_pypac.PACSession = self.mock_pac_session
 
         # Patch both modules before import
-        with patch.dict(
-            "sys.modules", {"winreg": self.mock_winreg, "pypac": self.mock_pypac, "pypac.parser": MagicMock()}
-        ):
+        with patch.dict("sys.modules", {"winreg": self.mock_winreg, "pypac": self.mock_pypac, "pypac.parser": MagicMock()}):
             # Import and create instance
             from gitbridge.pac_support import PACProxyDetector, detect_and_configure_proxy
 
@@ -700,9 +698,7 @@ class TestIntegrationScenarios:
 
         self.mock_pypac = MagicMock()
 
-        with patch.dict(
-            "sys.modules", {"winreg": self.mock_winreg, "pypac": self.mock_pypac, "pypac.parser": MagicMock()}
-        ):
+        with patch.dict("sys.modules", {"winreg": self.mock_winreg, "pypac": self.mock_pypac, "pypac.parser": MagicMock()}):
             from gitbridge.pac_support import PACProxyDetector
 
             self.PACProxyDetector = PACProxyDetector

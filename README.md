@@ -7,7 +7,7 @@
 [![Ruff](https://img.shields.io/badge/linter-ruff-informational?style=flat&color=orange)](https://github.com/astral-sh/ruff)
 [![Format](https://img.shields.io/badge/code%20style-ruff-black)](https://github.com/astral-sh/ruff)
 [![Type](https://img.shields.io/badge/type%20checker-mypy-blue)](https://mypy.readthedocs.io/)
-[![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Docs](https://img.shields.io/badge/docs-github%20pages-blue)](https://nevedomski.github.io/gitBridge/)
 [![Security](https://img.shields.io/badge/security-monitored-yellow.svg)](./SECURITY.md)
@@ -139,7 +139,7 @@ See `config.example.yaml` for a complete example.
 
 ## Requirements
 
-- Python 3.9+ (recommended: 3.11+)
+- Python 3.10+ (recommended: 3.11+)
 - [uv](https://github.com/astral-sh/uv) for dependency management
 - For browser mode: Chrome/Chromium and ChromeDriver
 

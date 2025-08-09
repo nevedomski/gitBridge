@@ -144,9 +144,7 @@ class TestWindowsCertificateDetector:
     def test_export_certificates_to_pem_without_certifi(self, mock_temp_file, mock_ssl):
         """Test export_certificates_to_pem without including certifi bundle"""
         mock_ssl.enum_certificates.return_value = [(b"cert_der_data", "x509_asn", None)]
-        mock_ssl.DER_cert_to_PEM_cert.return_value = (
-            "-----BEGIN CERTIFICATE-----\ntest_cert\n-----END CERTIFICATE-----\n"
-        )
+        mock_ssl.DER_cert_to_PEM_cert.return_value = "-----BEGIN CERTIFICATE-----\ntest_cert\n-----END CERTIFICATE-----\n"
 
         # Mock temporary file
         mock_file = Mock()
@@ -166,14 +164,10 @@ class TestWindowsCertificateDetector:
     @patch("gitbridge.cert_support.tempfile.NamedTemporaryFile")
     @patch("builtins.open", new_callable=mock_open, read_data="# Certifi bundle content\n")
     @patch("certifi.where")
-    def test_export_certificates_to_pem_with_certifi(
-        self, mock_certifi_where, mock_open_file, mock_temp_file, mock_ssl
-    ):
+    def test_export_certificates_to_pem_with_certifi(self, mock_certifi_where, mock_open_file, mock_temp_file, mock_ssl):
         """Test export_certificates_to_pem including certifi bundle"""
         mock_ssl.enum_certificates.return_value = [(b"cert_der_data", "x509_asn", None)]
-        mock_ssl.DER_cert_to_PEM_cert.return_value = (
-            "-----BEGIN CERTIFICATE-----\ntest_cert\n-----END CERTIFICATE-----\n"
-        )
+        mock_ssl.DER_cert_to_PEM_cert.return_value = "-----BEGIN CERTIFICATE-----\ntest_cert\n-----END CERTIFICATE-----\n"
         mock_certifi_where.return_value = "/path/to/cacert.pem"
 
         # Mock temporary file
@@ -223,9 +217,7 @@ class TestWindowsCertificateDetector:
             (b"x509_cert", "x509_asn", None),
             (b"pkcs7_cert", "pkcs_7_asn", None),  # This should be skipped
         ]
-        mock_ssl.DER_cert_to_PEM_cert.return_value = (
-            "-----BEGIN CERTIFICATE-----\ntest_cert\n-----END CERTIFICATE-----\n"
-        )
+        mock_ssl.DER_cert_to_PEM_cert.return_value = "-----BEGIN CERTIFICATE-----\ntest_cert\n-----END CERTIFICATE-----\n"
 
         mock_file = Mock()
         mock_file.name = "/tmp/test_certs.pem"

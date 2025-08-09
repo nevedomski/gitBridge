@@ -134,9 +134,7 @@ class RepositoryManager:
                     return str(tag_data["object"]["sha"])
                 else:
                     # It's an annotated tag, need to get the commit it points to
-                    tag_obj_response = self.client.get(
-                        f"repos/{self.owner}/{self.repo}/git/tags/{tag_data['object']['sha']}"
-                    )
+                    tag_obj_response = self.client.get(f"repos/{self.owner}/{self.repo}/git/tags/{tag_data['object']['sha']}")
                     if tag_obj_response.status_code == 200:
                         tag_obj_data: dict[str, Any] = tag_obj_response.json()
                         return str(tag_obj_data["object"]["sha"])
@@ -149,9 +147,7 @@ class RepositoryManager:
             # DOCDEV-NOTE: GitHub supports short SHA resolution with minimum 7 characters
             if len(ref) >= 7 and all(c in "0123456789abcdef" for c in ref.lower()):
                 # Search for commit by SHA prefix
-                response = self.client.get(
-                    f"repos/{self.owner}/{self.repo}/commits", params={"sha": ref, "per_page": 1}
-                )
+                response = self.client.get(f"repos/{self.owner}/{self.repo}/commits", params={"sha": ref, "per_page": 1})
                 if response.status_code == 200:
                     commits: list[dict[str, Any]] = response.json()
                     if commits:

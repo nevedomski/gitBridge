@@ -5,7 +5,7 @@ site_url: https://nevedomski.github.io/gitbridge/   # ← ensure lowercase repo 
 repo_url: https://github.com/nevedomski/gitbridge
 repo_name: gitbridge
 edit_uri: edit/main/docs/
-copyright: Copyright © 2025 Nevedomski Sergei
+copyright: !ENV [GITBRIDGE_COPYRIGHT, 'Copyright © 2025 Nevedomski Sergei']
 
 theme:
   name: material
@@ -63,7 +63,9 @@ theme:
     - content.action.view
     # Announce
     - announce.dismiss
-
+  logo: images/logo.svg
+  favicon: images/favicon.ico
+  banner: images/banner.svg
   icon:
     repo: fontawesome/brands/github
     edit: material/pencil
@@ -173,13 +175,6 @@ extra:
     - icon: fontawesome/brands/python
       link: https://pypi.org/project/gitbridge/
       name: GitBridge on PyPI
-  logo:
-    icon: images/logo-light.svg
-    icon_dark: images/logo-dark.svg
-  favicon: images/favicon.ico
-  banner:
-    light: images/banner-light.svg
-    dark: images/banner-dark.svg
   analytics:
     provider: google
     property: G-XXXXXXXXXX

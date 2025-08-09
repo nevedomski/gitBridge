@@ -96,6 +96,11 @@ class Config:
 
         github_ref = os.getenv("GITHUB_REF")
         if github_ref:
+            # Normalize GitHub ref format (refs/heads/main -> main, refs/tags/v1.0 -> v1.0)
+            if github_ref.startswith("refs/heads/"):
+                github_ref = github_ref.replace("refs/heads/", "")
+            elif github_ref.startswith("refs/tags/"):
+                github_ref = github_ref.replace("refs/tags/", "")
             self.config["repository"]["ref"] = github_ref
 
         # Local path

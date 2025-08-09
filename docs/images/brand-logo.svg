@@ -1,0 +1,40 @@
+<svg class="logo logo-animate" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background circle -->
+    <circle cx="100" cy="100" r="90" fill="url(#gradientBg)" opacity="0.1"/>
+    
+    <!-- Bridge structure -->
+    <path d="M 40 100 Q 60 80, 80 80 T 120 80 T 160 100" 
+            stroke="url(#gradientMain)" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M 40 120 Q 60 100, 80 100 T 120 100 T 160 120" 
+            stroke="url(#gradientMain)" stroke-width="8" fill="none" stroke-linecap="round"/>
+    
+    <!-- Vertical supports -->
+    <line x1="60" y1="80" x2="60" y2="120" stroke="#1f2937" stroke-width="6" stroke-linecap="round"/>
+    <line x1="100" y1="70" x2="100" y2="130" stroke="#1f2937" stroke-width="6" stroke-linecap="round"/>
+    <line x1="140" y1="80" x2="140" y2="120" stroke="#1f2937" stroke-width="6" stroke-linecap="round"/>
+    
+    <!-- Git nodes -->
+    <circle cx="60" cy="80" r="8" fill="#0969da"/>
+    <circle cx="100" cy="70" r="10" fill="#10b981"/>
+    <circle cx="140" cy="80" r="8" fill="#0969da"/>
+    <circle cx="60" cy="120" r="8" fill="#0969da"/>
+    <circle cx="100" cy="130" r="10" fill="#10b981"/>
+    <circle cx="140" cy="120" r="8" fill="#0969da"/>
+    
+    <!-- Sync arrows -->
+    <path d="M 45 50 Q 45 40, 55 40 L 75 40 M 70 35 L 75 40 L 70 45" 
+            stroke="#10b981" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 155 150 Q 155 160, 145 160 L 125 160 M 130 165 L 125 160 L 130 155" 
+            stroke="#10b981" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <defs>
+        <linearGradient id="gradientMain" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#0969da;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
+        </linearGradient>
+        <linearGradient id="gradientBg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#0969da;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+</svg>

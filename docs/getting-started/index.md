@@ -24,7 +24,7 @@ Welcome to GitBridge! This section will help you get up and running quickly.
 
 Before you begin, ensure you have:
 
-- [x] Python 3.9 or higher installed
+- [x] Python 3.10 or higher installed
 - [x] Network access to GitHub.com (via browser)
 - [x] A GitHub repository you want to sync
 - [x] (Optional) GitHub Personal Access Token for private repositories
