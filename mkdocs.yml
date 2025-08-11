@@ -164,10 +164,10 @@ markdown_extensions:
 extra:
   social:
     - icon: material/file-arrow-left-right-outline
-      link: https://github.com/nevedomski/gitbridge
+      link: changelog.md
       name: Changelog
     - icon: material/license
-      link: https://pypi.org/project/gitbridge/
+      link: license.md
       name: License
     - icon: material/github
       link: https://github.com/nevedomski/gitbridge

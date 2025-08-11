@@ -4,6 +4,10 @@
 
 The `gitbridge` package provides a robust solution for synchronizing GitHub repositories to local directories when direct git access is blocked. It's designed specifically for corporate environments with network restrictions, proxy requirements, and custom certificate configurations.
 
+**Version**: 0.5.0b1  
+**Python Support**: 3.10+  
+**Test Coverage**: 83% (with Codecov integration)
+
 ## Architecture
 
 ### Current Architecture Status

@@ -1,5 +1,7 @@
 # Codecov configuration
 # https://docs.codecov.com/docs/codecov-yaml
+# DOCDEV-NOTE: This configuration enables both coverage and test analytics
+# Test analytics helps identify flaky tests and track test performance over time
 
 # Coverage configuration
 coverage:

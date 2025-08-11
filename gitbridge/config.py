@@ -96,7 +96,9 @@ class Config:
 
         github_ref = os.getenv("GITHUB_REF")
         if github_ref:
-            # Normalize GitHub ref format (refs/heads/main -> main, refs/tags/v1.0 -> v1.0)
+            # DOCDEV-NOTE: GitHub Actions sets GITHUB_REF to full ref path (refs/heads/main)
+            # We normalize it to just the branch/tag name for consistency with user expectations
+            # This ensures CI/CD workflows work correctly without breaking existing configs
             if github_ref.startswith("refs/heads/"):
                 github_ref = github_ref.replace("refs/heads/", "")
             elif github_ref.startswith("refs/tags/"):

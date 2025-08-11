@@ -18,6 +18,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PyPI package distribution
 - Windows installer
 
+## [0.5.1b1] - 2025-01-11
+
+### Added
+- **Documentation Comments (DOCDEV)**
+  - Added DOCDEV-NOTE comments to critical CI/CD workflow steps for better maintainability
+  - Added DOCDEV-TODO for Codecov test analytics monitoring
+  - Documented GitHub Actions GITHUB_REF normalization behavior in config.py
+  - Enhanced codecov.yml with documentation about test analytics features
+
+### Changed
+- **CI/CD Improvements**
+  - Fixed dependency installation command from `uv sync --dev` to `uv sync --extra dev` for proper development dependencies
+  - Improved CI workflow documentation with inline explanations
+  
+- **Documentation**
+  - Updated AGENTS.md with current version (0.5.0b1) and test coverage metrics
+  - Fixed MkDocs social links to use relative paths instead of external URLs
+  - Changelog link now points to local changelog.md instead of GitHub
+  - License link now points to local license.md instead of PyPI
+
+### Fixed
+- Development dependency installation in GitHub Actions workflow
+
 ## [0.5.0b1] - 2025-08-09
 
 ### Changed
@@ -251,6 +274,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 0.5.1b1 | 2025-01-11 | CI/CD fixes, documentation improvements, DOCDEV comments added |
+| 0.5.0b1 | 2025-08-09 | Python 3.10+ requirement, GitHub Actions fixes, MkDocs version display |
 | 0.4.2b1 | 2025-08-06 | Added security documentation, roadmap, and contribution guidelines |
 | 0.4.1b1 | 2025-08-06 | Comprehensive review completed, all quality checks passing |
 | 0.4.0b1 | 2025-08-06 | Fixed all type hints, 502 tests passing, 83% coverage |
