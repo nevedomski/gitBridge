@@ -28,10 +28,10 @@ lint:
 	uv run ruff check . --fix
 
 type-check:
-	uv run mypy gitbridge
+	uv run mypy src/gitbridge
 
 test:
-	uv run pytest
+	uv run pytest --cov=gitbridge
 
 clean:
 	rm -rf build/
@@ -42,4 +42,4 @@ clean:
 
 # Usage: make run ARGS="sync --config config.yaml"
 run:
-	uv run gitbridge $(ARGS)
+	uv run src/gitbridge $(ARGS)
