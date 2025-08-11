@@ -1,20 +1,22 @@
 # GitBridge - GitHub Repository Synchronization Tool
 
 [![CI](https://github.com/nevedomski/gitBridge/workflows/CI/badge.svg)](https://github.com/nevedomski/gitBridge/actions)
+[![GitHub Release](https://img.shields.io/github/v/release/nevedomski/gitbridge?include_prereleases&label=version)](https://github.com/nevedomski/gitbridge/releases)
+[![PyPI Version](https://img.shields.io/pypi/v/gitbridge?label=pypi)](https://pypi.org/project/gitbridge/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/gitbridge)](https://pypi.org/project/gitbridge/)
 [![codecov](https://codecov.io/gh/user/gitBridge/branch/main/graph/badge.svg)](https://codecov.io/gh/user/gitBridge)
 [![Coverage](https://img.shields.io/badge/coverage-83%25-green.svg)](./tests/)
 [![Tests](https://img.shields.io/badge/tests-502%20passing-brightgreen.svg)](./tests/)
 [![Ruff](https://img.shields.io/badge/linter-ruff-informational?style=flat&color=orange)](https://github.com/astral-sh/ruff)
 [![Format](https://img.shields.io/badge/code%20style-ruff-black)](https://github.com/astral-sh/ruff)
 [![Type](https://img.shields.io/badge/type%20checker-mypy-blue)](https://mypy.readthedocs.io/)
-[![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Docs](https://img.shields.io/badge/docs-github%20pages-blue)](https://nevedomski.github.io/gitBridge/)
 [![Security](https://img.shields.io/badge/security-monitored-yellow.svg)](./SECURITY.md)
 
 **Production-ready tool to synchronize GitHub repositories when direct git access is blocked.**
 
-🎯 **Status**: Version 0.4.2b1 - Feature complete, pending security fixes before 1.0.0 release
+🎯 **Status**: Feature complete, pending security fixes before 1.0.0 release
 
 ## Features
 
