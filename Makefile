@@ -28,7 +28,7 @@ lint:
 	uv run ruff check . --fix
 
 type-check:
-	uv run mypy src/gitbridge
+	uv run mypy src/
 
 test:
 	uv run pytest --cov=gitbridge

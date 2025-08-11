@@ -139,7 +139,7 @@ jobs:
 
       # --- MyPy type‐check
       - name: 📐 MyPy
-        run: uv run mypy
+        run: uv run mypy src/
 
   security:
     name: 🔒 Security Check
