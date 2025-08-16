@@ -371,7 +371,7 @@ wheels = [
 
 [[package]]
 name = "gitbridge"
-version = "0.6.3b1"
+version = "0.6.4b1"
 source = { editable = "." }
 dependencies = [
     { name = "certifi" },

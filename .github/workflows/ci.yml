@@ -71,6 +71,7 @@ jobs:
         if: always()  # Always run, even if tests fail
         uses: codecov/codecov-action@v5
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}  # More reliable uploads with token
           files: ./coverage.xml
           flags: unittests
           name: codecov-${{ matrix.os }}-py${{ matrix.python }}
@@ -85,6 +86,7 @@ jobs:
         if: always()  # Always run, even if tests fail
         uses: codecov/test-results-action@v1
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}  # More reliable uploads with token
           files: ./junit.xml
           flags: test-results
           name: test-results-${{ matrix.os }}-py${{ matrix.python }}
