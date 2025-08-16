@@ -63,7 +63,7 @@ ignore:
 flags:
   unittests:
     paths:
-      - gitbridge/
+      - src/gitbridge/
     carryforward: true
     
   test-results:
@@ -72,10 +72,6 @@ flags:
 # GitHub integration
 github_checks:
   annotations: true
-
-# Test analytics configuration
-test_analytics:
-  enabled: true
   
 # Component configuration
 component_management:
@@ -88,14 +84,14 @@ component_management:
     - component_id: api
       name: API Module
       paths:
-        - gitbridge/api_*.py
+        - src/gitbridge/api_*.py
     - component_id: browser
       name: Browser Module
       paths:
-        - gitbridge/browser_*.py
+        - src/gitbridge/browser_*.py
     - component_id: core
       name: Core Module
       paths:
-        - gitbridge/config.py
-        - gitbridge/utils.py
-        - gitbridge/exceptions.py
+        - src/gitbridge/config.py
+        - src/gitbridge/utils.py
+        - src/gitbridge/exceptions.py

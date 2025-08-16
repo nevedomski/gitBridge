@@ -37,6 +37,7 @@ class TestGitHubAPISync:
             ca_bundle=None,
             auto_proxy=False,
             auto_cert=False,
+            config=None,
         )
         mock_repo_mgr.assert_called_once_with(mock_client.return_value)
         mock_file_sync.assert_called_once_with(mock_client.return_value, Path(self.temp_dir))
@@ -58,6 +59,7 @@ class TestGitHubAPISync:
             ca_bundle=None,
             auto_proxy=False,
             auto_cert=False,
+            config=None,
         )
 
     @patch("gitbridge.api_sync.GitHubAPIClient")
@@ -75,6 +77,7 @@ class TestGitHubAPISync:
             ca_bundle=None,
             auto_proxy=False,
             auto_cert=False,
+            config=None,
         )
 
     @patch("gitbridge.api_sync.GitHubAPIClient")
@@ -94,6 +97,7 @@ class TestGitHubAPISync:
             ca_bundle=ca_bundle_path,
             auto_proxy=False,
             auto_cert=False,
+            config=None,
         )
 
     @patch("gitbridge.api_sync.GitHubAPIClient")
@@ -111,6 +115,7 @@ class TestGitHubAPISync:
             ca_bundle=None,
             auto_proxy=False,
             auto_cert=True,
+            config=None,
         )
 
     @patch("gitbridge.api_sync.GitHubAPIClient")
@@ -128,6 +133,7 @@ class TestGitHubAPISync:
             ca_bundle=None,
             auto_proxy=True,
             auto_cert=False,
+            config=None,
         )
 
     @patch("gitbridge.api_sync.GitHubAPIClient")

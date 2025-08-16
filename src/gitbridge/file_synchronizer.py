@@ -29,12 +29,13 @@ Typical Usage:
 
 import base64
 import logging
+import tempfile
 from pathlib import Path
 from typing import Any
 
 from .api_client import GitHubAPIClient
-from .exceptions import DirectoryCreateError, FileWriteError
-from .utils import ensure_dir, load_file_hashes, save_file_hashes
+from .exceptions import DirectoryCreateError, FileWriteError, SecurityError
+from .utils import ensure_dir, format_size, load_file_hashes, save_file_hashes, validate_safe_path
 
 logger = logging.getLogger(__name__)
 
@@ -167,18 +168,29 @@ class FileSynchronizer:
             if self.current_ref:
                 params["ref"] = self.current_ref
 
-            response = self.client.get(path, params=params)
+            # Use get_with_limits for security-enhanced downloading
+            response = self.client.get_with_limits(path, params=params)
 
             if response.status_code == 200:
                 data = response.json()
+                file_size = data.get("size", 0)
+
+                # Check if file should be streamed based on config
+                download_limits = self.client.config.get("download_limits", {})
+                stream_threshold = download_limits.get("stream_threshold", 10 * 1024 * 1024)  # 10MB default
 
                 # Check if file is too large for Contents API
                 # DOCDEV-NOTE: Contents API limit is 1MB, Blob API supports up to 100MB
-                if data.get("size", 0) > 1024 * 1024:  # 1MB limit for Contents API
+                if file_size > 1024 * 1024:  # 1MB limit for Contents API
                     # Use git blob API for large files
-                    return self.download_blob(sha)
+                    if file_size > stream_threshold:
+                        # Stream very large files to avoid memory issues
+                        logger.debug(f"Streaming large file: {file_path} ({format_size(file_size)})")
+                        return self.download_blob_streamed(sha)
+                    else:
+                        return self.download_blob(sha)
 
-                # Decode base64 content
+                # Decode base64 content for small files
                 content = data.get("content", "")
                 if content:
                     return base64.b64decode(content)
@@ -194,6 +206,10 @@ class FileSynchronizer:
                 logger.error(f"API error {response.status_code} for {file_path}: {response.text}")
                 return None
 
+        except SecurityError as e:
+            # File size limit exceeded - log and skip
+            logger.error(f"Security error downloading {file_path}: {e}")
+            return None
         except Exception as e:
             logger.error(f"Failed to download file {file_path}: {e}")
 
@@ -226,6 +242,86 @@ class FileSynchronizer:
 
         except Exception as e:
             logger.error(f"Failed to download blob {sha}: {e}")
+
+        return None
+
+    def download_blob_streamed(self, sha: str) -> bytes | None:
+        """Download large file using git blob API with streaming.
+
+        Streams large files to a temporary file to avoid memory exhaustion,
+        then reads the content back. This prevents DoS attacks via large files.
+
+        Args:
+            sha: Git SHA hash of the blob
+
+        Returns:
+            File content as bytes, or None if download fails
+
+        DOCDEV-NOTE: Security enhancement - streams large files to prevent memory exhaustion
+        """
+        try:
+            path = f"repos/{self.client.owner}/{self.client.repo}/git/blobs/{sha}"
+
+            # Use get_with_limits with streaming enabled
+            response = self.client.get_with_limits(path, stream=True)
+
+            if response.status_code == 200:
+                # Get size limits from response (set by get_with_limits)
+                max_size = getattr(response, "_max_size", 100 * 1024 * 1024)
+                download_limits = self.client.config.get("download_limits", {})
+                chunk_size = download_limits.get("chunk_size", 8192)
+
+                # Stream to temporary file
+                with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+                    temp_path = tmp_file.name
+                    total_size = 0
+
+                    try:
+                        # Stream the response in chunks
+                        for chunk in response.iter_content(chunk_size=chunk_size):
+                            if chunk:
+                                total_size += len(chunk)
+
+                                # Check size limit
+                                if total_size > max_size:
+                                    raise SecurityError(
+                                        f"Download exceeded size limit: {format_size(total_size)} > {format_size(max_size)}",
+                                        violation_type="size_limit",
+                                        details={"sha": sha, "downloaded": total_size, "limit": max_size},
+                                    )
+
+                                tmp_file.write(chunk)
+
+                        # Read the complete file back
+                        tmp_file.seek(0)
+                        content = tmp_file.read()
+
+                        # Parse JSON response and decode if base64
+                        import json
+
+                        data = json.loads(content)
+
+                        if data.get("encoding") == "base64":
+                            blob_content = data.get("content", "")
+                            if blob_content:
+                                return base64.b64decode(blob_content)
+
+                    finally:
+                        # Clean up temp file
+                        try:
+                            import os
+
+                            os.unlink(temp_path)
+                        except Exception:
+                            pass
+
+            logger.error(f"Failed to download blob {sha}: status {response.status_code}")
+
+        except SecurityError:
+            # Re-raise security errors
+            raise
+        except Exception as e:
+            logger.error(f"Failed to stream blob {sha}: {e}")
 
         return None
 
@@ -266,7 +362,8 @@ class FileSynchronizer:
                 return False
 
             # Save file to local filesystem
-            local_file = self.local_path / file_path
+            # DOCDEV-NOTE: Path validation prevents directory traversal attacks
+            local_file = validate_safe_path(self.local_path, file_path)
 
             # Ensure directory exists
             try:

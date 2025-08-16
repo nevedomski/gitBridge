@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
-from .exceptions import ConfigurationError
+from .exceptions import ConfigurationError, SecurityError
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +39,141 @@ def expand_path(path: str) -> str:
     expanded = os.path.expandvars(expanded)
 
     return expanded
+
+
+def validate_safe_path(base_path: Path, file_path: str) -> Path:
+    """Validate that file_path doesn't escape base_path (prevent path traversal).
+
+    This function ensures that the resolved file path stays within the
+    intended base directory, preventing directory traversal attacks.
+
+    Args:
+        base_path: The base directory that files should be contained within
+        file_path: The relative file path to validate
+
+    Returns:
+        The validated absolute Path object
+
+    Raises:
+        SecurityError: If path traversal is detected
+
+    Example:
+        >>> base = Path("/home/user/repo")
+        >>> validate_safe_path(base, "src/main.py")  # OK
+        >>> validate_safe_path(base, "../etc/passwd")  # Raises SecurityError
+
+    DOCDEV-NOTE: Critical security function - prevents path traversal attacks
+    """
+    # Resolve base path to absolute
+    base = base_path.resolve()
+
+    # Combine and resolve the target path
+    target = (base / file_path).resolve()
+
+    # Check if target is within base directory
+    try:
+        # This will raise ValueError if target is not relative to base
+        target.relative_to(base)
+        return target
+    except ValueError as err:
+        # Path escapes the base directory - security violation
+        raise SecurityError(
+            f"Path traversal attempt detected: '{file_path}' would escape base directory",
+            violation_type="path_traversal",
+            attempted_path=str(file_path),
+            details={"base_path": str(base), "resolved_target": str(target)},
+        ) from err
+
+
+def validate_proxy_url(proxy_url: str | None) -> dict[str, Any]:
+    """Validate and parse proxy URL safely.
+
+    Validates proxy URLs to prevent injection attacks and ensure
+    they conform to expected patterns.
+
+    Args:
+        proxy_url: The proxy URL to validate (e.g., "http://proxy:8080")
+
+    Returns:
+        Dict with validated proxy configuration:
+            - server: The validated proxy server URL
+            - username: Optional username (if present)
+            - password: Optional password (if present)
+
+    Raises:
+        ConfigurationError: If proxy URL is invalid or malformed
+
+    Example:
+        >>> validate_proxy_url("http://proxy.example.com:8080")
+        {'server': 'http://proxy.example.com:8080', 'username': None, 'password': None}
+
+    DOCDEV-NOTE: Security validation for proxy URLs to prevent injection
+    """
+    if not proxy_url:
+        raise ConfigurationError("Empty proxy URL provided", invalid_key="proxy_url")
+
+    # Check for control characters in the URL before parsing
+    suspicious_chars = ["\n", "\r", "\t", "\0"]
+    if any(char in proxy_url for char in suspicious_chars):
+        raise SecurityError("Proxy URL contains control characters", violation_type="malicious_proxy_url", attempted_path=proxy_url)
+
+    try:
+        parsed = urlparse(proxy_url)
+
+        # Validate scheme - only allow safe protocols
+        allowed_schemes = {"http", "https", "socks5", "socks5h"}
+        if parsed.scheme not in allowed_schemes:
+            raise SecurityError(
+                f"Invalid proxy scheme '{parsed.scheme}'. Allowed: {allowed_schemes}",
+                violation_type="invalid_proxy_scheme",
+                attempted_path=proxy_url,
+            )
+
+        # Validate hostname
+        if not parsed.hostname:
+            raise ConfigurationError(f"Proxy URL missing hostname: {proxy_url}", invalid_key="proxy_url")
+
+        # Validate hostname doesn't contain suspicious characters
+        suspicious_chars = ["<", ">", '"', "'", "\\", "\n", "\r", "\t"]
+        if any(char in parsed.hostname for char in suspicious_chars):
+            raise SecurityError(
+                "Proxy hostname contains suspicious characters", violation_type="malicious_proxy_url", attempted_path=proxy_url
+            )
+
+        # Validate port (must be 1-65535)
+        # Check for explicit port 0 which urlparse might accept
+        if parsed.port is not None and parsed.port == 0:
+            raise ConfigurationError(f"Invalid proxy port: 0. Must be between 1 and 65535. URL: {proxy_url}", invalid_key="proxy_port")
+
+        default_ports = {"http": 80, "https": 443, "socks5": 1080, "socks5h": 1080}
+        port = parsed.port or default_ports.get(parsed.scheme, 80)
+        if not 1 <= port <= 65535:
+            raise ConfigurationError(f"Invalid proxy port: {port}. Must be between 1 and 65535. URL: {proxy_url}", invalid_key="proxy_port")
+
+        # Build validated proxy configuration
+        proxy_config: dict[str, Any] = {"server": f"{parsed.scheme}://{parsed.hostname}:{port}"}
+
+        # Add credentials if present (but validate them)
+        if parsed.username:
+            # Validate username doesn't contain control characters
+            if any(ord(char) < 32 for char in parsed.username):
+                raise SecurityError(
+                    "Proxy username contains control characters", violation_type="malicious_proxy_credentials", attempted_path=proxy_url
+                )
+            proxy_config["username"] = parsed.username
+
+        if parsed.password:
+            # Don't validate password content but ensure it exists
+            proxy_config["password"] = parsed.password
+
+        return proxy_config
+
+    except (ConfigurationError, SecurityError):
+        # Re-raise our custom exceptions
+        raise
+    except Exception as e:
+        # Wrap any other parsing errors
+        raise ConfigurationError(f"Failed to parse proxy URL: {e}", invalid_key="proxy_url", original_error=e) from e
 
 
 def parse_github_url(url: str) -> tuple[str, str]:

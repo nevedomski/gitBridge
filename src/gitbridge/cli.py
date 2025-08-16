@@ -132,6 +132,7 @@ def sync(
                 ca_bundle=ca_bundle,
                 auto_proxy=auto_proxy,
                 auto_cert=auto_cert,
+                config=cfg.config,  # Pass full config for download limits
             )
             success = syncer.sync(ref=ref, show_progress=not no_progress)
         elif method == "browser":
@@ -302,6 +303,7 @@ def status(
         ca_bundle=ca_bundle,
         auto_proxy=auto_proxy,
         auto_cert=auto_cert,
+        config=cfg.config,  # Pass full config for download limits
     )
 
     click.echo(f"Repository: {repo_url}")

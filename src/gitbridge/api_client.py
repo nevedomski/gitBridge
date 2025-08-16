@@ -32,9 +32,11 @@ from .exceptions import (
     NetworkError,
     RateLimitError,
     RepositoryNotFoundError,
+    SecurityError,
     wrap_requests_exception,
 )
 from .session_factory import SessionFactory
+from .utils import format_size
 
 logger = logging.getLogger(__name__)
 
@@ -74,6 +76,7 @@ class GitHubAPIClient:
         ca_bundle: str | None = None,
         auto_proxy: bool = False,
         auto_cert: bool = False,
+        config: dict[str, Any] | None = None,
     ):
         """Initialize GitHub API client.
 
@@ -91,6 +94,7 @@ class GitHubAPIClient:
                 or Chrome PAC scripts. Useful in corporate environments
             auto_cert: Whether to auto-detect certificates from Windows certificate
                 store. Useful for corporate environments with custom CAs
+            config: Optional configuration dictionary with download limits and other settings
 
         Note:
             Environment variables HTTP_PROXY and HTTPS_PROXY take precedence
@@ -100,6 +104,7 @@ class GitHubAPIClient:
         self.repo = repo
         self.token = token
         self.base_url = "https://api.github.com"
+        self.config = config or {}
 
         # Create configured session using SessionFactory
         # DOCDEV-NOTE: SessionFactory centralizes session configuration logic
@@ -293,6 +298,97 @@ class GitHubAPIClient:
 
         except requests.RequestException as e:
             raise wrap_requests_exception(e, f"GET {path}") from e
+
+    def get_with_limits(self, path: str, params: dict[str, Any] | None = None, stream: bool = False) -> requests.Response:
+        """Perform GET request with size and timeout limits.
+
+        Enhanced version of get() that enforces download size limits and timeouts
+        to prevent DoS attacks and memory exhaustion.
+
+        Args:
+            path: API path relative to base_url
+            params: Optional query parameters
+            stream: Whether to stream the response (for large files)
+
+        Returns:
+            Response object from the API request
+
+        Raises:
+            SecurityError: If file size exceeds configured limits
+            NetworkError: If request fails due to network issues
+            AuthenticationError: If authentication fails
+            RateLimitError: If rate limit is exceeded
+
+        DOCDEV-NOTE: Security enhancement - prevents DoS via large file downloads
+        """
+        url = f"{self.base_url}/{path.lstrip('/')}"
+
+        # Get configured limits
+        download_limits = self.config.get("download_limits", {})
+        max_size = download_limits.get("max_file_size", 100 * 1024 * 1024)  # 100MB default
+        timeout = download_limits.get("timeout", 30)  # 30 second default
+
+        # Check file size with HEAD request first (for efficiency)
+        try:
+            head_resp = self.session.head(url, params=params, timeout=5)
+            content_length = head_resp.headers.get("Content-Length")
+
+            if content_length:
+                file_size = int(content_length)
+                if file_size > max_size:
+                    raise SecurityError(
+                        f"File size exceeds limit: {format_size(file_size)} > {format_size(max_size)}",
+                        violation_type="size_limit",
+                        details={"file_size": file_size, "max_size": max_size, "url": url},
+                    )
+        except (requests.RequestException, ValueError) as e:
+            # If HEAD fails or Content-Length is invalid, continue with GET
+            # but enforce streaming to prevent memory issues
+            logger.debug(f"HEAD request failed or invalid Content-Length: {e}")
+            stream = True
+        except SecurityError:
+            # Re-raise security errors
+            raise
+
+        # Perform the actual GET request with limits
+        try:
+            response = self.session.get(url, params=params, stream=stream, timeout=timeout)
+
+            # Handle common error cases (same as regular get method)
+            if response.status_code == 401:
+                raise AuthenticationError(
+                    f"Authentication failed for {path}",
+                    token_provided=self.token is not None,
+                    repo_url=f"https://github.com/{self.owner}/{self.repo}",
+                )
+            elif response.status_code == 403:
+                rate_limit_remaining = response.headers.get("X-RateLimit-Remaining", "0")
+                if rate_limit_remaining == "0":
+                    raise RateLimitError(
+                        "API rate limit exceeded",
+                        remaining=0,
+                        reset_time=int(response.headers.get("X-RateLimit-Reset", "0")),
+                        url=url,
+                        status_code=403,
+                    )
+            elif response.status_code == 404:
+                raise RepositoryNotFoundError(
+                    f"API endpoint not found: {path}",
+                    owner=self.owner,
+                    repo=self.repo,
+                )
+
+            # If streaming, validate size while downloading
+            if stream and response.status_code == 200:
+                # Store the streaming response for later consumption
+                # The caller is responsible for iterating over response.iter_content()
+                # and enforcing size limits during iteration
+                response._max_size = max_size  # type: ignore[attr-defined]
+
+            return response
+
+        except requests.RequestException as e:
+            raise wrap_requests_exception(e, f"GET {path} (with limits)") from e
 
     def close(self) -> None:
         """Close the HTTP session and cleanup resources.

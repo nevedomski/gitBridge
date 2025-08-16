@@ -8,10 +8,10 @@
 
 **Synchronize GitHub repositories when direct git access is blocked**
 
-[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/license-MIT-green)](license.md)
+[![Python Version](https://img.shields.io/pypi/pyversions/gitbridge)](https://pypi.org/project/gitbridge/)
+[![License](https://img.shields.io/github/license/nevedomski/gitbridge)](./LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-mkdocs-brightgreen)](index.md)
-[![codecov](https://codecov.io/gh/user/gitBridge/branch/main/graph/badge.svg)](https://codecov.io/gh/user/gitBridge)
+[![codecov](https://codecov.io/gh/nevedomski/gitBridge/branch/main/graph/badge.svg)](https://codecov.io/gh/nevedomski/gitBridge)
 
 [Get Started](getting-started/quick-start.md){ .md-button .md-button--primary }
 [View on GitHub](https://github.com/nevedomski/gitbridge){ .md-button }

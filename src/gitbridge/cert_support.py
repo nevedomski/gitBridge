@@ -1,34 +1,101 @@
 """Certificate support for Windows - automatic detection and export"""
 
 import atexit
+import contextlib
 import logging
 import os
 import platform
 import ssl
 import tempfile
+import threading
 from typing import Any
 
 from .interfaces import CertificateProvider
 
 logger = logging.getLogger(__name__)
 
-# Track temporary files for cleanup
+# Thread-safe certificate management
+# DOCDEV-NOTE: Thread lock prevents race conditions in certificate operations
+_cert_lock = threading.Lock()
 _temp_cert_files: list[str] = []
 
 
 def cleanup_temp_certs() -> None:
-    """Clean up temporary certificate files on exit."""
-    for cert_file in _temp_cert_files:
+    """Clean up temporary certificate files on exit (thread-safe)."""
+    with _cert_lock:
+        # Create a copy to avoid modification during iteration
+        files_to_clean = _temp_cert_files.copy()
+
+    for cert_file in files_to_clean:
         try:
             if os.path.exists(cert_file):
                 os.unlink(cert_file)
                 logger.debug(f"Cleaned up temporary cert file: {cert_file}")
+                with _cert_lock:
+                    if cert_file in _temp_cert_files:
+                        _temp_cert_files.remove(cert_file)
         except Exception as e:
             logger.warning(f"Failed to clean up {cert_file}: {e}")
 
 
 # Register cleanup function
 atexit.register(cleanup_temp_certs)
+
+
+class CertificateManager:
+    """Thread-safe certificate manager with automatic cleanup.
+
+    Provides context manager support for guaranteed cleanup of temporary
+    certificate files, even in the presence of exceptions or thread interruptions.
+
+    DOCDEV-NOTE: Use this for all certificate operations to ensure thread safety
+    """
+
+    def __init__(self) -> None:
+        """Initialize certificate manager with thread-local storage."""
+        self._local = threading.local()
+        self._exit_stack = contextlib.ExitStack()
+        self._managed_certs: list[str] = []
+
+    def add_temp_cert(self, cert_path: str) -> None:
+        """Add a temporary certificate file for tracking and cleanup.
+
+        Args:
+            cert_path: Path to temporary certificate file
+        """
+        with _cert_lock:
+            _temp_cert_files.append(cert_path)
+            self._managed_certs.append(cert_path)
+
+        # Register cleanup callback
+        self._exit_stack.callback(self._cleanup_cert, cert_path)
+
+    def _cleanup_cert(self, cert_path: str) -> None:
+        """Clean up a single certificate file (thread-safe).
+
+        Args:
+            cert_path: Path to certificate file to clean up
+        """
+        with _cert_lock:
+            try:
+                if cert_path in _temp_cert_files:
+                    _temp_cert_files.remove(cert_path)
+                if cert_path in self._managed_certs:
+                    self._managed_certs.remove(cert_path)
+
+                if os.path.exists(cert_path):
+                    os.unlink(cert_path)
+                    logger.debug(f"Cleaned up managed cert file: {cert_path}")
+            except Exception as e:
+                logger.warning(f"Failed to cleanup {cert_path}: {e}")
+
+    def __enter__(self) -> "CertificateManager":
+        """Enter context manager."""
+        return self
+
+    def __exit__(self, *args: Any) -> None:
+        """Exit context manager and clean up all managed certificates."""
+        self._exit_stack.__exit__(*args)
 
 
 class WindowsCertificateDetector(CertificateProvider):
@@ -93,8 +160,9 @@ class WindowsCertificateDetector(CertificateProvider):
             # Create temporary file
             temp_bundle = tempfile.NamedTemporaryFile(mode="w", suffix=".pem", delete=False, encoding="utf-8")
 
-            # Track for cleanup
-            _temp_cert_files.append(temp_bundle.name)
+            # Track for cleanup (thread-safe)
+            with _cert_lock:
+                _temp_cert_files.append(temp_bundle.name)
 
             cert_count = 0
 

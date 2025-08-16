@@ -6,7 +6,6 @@ import time
 import zipfile
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse
 
 from playwright._impl._errors import Error as PlaywrightError
 from playwright._impl._errors import TimeoutError as PlaywrightTimeoutError
@@ -20,6 +19,7 @@ from .utils import (
     load_file_hashes,
     parse_github_url,
     save_file_hashes,
+    validate_proxy_url,
 )
 
 logger = logging.getLogger(__name__)
@@ -111,14 +111,9 @@ class GitHubBrowserSync(SyncProvider):
                 detected_proxies = detect_and_configure_proxy()
                 if detected_proxies.get("http"):
                     proxy_url = detected_proxies["http"]
-                    parsed = urlparse(proxy_url)
-                    hostname = str(parsed.hostname) if parsed.hostname else ""
-                    port = str(parsed.port) if parsed.port else ""
-                    proxy_config = {"server": f"http://{hostname}:{port}"}
-                    if parsed.username and parsed.password:
-                        proxy_config["username"] = str(parsed.username)
-                        proxy_config["password"] = str(parsed.password)
-                    logger.info(f"Using auto-detected proxy: {hostname}:{port}")
+                    # DOCDEV-NOTE: Proxy URL validation prevents injection attacks
+                    proxy_config = validate_proxy_url(proxy_url)
+                    logger.info(f"Using auto-detected proxy: {proxy_config['server']}")
             except Exception as e:
                 logger.warning(f"Failed to auto-detect proxy: {e}")
 
@@ -126,14 +121,9 @@ class GitHubBrowserSync(SyncProvider):
         if not proxy_config:
             http_proxy = os.environ.get("HTTP_PROXY") or os.environ.get("http_proxy")
             if http_proxy:
-                parsed = urlparse(http_proxy)
-                hostname = str(parsed.hostname) if parsed.hostname else ""
-                port = str(parsed.port) if parsed.port else ""
-                proxy_config = {"server": f"http://{hostname}:{port}"}
-                if parsed.username and parsed.password:
-                    proxy_config["username"] = str(parsed.username)
-                    proxy_config["password"] = str(parsed.password)
-                logger.info(f"Using proxy from environment: {hostname}:{port}")
+                # DOCDEV-NOTE: Validate proxy URL from environment variable
+                proxy_config = validate_proxy_url(http_proxy)
+                logger.info(f"Using proxy from environment: {proxy_config['server']}")
 
         if proxy_config:
             launch_options["proxy"] = proxy_config

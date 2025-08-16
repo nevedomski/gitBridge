@@ -19,6 +19,7 @@ class TestFileSynchronizer:
         self.mock_client = Mock(spec=GitHubAPIClient)
         self.mock_client.owner = "test_owner"
         self.mock_client.repo = "test_repo"
+        self.mock_client.config = {}  # Add config attribute
 
     @patch("gitbridge.file_synchronizer.load_file_hashes")
     def test_init(self, mock_load_hashes):
@@ -94,12 +95,12 @@ class TestFileSynchronizer:
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"content": encoded_content, "size": len(test_content)}
-        self.mock_client.get.return_value = mock_response
+        self.mock_client.get_with_limits.return_value = mock_response
 
         result = synchronizer.download_file("test.txt", "abc123")
 
         assert result == test_content.encode()
-        self.mock_client.get.assert_called_once_with("repos/test_owner/test_repo/contents/test.txt", params={"ref": "main"})
+        self.mock_client.get_with_limits.assert_called_once_with("repos/test_owner/test_repo/contents/test.txt", params={"ref": "main"})
 
     def test_download_file_large_file_fallback(self):
         """Test file download fallback to Blob API for large files"""
@@ -113,7 +114,7 @@ class TestFileSynchronizer:
             "size": 2 * 1024 * 1024,  # 2MB - exceeds 1MB limit
             "content": "",
         }
-        self.mock_client.get.return_value = mock_response
+        self.mock_client.get_with_limits.return_value = mock_response
 
         # Mock download_blob method
         test_content = b"Large file content"
@@ -132,7 +133,7 @@ class TestFileSynchronizer:
         # Mock Contents API 403 response (rate limit)
         mock_response = Mock()
         mock_response.status_code = 403
-        self.mock_client.get.return_value = mock_response
+        self.mock_client.get_with_limits.return_value = mock_response
 
         # Mock download_blob method
         test_content = b"File content"
@@ -150,7 +151,7 @@ class TestFileSynchronizer:
 
         mock_response = Mock()
         mock_response.status_code = 404
-        self.mock_client.get.return_value = mock_response
+        self.mock_client.get_with_limits.return_value = mock_response
 
         result = synchronizer.download_file("nonexistent.txt", "abc123")
 

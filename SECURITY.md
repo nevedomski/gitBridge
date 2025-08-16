@@ -4,41 +4,55 @@
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.4.x   | :white_check_mark: |
-| < 0.4   | :x:                |
+| 0.6.x   | :white_check_mark: |
+| 0.5.x   | :x:                |
+| < 0.5   | :x:                |
 
 ## Reporting a Vulnerability
 
-Please report security vulnerabilities by opening a private security advisory on GitHub or by emailing the maintainers directly. 
+Please report security vulnerabilities by emailing info@nevedomski.us or by opening a private security advisory on GitHub.
 
 **Do not open public issues for security vulnerabilities.**
 
-## Known Security Issues
+Include the following information:
+- Type of issue and affected component
+- Steps to reproduce the vulnerability
+- Potential impact and exploitation scenarios
+- Any proof-of-concept code
 
-The following security issues have been identified and are being addressed:
+## Security Updates - Version 0.6.3b1 (2025-08-16)
 
-### Critical Issues (Fix in Progress)
+### ✅ Fixed Critical Security Issues
 
-#### 1. Path Traversal Vulnerability
+All previously identified security vulnerabilities have been fixed in version 0.6.3b1:
 
-- **Location**: `gitbridge/file_synchronizer.py:268-289`
-- **Impact**: High - Malicious repository content could write files outside the intended sync directory
-- **Status**: Fix in development
-- **Mitigation**: Avoid syncing untrusted repositories until patched
+#### 1. Path Traversal Vulnerability - FIXED ✅
 
-#### 2. Insufficient Proxy URL Validation
+- **Previous Location**: `gitbridge/file_synchronizer.py:268-289`
+- **Fix**: Implemented `validate_safe_path()` function that validates all file paths
+- **Protection**: Prevents "../" sequences and absolute paths from escaping the sync directory
+- **Testing**: Comprehensive tests in `test_security.py`
 
-- **Location**: `gitbridge/browser_sync.py:118-135`
-- **Impact**: Medium - Malformed proxy URLs could cause credential leakage
-- **Status**: Fix in development
-- **Mitigation**: Validate proxy URLs before use
+#### 2. Proxy URL Validation - FIXED ✅
 
-#### 3. Race Condition in Certificate Cleanup
+- **Previous Location**: `gitbridge/browser_sync.py:118-135`
+- **Fix**: Added `validate_proxy_url()` function with comprehensive validation
+- **Protection**: Validates schemes, hostnames, ports, and rejects control characters
+- **Testing**: Multiple test cases for malicious URLs
 
-- **Location**: `gitbridge/cert_support.py:19-28`
-- **Impact**: Low - Could lead to incomplete cleanup in concurrent scenarios
-- **Status**: Fix in development
-- **Mitigation**: Single-threaded operation recommended
+#### 3. Race Condition in Certificate Cleanup - FIXED ✅
+
+- **Previous Location**: `gitbridge/cert_support.py:19-28`
+- **Fix**: Implemented thread-safe `CertificateManager` with locking
+- **Protection**: Uses `threading.Lock` to prevent race conditions
+- **Testing**: Thread-safety tests with concurrent operations
+
+#### 4. Request Size Limits - IMPLEMENTED ✅
+
+- **New Feature**: Added configurable download size limits
+- **Protection**: Prevents DoS attacks via large file downloads
+- **Default Limits**: 100MB per file, 500MB total, with streaming for files >10MB
+- **Configuration**: Customizable via `download_limits` config section
 
 ## Security Best Practices
 
@@ -82,20 +96,25 @@ GitBridge includes several security features:
 - **Proxy Authentication**: Supports authenticated proxy connections
 - **No Credential Storage**: Never stores credentials in configuration files
 
-## Upcoming Security Enhancements
+## Security Implementation Status
 
-- [ ] Path traversal protection with strict validation
-- [ ] Input sanitization for all user inputs
-- [ ] Request size limits to prevent DoS
+### Completed (v0.6.3b1)
+- [x] Path traversal protection with strict validation
+- [x] Input sanitization for proxy URLs and file paths
+- [x] Request size limits to prevent DoS
+- [x] Thread-safe certificate management
+
+### Planned Enhancements
 - [ ] Rate limiting with exponential backoff
 - [ ] Audit logging for security events
 - [ ] Content-type validation for API responses
+- [ ] SAML/SSO authentication support
 
 ## Security Audit
 
-Last security review: 2025-08-06
+Last security review: 2025-08-16 (v0.6.3b1 security fixes)
 
-Next scheduled review: 2025-09-06
+Next scheduled review: 2025-09-16
 
 ## Contact
 

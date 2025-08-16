@@ -4,19 +4,18 @@
 [![GitHub Release](https://img.shields.io/github/v/release/nevedomski/gitbridge?include_prereleases&label=version)](https://github.com/nevedomski/gitbridge/releases)
 [![PyPI Version](https://img.shields.io/pypi/v/gitbridge?label=pypi)](https://pypi.org/project/gitbridge/)
 [![Python Versions](https://img.shields.io/pypi/pyversions/gitbridge)](https://pypi.org/project/gitbridge/)
-[![codecov](https://codecov.io/gh/user/gitBridge/branch/main/graph/badge.svg)](https://codecov.io/gh/user/gitBridge)
-[![Coverage](https://img.shields.io/badge/coverage-83%25-green.svg)](./tests/)
-[![Tests](https://img.shields.io/badge/tests-502%20passing-brightgreen.svg)](./tests/)
-[![Ruff](https://img.shields.io/badge/linter-ruff-informational?style=flat&color=orange)](https://github.com/astral-sh/ruff)
-[![Format](https://img.shields.io/badge/code%20style-ruff-black)](https://github.com/astral-sh/ruff)
-[![Type](https://img.shields.io/badge/type%20checker-mypy-blue)](https://mypy.readthedocs.io/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![codecov](https://codecov.io/gh/nevedomski/gitBridge/branch/main/graph/badge.svg)](https://codecov.io/gh/nevedomski/gitBridge)
+[![Tests](https://img.shields.io/github/actions/workflow/status/nevedomski/gitbridge/ci.yml?branch=main&label=tests)](https://github.com/nevedomski/gitbridge/actions)
+[![Known Vulnerabilities](https://snyk.io/test/github/nevedomski/gitbridge/badge.svg)](https://snyk.io/test/github/nevedomski/gitbridge)
+[![Ruff Format](https://img.shields.io/github/actions/workflow/status/nevedomski/gitbridge/ruff-format.yml?branch=main&label=ruff%20format)](https://github.com/nevedomski/gitbridge/actions)
+[![Ruff Lint](https://img.shields.io/github/actions/workflow/status/nevedomski/gitbridge/ruff-lint.yml?branch=main&label=ruff%20lint)](https://github.com/nevedomski/gitbridge/actions)
+[![MyPy](https://img.shields.io/github/actions/workflow/status/nevedomski/gitbridge/mypy.yml?branch=main&label=mypy)](https://github.com/nevedomski/gitbridge/actions)
+[![License](https://img.shields.io/github/license/nevedomski/gitbridge)](./LICENSE)
 [![Docs](https://img.shields.io/badge/docs-github%20pages-blue)](https://nevedomski.github.io/gitBridge/)
-[![Security](https://img.shields.io/badge/security-monitored-yellow.svg)](./SECURITY.md)
 
 **Production-ready tool to synchronize GitHub repositories when direct git access is blocked.**
 
-🎯 **Status**: Feature complete, pending security fixes before 1.0.0 release
+🎯 **Status**: Security beta release v0.6.3b1 - All critical security issues fixed ✅
 
 ## Features
 

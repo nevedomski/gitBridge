@@ -54,16 +54,16 @@ jobs:
           # Run platform-specific tests based on the OS
           if [[ "${{ runner.os }}" == "Windows" ]]; then
             # On Windows, run all tests including Windows-specific ones
-            uv run pytest --cov=gitbridge --cov-report=xml --cov-report=term --junitxml=junit.xml -o junit_family=legacy
+            uv run pytest --cov=src/gitbridge --cov-report=xml --cov-report=term --junitxml=junit.xml -o junit_family=legacy
           elif [[ "${{ runner.os }}" == "Linux" ]]; then
             # On Linux, skip Windows-specific tests
-            uv run pytest --cov=gitbridge --cov-report=xml --cov-report=term --junitxml=junit.xml -o junit_family=legacy -m "not windows"
+            uv run pytest --cov=src/gitbridge --cov-report=xml --cov-report=term --junitxml=junit.xml -o junit_family=legacy -m "not windows"
           elif [[ "${{ runner.os }}" == "macOS" ]]; then
             # On macOS, skip Windows-specific tests
-            uv run pytest --cov=gitbridge --cov-report=xml --cov-report=term --junitxml=junit.xml -o junit_family=legacy -m "not windows"
+            uv run pytest --cov=src/gitbridge --cov-report=xml --cov-report=term --junitxml=junit.xml -o junit_family=legacy -m "not windows"
           else
             # Fallback - skip Windows-specific tests
-            uv run pytest --cov=gitbridge --cov-report=xml --cov-report=term --junitxml=junit.xml -o junit_family=legacy -m "not windows"
+            uv run pytest --cov=src/gitbridge --cov-report=xml --cov-report=term --junitxml=junit.xml -o junit_family=legacy -m "not windows"
           fi
 
       - name: 📊 Upload coverage to Codecov
@@ -165,6 +165,61 @@ jobs:
           uv add --dev safety
           uv run safety check --json
         continue-on-error: true
+
+  sync-requirements:
+    name: 📋 Sync Requirements File
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+      
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      
+      - name: Generate requirements.txt
+        run: |
+          # Generate requirements.txt from pyproject.toml for Snyk compatibility
+          uv pip compile pyproject.toml -o requirements.txt
+          
+          # Add header comment
+          echo "# Auto-generated from pyproject.toml by GitHub Actions" > requirements.tmp
+          echo "# This file is maintained automatically for Snyk vulnerability scanning" >> requirements.tmp
+          echo "# Do not edit manually - edit pyproject.toml instead" >> requirements.tmp
+          echo "" >> requirements.tmp
+          cat requirements.txt >> requirements.tmp
+          mv requirements.tmp requirements.txt
+      
+      - name: Check for changes
+        id: check_changes
+        run: |
+          # Check if file is new (untracked) or modified
+          git add requirements.txt
+          if git diff --cached --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes detected in requirements.txt"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Changes detected in requirements.txt"
+          fi
+      
+      - name: Commit and push if changed
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -m "chore: update requirements.txt from pyproject.toml [skip ci]"
+          git push
 
   build:
     name: 📦 Build Package

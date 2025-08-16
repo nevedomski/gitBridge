@@ -84,6 +84,7 @@ class GitHubAPISync(SyncProvider):
         ca_bundle: str | None = None,
         auto_proxy: bool = False,
         auto_cert: bool = False,
+        config: dict[str, Any] | None = None,
     ):
         """Initialize GitHub API sync facade.
 
@@ -101,6 +102,7 @@ class GitHubAPISync(SyncProvider):
                 or Chrome PAC scripts. Useful in corporate environments
             auto_cert: Whether to auto-detect certificates from Windows certificate
                 store. Useful for corporate environments with custom CAs
+            config: Optional configuration dictionary with download limits and other settings
 
         Raises:
             ValueError: If the repository URL is invalid or cannot be parsed
@@ -124,6 +126,7 @@ class GitHubAPISync(SyncProvider):
             ca_bundle=ca_bundle,
             auto_proxy=auto_proxy,
             auto_cert=auto_cert,
+            config=config,
         )
 
         self.repository = RepositoryManager(self.client)

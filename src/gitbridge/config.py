@@ -29,6 +29,13 @@ DEFAULT_CONFIG = {
         "incremental": True,
         "verify_ssl": True,
     },
+    "download_limits": {
+        "max_file_size": 100 * 1024 * 1024,  # 100MB default limit per file
+        "max_total_size": 500 * 1024 * 1024,  # 500MB total download limit
+        "chunk_size": 8192,  # 8KB chunks for streaming
+        "timeout": 30,  # 30 second timeout per request
+        "stream_threshold": 10 * 1024 * 1024,  # Stream files larger than 10MB
+    },
     "logging": {
         "level": "INFO",
         "file": None,

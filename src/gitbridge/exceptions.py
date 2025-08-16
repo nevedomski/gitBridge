@@ -80,6 +80,43 @@ class GitBridgeError(Exception):
         return context
 
 
+class SecurityError(GitBridgeError):
+    """Security-related errors.
+
+    Raised when security violations are detected, such as:
+    - Path traversal attempts
+    - Invalid or malicious proxy URLs
+    - File size limit violations (DoS prevention)
+    - Unsafe certificate operations
+
+    This is a critical error type that should be logged and monitored.
+    """
+
+    def __init__(
+        self,
+        message: str = "Security violation detected",
+        violation_type: str | None = None,
+        attempted_path: str | None = None,
+        details: dict[str, Any] | None = None,
+        original_error: Exception | None = None,
+    ):
+        """Initialize security error.
+
+        Args:
+            message: Specific security error message
+            violation_type: Type of security violation (e.g., 'path_traversal', 'size_limit')
+            attempted_path: Path or resource that triggered the violation
+            details: Additional security context
+            original_error: Original exception if any
+        """
+        sec_details = details or {}
+        if violation_type:
+            sec_details["violation_type"] = violation_type
+        if attempted_path:
+            sec_details["attempted_path"] = attempted_path
+        super().__init__(message, sec_details, original_error)
+
+
 class AuthenticationError(GitBridgeError):
     """Authentication-related errors.
 

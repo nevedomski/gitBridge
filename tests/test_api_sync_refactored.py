@@ -51,6 +51,7 @@ class TestGitHubAPISyncFacade:
             ca_bundle=None,
             auto_proxy=False,
             auto_cert=False,
+            config=None,
         )
 
     @patch("gitbridge.api_sync.FileSynchronizer")
@@ -86,6 +87,7 @@ class TestGitHubAPISyncFacade:
             ca_bundle="/path/to/ca.pem",
             auto_proxy=True,
             auto_cert=True,
+            config=None,
         )
 
     @patch("gitbridge.api_sync.FileSynchronizer")

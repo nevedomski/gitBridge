@@ -5,18 +5,49 @@ All notable changes to GitBridge will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.6.3b1] - 2025-08-16
 
 ### Security
-- Identified path traversal vulnerability in file_synchronizer.py
-- Identified proxy URL validation issue in browser_sync.py
-- Identified race condition in certificate cleanup
+- **CRITICAL**: Fixed path traversal vulnerability in FileSynchronizer that could allow files to be written outside the sync directory
+- **CRITICAL**: Added comprehensive proxy URL validation to prevent injection attacks
+- **CRITICAL**: Fixed race condition in certificate cleanup that could cause crashes in multi-threaded operations
+- **CRITICAL**: Implemented request size limits to prevent DoS attacks (default: 100MB per file)
 
-### Planned for 1.0.0
-- Security fixes for all identified vulnerabilities
-- Performance improvements (parallel downloads, connection pooling)
-- PyPI package distribution
-- Windows installer
+### Added
+- `validate_safe_path()` utility function for secure path validation
+- `validate_proxy_url()` utility function for comprehensive proxy URL validation
+- Thread-safe `CertificateManager` class with proper locking mechanisms
+- Configurable download limits in configuration:
+  - `max_file_size`: Maximum size for individual files (default: 100MB)
+  - `max_total_size`: Maximum total download size (default: 500MB)
+  - `stream_threshold`: File size threshold for streaming (default: 10MB)
+  - `chunk_size`: Download chunk size (default: 8192 bytes)
+  - `timeout`: Request timeout in seconds (default: 30)
+- `SecurityError` exception type for security-related violations
+- Streaming support for large files to prevent memory exhaustion
+- Comprehensive security test suite with 18 test cases
+
+### Changed
+- FileSynchronizer now validates all file paths before writing
+- BrowserSync now validates proxy URLs before configuration
+- GitHubAPIClient now enforces size limits on all downloads
+- Large files (>10MB) are now streamed to prevent memory issues
+
+### Fixed
+- Path traversal vulnerability allowing directory escape
+- Missing validation for malicious proxy URLs
+- Race condition in temporary certificate file cleanup
+- Potential DoS via unlimited file downloads
+
+## [0.6.2b1] - 2025-08-16
+
+### Fixed
+- Minor version update for release preparation
+
+## [0.6.1b1] - 2025-08-16
+
+### Fixed
+- MyPy type-check paths in CI configuration
 
 ## [0.5.1b1] - 2025-01-11
 
@@ -274,6 +305,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 0.6.3b1 | 2025-08-16 | **SECURITY RELEASE** - Fixed all critical vulnerabilities (path traversal, proxy validation, race conditions, DoS) |
+| 0.6.2b1 | 2025-08-16 | Minor version update for release preparation |
+| 0.6.1b1 | 2025-08-16 | MyPy type-check paths fix in CI configuration |
 | 0.5.1b1 | 2025-01-11 | CI/CD fixes, documentation improvements, DOCDEV comments added |
 | 0.5.0b1 | 2025-08-09 | Python 3.10+ requirement, GitHub Actions fixes, MkDocs version display |
 | 0.4.2b1 | 2025-08-06 | Added security documentation, roadmap, and contribution guidelines |
