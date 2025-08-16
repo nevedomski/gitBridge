@@ -385,55 +385,38 @@ class TestGitHubBrowserSync:
     def test_get_file_list_from_zip_success(self, browser_sync, temp_dir):
         """Test successful file list extraction from ZIP using Playwright"""
         mock_page = Mock()
-        mock_download_info = Mock()
-        mock_download = Mock()
-        mock_download_info.value = mock_download
+        mock_context = Mock()
+        mock_response = Mock()
 
         browser_sync._setup_browser = Mock()
         browser_sync.page = mock_page
-        mock_page.expect_download.return_value.__enter__ = Mock(return_value=mock_download_info)
-        mock_page.expect_download.return_value.__exit__ = Mock(return_value=None)
+        browser_sync.context = mock_context
 
-        # Create a fake ZIP file for testing
-        test_zip_path = temp_dir / ".gitbridge" / "temp_repo.zip"
-        test_zip_path.parent.mkdir(parents=True, exist_ok=True)
+        # Mock the API request response
+        mock_response.status = 200
 
-        with zipfile.ZipFile(test_zip_path, "w") as zip_ref:
-            zip_ref.writestr("testrepo-main/file1.txt", "content1")
-            zip_ref.writestr("testrepo-main/dir/file2.py", "content2")
-            zip_ref.writestr("testrepo-main/", "")  # directory entry
+        # Create a fake ZIP file content
+        import io
 
-        # Mock download save_as to use our test zip
-        mock_download.save_as.side_effect = lambda path: None  # File already exists
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, "w") as zf:
+            zf.writestr("testrepo-main/file1.txt", "content1")
+            zf.writestr("testrepo-main/dir/file2.py", "content2")
+            zf.writestr("testrepo-main/", "")  # directory entry
 
-        with patch("zipfile.ZipFile") as mock_zipfile:
-            # Create mock zip file info objects
-            mock_info1 = Mock()
-            mock_info1.filename = "testrepo-main/file1.txt"
-            mock_info1.is_dir.return_value = False
+        mock_response.body.return_value = zip_buffer.getvalue()
+        mock_context.request.get.return_value = mock_response
 
-            mock_info2 = Mock()
-            mock_info2.filename = "testrepo-main/dir/file2.py"
-            mock_info2.is_dir.return_value = False
+        # Mock page navigation
+        mock_page.goto.return_value = None
+        mock_page.wait_for_load_state.return_value = None
 
-            mock_info3 = Mock()
-            mock_info3.filename = "testrepo-main/"
-            mock_info3.is_dir.return_value = True
-
-            mock_zipfile_instance = Mock()
-            mock_zipfile.return_value.__enter__.return_value = mock_zipfile_instance
-            mock_zipfile_instance.infolist.return_value = [mock_info1, mock_info2, mock_info3]
-
-            with patch("pathlib.Path.unlink"):
-                result = browser_sync.get_file_list_from_zip("main")
+        with patch("pathlib.Path.unlink"):
+            result = browser_sync.get_file_list_from_zip("main")
 
         assert result == ["file1.txt", "dir/file2.py"]
-        mock_page.goto.assert_has_calls(
-            [
-                call("https://github.com/testuser/testrepo/tree/main"),
-                call("https://github.com/testuser/testrepo/archive/refs/heads/main.zip"),
-            ]
-        )
+        mock_page.goto.assert_called_once_with("https://github.com/testuser/testrepo/tree/main")
+        mock_context.request.get.assert_called_once_with("https://github.com/testuser/testrepo/archive/refs/heads/main.zip")
 
     def test_get_file_list_from_zip_timeout(self, browser_sync):
         """Test file list extraction with Playwright timeout"""
@@ -461,32 +444,41 @@ class TestGitHubBrowserSync:
 
         assert result is None
 
-    def test_get_file_list_from_zip_no_browser_setup(self, browser_sync):
+    def test_get_file_list_from_zip_no_browser_setup(self, browser_sync) -> None:
         """Test file list extraction when browser needs to be set up"""
         # Don't mock _setup_browser to ensure it gets called
         browser_sync.page = None
+        browser_sync.context = None
 
         mock_page = Mock()
-        mock_download_info = Mock()
-        mock_download = Mock()
-        mock_download_info.value = mock_download
+        mock_context = Mock()
+        mock_response = Mock()
 
-        mock_page.expect_download.return_value.__enter__ = Mock(return_value=mock_download_info)
-        mock_page.expect_download.return_value.__exit__ = Mock(return_value=None)
-        mock_download.save_as.return_value = None
+        # Mock the API request response
+        mock_response.status = 200
+
+        # Create a fake ZIP file content with no files
+        import io
+
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, "w"):
+            pass  # Empty ZIP
+
+        mock_response.body.return_value = zip_buffer.getvalue()
+        mock_context.request.get.return_value = mock_response
+
+        # Mock page navigation
+        mock_page.goto.return_value = None
+        mock_page.wait_for_load_state.return_value = None
 
         def setup_browser_side_effect():
             browser_sync.page = mock_page
+            browser_sync.context = mock_context
 
         browser_sync._setup_browser = Mock(side_effect=setup_browser_side_effect)
 
-        with patch("zipfile.ZipFile") as mock_zipfile:
-            mock_zipfile_instance = Mock()
-            mock_zipfile.return_value.__enter__.return_value = mock_zipfile_instance
-            mock_zipfile_instance.infolist.return_value = []
-
-            with patch("pathlib.Path.unlink"):
-                result = browser_sync.get_file_list_from_zip("main")
+        with patch("pathlib.Path.unlink"):
+            result = browser_sync.get_file_list_from_zip("main")
 
         assert result == []
         # Verify browser was set up

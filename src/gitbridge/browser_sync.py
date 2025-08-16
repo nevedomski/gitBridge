@@ -294,7 +294,7 @@ class GitHubBrowserSync(SyncProvider):
             if not self.page:
                 self._setup_browser()
 
-            # Navigate to repository
+            # Navigate to repository first to ensure we're authenticated
             repo_url = f"{self.base_url}/tree/{ref}"
             if self.page:
                 self.page.goto(repo_url)
@@ -304,22 +304,25 @@ class GitHubBrowserSync(SyncProvider):
             # Get the download URL directly (GitHub pattern)
             download_url = f"{self.base_url}/archive/refs/heads/{ref}.zip"
 
-            # Use Playwright to download the ZIP file
-            if self.page:
-                with self.page.expect_download() as download_info:
-                    # Trigger download by navigating to the URL
-                    self.page.goto(download_url)
+            # Use Playwright context to download the ZIP file via API request
+            if self.context:
+                # Use context.request to download the file instead of page navigation
+                response = self.context.request.get(download_url)
+                if response.status != 200:
+                    logger.error(f"Failed to download ZIP: HTTP {response.status}")
+                    return None
+
+                # Get the content
+                zip_content = response.body()
             else:
                 return None
-
-            download = download_info.value
 
             # Save ZIP temporarily
             temp_zip = self.local_path / ".gitbridge" / "temp_repo.zip"
             ensure_dir(temp_zip.parent)
 
-            # Save the downloaded file
-            download.save_as(temp_zip)
+            # Write the ZIP content to file
+            temp_zip.write_bytes(zip_content)
 
             # Extract file list from ZIP
             file_list = []

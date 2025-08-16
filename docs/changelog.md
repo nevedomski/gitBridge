@@ -5,6 +5,29 @@ All notable changes to GitBridge will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0b1] - 2025-08-16
+
+### Fixed
+- Fixed Codecov badge showing "unknown" by correcting repository URL from `gh/user/gitBridge` to `gh/nevedomski/gitBridge`
+- Replaced all hardcoded badge values with dynamic badges in README and documentation
+- Fixed 11 failing tests due to GitHubAPIClient constructor signature changes (added `config` parameter)
+- Fixed test mocks to use `get_with_limits` instead of `get` method
+- Fixed Codecov configuration paths from `gitbridge/` to `src/gitbridge/` after project restructure
+- Fixed pytest coverage command to use `--cov=src/gitbridge` instead of `--cov=gitbridge`
+- Fixed browser sync failing with ERR_ABORTED error when downloading ZIP files
+- Fixed browser sync tests to match new implementation using `context.request.get()`
+
+### Added
+- Created separate CI workflows for individual tool badges (ruff-format.yml, ruff-lint.yml, mypy.yml)
+- Added CI job to auto-generate requirements.txt from pyproject.toml for Snyk compatibility
+- Created .snyk configuration file to ignore false positive MPL-2.0 license warnings
+- Added CODECOV_TOKEN to CI workflow for more reliable uploads
+
+### Changed
+- Browser sync now uses `context.request.get()` instead of `page.goto()` for downloading ZIP files
+- Updated all tests to match new browser sync implementation
+- All 528 tests now passing with 84% code coverage
+
 ## [0.6.3b1] - 2025-08-16
 
 ### Security
@@ -305,6 +328,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 0.7.0b1 | 2025-08-16 | Fixed badges, test failures, Codecov/Snyk integration, browser sync ERR_ABORTED error |
 | 0.6.3b1 | 2025-08-16 | **SECURITY RELEASE** - Fixed all critical vulnerabilities (path traversal, proxy validation, race conditions, DoS) |
 | 0.6.2b1 | 2025-08-16 | Minor version update for release preparation |
 | 0.6.1b1 | 2025-08-16 | MyPy type-check paths fix in CI configuration |
