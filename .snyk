@@ -1,0 +1,16 @@
+# Snyk configuration file
+# https://docs.snyk.io/products/snyk-open-source/language-and-package-manager-support/snyk-for-python
+
+# Version of the Snyk configuration file
+version: v1.0.0
+
+# Patches to apply
+patch: {}
+
+# Ignores - you can ignore the license issue if you want
+ignore:
+  # Ignore MPL-2.0 license issue in certifi (it's just a license notice, not a security issue)
+  'snyk:lic:pip:certifi:MPL-2.0':
+    - '*':
+        reason: MPL-2.0 is compatible with our MIT license project
+        expires: '2026-12-31T23:59:59.999Z'
