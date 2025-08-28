@@ -30,7 +30,7 @@ jobs:
             ~/.cache/pip
             ~/.cache/uv
             ~/AppData/Local/uv/cache
-          key: ${{ runner.os }}-${{ matrix.python }}-${{ hashFiles('**/pyproject.toml') }}
+          key: ${{ runner.os }}-${{ matrix.python }}-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
           restore-keys: |
             ${{ runner.os }}-${{ matrix.python }}-
             ${{ runner.os }}-
@@ -41,8 +41,7 @@ jobs:
           version: "latest"
 
       - name: Install dependencies
-        run: |
-          uv sync --all-extras
+        run: uv sync --all-extras
               
       - name: 🔬 Unit tests with coverage
         id: tests
@@ -120,13 +119,13 @@ jobs:
         with:
           path: |
             ~/.cache/uv
-          key: ${{ runner.os }}-uv-lint-${{ hashFiles('**/pyproject.toml') }}
+          key: ${{ runner.os }}-uv-lint-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
           restore-keys: |
             ${{ runner.os }}-uv-lint-
             ${{ runner.os }}-uv-
 
       - name: Install dependencies
-        run: uv sync --extra dev
+        run: uv sync --all-extras
       
       - name: 🛑 Ruff check
         uses: astral-sh/ruff-action@v3 # Use the official action
@@ -160,7 +159,7 @@ jobs:
           python-version: "3.11"
       
       - name: Install dependencies
-        run: uv sync --extra dev
+        run: uv sync --all-extras
       
       - name: 🔍 Run safety check
         run: |
