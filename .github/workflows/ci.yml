@@ -241,7 +241,14 @@ jobs:
           python-version: "3.11"
       
       - name: Build package
-        run: uv build
+        run: |
+          uv build
+          echo "=== Build artifacts ==="
+          ls -la dist/
+          echo ""
+          echo "=== Wheel metadata ==="
+          pip install pkginfo
+          python -c "from pkginfo import Wheel; import glob; w = Wheel(glob.glob('dist/*.whl')[0]); print(f'Name: {w.name}\nVersion: {w.version}\nPython: {w.requires_python}')"
       
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -249,3 +256,85 @@ jobs:
           name: dist
           path: dist/
           retention-days: 7
+
+  test-wheel:
+    name: 🎯 Test Wheel (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    needs: build
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.10', '3.11', '3.12']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Download wheel
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Test wheel installation
+        shell: bash
+        run: |
+          # Install the wheel
+          WHEEL_FILE=$(ls dist/*.whl | head -1)
+          echo "Installing: $WHEEL_FILE"
+          pip install "$WHEEL_FILE"
+          
+          # Test basic functionality
+          gitbridge --version
+          python -c "import gitbridge; print(f'GitBridge {gitbridge.__version__} imported')"
+          
+          # Show installed deps
+          echo "=== Installed packages ==="
+          pip list | grep -E "gitbridge|pypac|wincertstore|pywin32" || true
+      
+      - name: Verify Windows dependencies (Windows only)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          echo "=== Testing Windows dependencies ==="
+          python -c "import pypac, wincertstore, win32api; print('✓ Windows deps OK')"
+      
+      - name: Verify NO Windows dependencies (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          echo "=== Verifying no Windows dependencies ==="
+          pip list | grep -E "pypac|wincertstore|pywin32" && exit 1 || echo "✓ No Windows deps (correct)"
+      
+      - name: Test browser extra
+        shell: bash
+        run: |
+          WHEEL_FILE=$(ls dist/*.whl | head -1)
+          pip install "${WHEEL_FILE}[browser]"
+          python -c "import playwright; print('✓ Playwright installed')"
+
+  publish-testpypi:
+    name: 🧪 Publish to TestPyPI
+    # Only publish from main branch, not from PRs
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [build, test-wheel]
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/gitbridge
+    permissions:
+      id-token: write  # For trusted publishing
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          verbose: true
+          skip-existing: true  # Don't fail if version exists

@@ -5,6 +5,33 @@ All notable changes to GitBridge will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2025-08-28
+
+### 🎉 First Stable Release
+
+This is the first stable production release of GitBridge, a tool to synchronize GitHub repositories when direct git access is blocked.
+
+### Added
+- **PyPI Distribution**
+  - Published to PyPI as `gitbridge` package
+  - Universal wheel with automatic platform-specific dependency installation
+  - Windows dependencies (pypac, wincertstore, pywin32) auto-install on Windows only
+  - Optional extras: `[browser]` for Playwright, `[dev]` for development tools
+
+### Changed
+- **Packaging Improvements**
+  - Moved Windows dependencies to main dependencies with platform markers
+  - Simplified installation process - Windows users get everything automatically
+  - Enhanced CI/CD with wheel testing across all platforms
+  - Automatic TestPyPI deployment from main branch
+
+### Infrastructure
+- **GitHub Actions Workflows**
+  - CI workflow now tests wheel installation on every push/PR
+  - Automatic deployment to TestPyPI for main branch commits
+  - Simplified publish workflow for PyPI releases
+  - Cross-platform testing matrix (Windows, Linux, macOS × Python 3.10-3.12)
+
 ## [0.8.0b1] - 2025-08-28
 
 ### Changed
@@ -344,6 +371,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.0.0 | 2025-08-28 | **STABLE RELEASE** - PyPI distribution, automatic Windows dependency installation, universal wheel |
+| 0.8.0b1 | 2025-08-28 | Complete Playwright migration, removed all Selenium references |
 | 0.7.0b1 | 2025-08-16 | Fixed badges, test failures, Codecov/Snyk integration, browser sync ERR_ABORTED error |
 | 0.6.3b1 | 2025-08-16 | **SECURITY RELEASE** - Fixed all critical vulnerabilities (path traversal, proxy validation, race conditions, DoS) |
 | 0.6.2b1 | 2025-08-16 | Minor version update for release preparation |

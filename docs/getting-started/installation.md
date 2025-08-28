@@ -20,22 +20,27 @@ This guide covers all installation methods for GitBridge, including optional com
 
 ## Installation Methods
 
-### Method 1: Using pip (Standard)
+### Method 1: From PyPI (Recommended)
 
-The simplest installation method using Python's package manager:
+GitBridge is available on PyPI as `gitbridge`:
 
 ```bash
 # Basic installation
 pip install gitbridge
 
-# With all optional dependencies
-pip install gitbridge[full]
+# With browser automation support (Playwright)
+pip install gitbridge[browser]
 
 # For development
 pip install gitbridge[dev]
+
+# All extras
+pip install gitbridge[all]
 ```
 
-### Method 2: Using uv (Recommended)
+**Note for Windows users**: Windows-specific dependencies (pypac, wincertstore, pywin32) are **automatically installed** when you install GitBridge on Windows.
+
+### Method 2: Using uv
 
 [uv](https://github.com/astral-sh/uv) is a fast Python package manager that handles virtual environments automatically:
 
@@ -45,11 +50,11 @@ pip install gitbridge[dev]
     # Install uv
     curl -LsSf https://astral.sh/uv/install.sh | sh
     
-    # Install gitbridge
+    # Install gitbridge from PyPI
     uv pip install gitbridge
     
-    # With optional dependencies
-    uv pip install "gitbridge[pac,win]"
+    # With browser automation
+    uv pip install "gitbridge[browser]"
     ```
 
 === "Windows"
@@ -58,11 +63,11 @@ pip install gitbridge[dev]
     # Install uv
     powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
     
-    # Install gitbridge
+    # Install gitbridge (Windows deps auto-install)
     uv pip install gitbridge
     
-    # With Windows-specific features
-    uv pip install "gitbridge[pac,win]"
+    # With browser automation
+    uv pip install "gitbridge[browser]"
     ```
 
 ### Method 3: From Source
@@ -88,26 +93,23 @@ uv pip install -e ".[dev]"
 
 GitBridge has several optional dependency groups for specific features:
 
-### PAC Proxy Support
+### Browser Automation
 
-For automatic proxy detection from PAC scripts (Windows/Chrome):
+For browser-based synchronization fallback:
 
 ```bash
-pip install "gitbridge[pac]"
+pip install "gitbridge[browser]"
 ```
 
 This installs:
+- `playwright`: Browser automation framework
+
+### Windows Platform Support
+
+**Note**: Windows dependencies are **automatically installed** on Windows systems. You don't need to specify them manually.
+
+The following are included automatically on Windows:
 - `pypac`: PAC file parsing and proxy detection
-
-### Windows Certificate Support
-
-For automatic certificate extraction from Windows certificate store:
-
-```bash
-pip install "gitbridge[win]"
-```
-
-This installs:
 - `wincertstore`: Windows certificate store access
 - `pywin32`: Windows API access
 
@@ -126,14 +128,14 @@ This installs:
 - `mypy`: Type checking
 - Type stubs for better IDE support
 
-### Full Installation
+### All Extras
 
 Install all optional dependencies:
 
 ```bash
-pip install "gitbridge[full]"
+pip install "gitbridge[all]"
 # or
-pip install "gitbridge[pac,win,dev]"
+pip install "gitbridge[browser,dev]"
 ```
 
 ## Browser Mode Setup
@@ -207,7 +209,7 @@ gitbridge status
 
 Expected output:
 ```
-GitBridge version 0.1.0
+GitBridge version 1.0.0
 Python 3.11.5
 System: Linux-6.15.8-200.fc42.x86_64
 ```

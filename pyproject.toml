@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "gitbridge"
-version = "0.8.0b1"
+version = "1.0.0"
 description = "Synchronize GitHub repositories when git access is blocked"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -22,12 +22,15 @@ classifiers = [
 ]
 dependencies = [
     "requests>=2.31.0",
-    "playwright>=1.40.0",
     "pyyaml>=6.0",
     "click>=8.1.0",
     "python-dotenv>=1.0.0",
     "tqdm>=4.66.0",
     "certifi>=2023.0.0",
+    # Windows-specific dependencies (automatically installed on Windows only)
+    "pypac>=0.16.0; sys_platform == 'win32'",
+    "wincertstore>=0.2.0; sys_platform == 'win32'",
+    "pywin32>=300; sys_platform == 'win32'",
 ]
 
 [project.urls]
@@ -61,10 +64,8 @@ docs = [
     "pillow>=10.4.0",
     "cairosvg>=2.7.1",
 ]
-windows = [
-    "pypac>=0.16.0; sys_platform == 'win32'",
-    "wincertstore>=0.2.0; sys_platform == 'win32'",
-    "pywin32>=300; sys_platform == 'win32'",
+browser = [
+    "playwright>=1.40.0",
 ]
 # Combine all optional dependencies
 all = [
@@ -86,10 +87,8 @@ all = [
     "mkdocstrings[python]>=0.30.0",
     "pillow>=10.4.0",
     "cairosvg>=2.7.1",
-    # windows
-    "pypac>=0.16.0; sys_platform == 'win32'",
-    "wincertstore>=0.2.0; sys_platform == 'win32'",
-    "pywin32>=300; sys_platform == 'win32'",
+    # browser
+    "playwright>=1.40.0",
 ]
 
 [tool.ruff]

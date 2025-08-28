@@ -3,6 +3,7 @@
 [![CI](https://github.com/nevedomski/gitBridge/workflows/CI/badge.svg)](https://github.com/nevedomski/gitBridge/actions)
 [![GitHub Release](https://img.shields.io/github/v/release/nevedomski/gitbridge?include_prereleases&label=version)](https://github.com/nevedomski/gitbridge/releases)
 [![PyPI Version](https://img.shields.io/pypi/v/gitbridge?label=pypi)](https://pypi.org/project/gitbridge/)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/gitbridge?label=downloads)](https://pypi.org/project/gitbridge/)
 [![Python Versions](https://img.shields.io/pypi/pyversions/gitbridge)](https://pypi.org/project/gitbridge/)
 [![codecov](https://codecov.io/gh/nevedomski/gitBridge/branch/main/graph/badge.svg)](https://codecov.io/gh/nevedomski/gitBridge)
 [![Tests](https://img.shields.io/github/actions/workflow/status/nevedomski/gitbridge/ci.yml?branch=main&label=tests)](https://github.com/nevedomski/gitbridge/actions)
@@ -15,7 +16,7 @@
 
 **Production-ready tool to synchronize GitHub repositories when direct git access is blocked.**
 
-🎯 **Status**: Security beta release v0.6.3b1 - All critical security issues fixed ✅
+🎉 **v1.0.0 Released!** - First stable release now available on PyPI
 
 ## Features
 
@@ -32,20 +33,37 @@
 
 ## Installation
 
+### From PyPI (Recommended)
+
+```bash
+# Basic installation
+pip install gitbridge
+
+# With browser automation support
+pip install gitbridge[browser]
+
+# For development
+pip install gitbridge[dev]
+```
+
+### Windows Users
+
+Windows dependencies (pypac, wincertstore, pywin32) are **automatically installed** when you install GitBridge on Windows.
+
+### From Source
+
 Using [uv](https://github.com/astral-sh/uv):
 
 ```bash
-# Install uv if you haven't already
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# Clone the repository
+git clone https://github.com/nevedomski/gitbridge.git
+cd gitbridge
 
-# Install the project
+# Install with uv
 uv pip install -e .
 
-# Or install with development dependencies
-uv pip install -e ".[dev]"
-
-# Install with PAC proxy support (Windows)
-uv pip install -e ".[pac]"
+# Or with all extras
+uv pip install -e ".[all]"
 ```
 
 ## Quick Start
