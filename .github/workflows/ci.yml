@@ -297,21 +297,21 @@ jobs:
         shell: bash
         run: |
           echo "=== Testing Windows dependencies ==="
-          python -c "import pypac, wincertstore, win32api; print('✓ Windows deps OK')"
+          python -c "import pypac, wincertstore, win32api; print('[OK] Windows deps installed')"
       
       - name: Verify NO Windows dependencies (Linux/macOS)
         if: runner.os != 'Windows'
         shell: bash
         run: |
           echo "=== Verifying no Windows dependencies ==="
-          pip list | grep -E "pypac|wincertstore|pywin32" && exit 1 || echo "✓ No Windows deps (correct)"
+          pip list | grep -E "pypac|wincertstore|pywin32" && exit 1 || echo "[OK] No Windows deps (correct)"
       
       - name: Test browser extra
         shell: bash
         run: |
           WHEEL_FILE=$(ls dist/*.whl | head -1)
           pip install "${WHEEL_FILE}[browser]"
-          python -c "import playwright; print('✓ Playwright installed')"
+          python -c "import playwright; print('[OK] Playwright installed')"
 
   publish-testpypi:
     name: 🧪 Publish to TestPyPI
