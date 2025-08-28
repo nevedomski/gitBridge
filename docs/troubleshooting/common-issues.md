@@ -234,11 +234,12 @@ This will check:
      --config config.yaml
    ```
 
-3. **Check ChromeDriver:**
+3. **Check Playwright browsers:**
    ```bash
-   # Selenium 4+ manages ChromeDriver automatically
-   # For manual installation:
-   pip install webdriver-manager
+   # Install Playwright browsers
+   playwright install chromium
+   # Or check installation status
+   playwright show-browsers
    ```
 
 ### Error: Browser Timeout

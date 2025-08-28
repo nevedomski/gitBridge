@@ -171,27 +171,24 @@ If you plan to use the browser automation fallback method, you need:
     sudo pacman -S chromium
     ```
 
-### 2. Install ChromeDriver
+### 2. Install Playwright Browsers
 
-ChromeDriver is automatically managed by Selenium, but you can install it manually:
+Playwright manages browser binaries automatically:
 
-=== "Automatic (Recommended)"
-
-    Selenium 4+ automatically downloads and manages ChromeDriver.
-
-=== "Manual Installation"
+=== "Automatic Installation"
 
     ```bash
-    # Download the appropriate version
-    # Visit: https://chromedriver.chromium.org/downloads
+    # Install browser binaries
+    playwright install chromium
     
-    # Or use package manager
-    # macOS
-    brew install chromedriver
-    
-    # Ubuntu/Debian
-    sudo apt-get install chromium-driver
+    # Or install all browsers
+    playwright install
     ```
+
+=== "System Requirements"
+
+    Playwright will automatically download the appropriate browser binaries for your system.
+    No additional driver installation is required.
 
 ## Verification
 

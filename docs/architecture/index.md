@@ -461,7 +461,7 @@ graph TB
     
     subgraph "Usage"
         REQUESTS[Requests Library]
-        SELENIUM[Selenium Browser]
+        PLAYWRIGHT[Playwright Browser]
     end
     
     SYSTEM --> LOADER
@@ -471,7 +471,7 @@ graph TB
     LOADER --> COMBINER
     COMBINER --> VALIDATOR
     VALIDATOR --> REQUESTS
-    VALIDATOR --> SELENIUM
+    VALIDATOR --> PLAYWRIGHT
 ```
 
 ## Error Handling Strategy

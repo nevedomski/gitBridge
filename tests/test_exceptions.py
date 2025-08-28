@@ -520,7 +520,7 @@ class TestBrowserError:
 
     def test_initialization_with_parameters(self):
         """Test initialization with all parameters."""
-        original = Exception("Selenium error")
+        original = Exception("Playwright error")
         error = BrowserError("Browser failed", browser="chrome", url="https://github.com/user/repo", original_error=original)
 
         assert error.message == "Browser failed"

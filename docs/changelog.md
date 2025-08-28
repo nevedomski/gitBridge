@@ -5,6 +5,22 @@ All notable changes to GitBridge will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0b1] - 2025-08-28
+
+### Changed
+- **Complete Playwright Migration**
+  - Removed all remaining Selenium references from codebase
+  - Updated all documentation to reflect Playwright usage
+  - Updated exception messages and docstrings
+  - Updated installation and troubleshooting guides
+  - Marked migration as complete in ROADMAP and PROJECT_STATUS
+
+### Documentation
+- Updated AGENTS.md to reflect completed Playwright implementation
+- Updated architecture diagrams to show Playwright instead of Selenium
+- Updated all historical changelog entries for consistency
+- Removed ChromeDriver installation instructions
+
 ## [0.7.0b1] - 2025-08-16
 
 ### Fixed
@@ -119,7 +135,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Documentation**
   - Updated README with production status and security monitoring
   - Added comprehensive review results and action items
-  - Fixed Selenium references to Playwright throughout docs
+  - Completed full migration from Selenium to Playwright
   - Enhanced project status with prioritized action items
 
 ### Security
@@ -216,7 +232,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **Browser Automation**
-  - Migrated from Selenium to Playwright for better performance
+  - Fully migrated from Selenium to Playwright for better performance
   - Improved browser automation reliability
   - Enhanced download handling with expect_download()
   
@@ -227,7 +243,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Comprehensive Google-style docstrings throughout
 
 - **Dependencies**
-  - Replaced Selenium with Playwright
+  - Completed replacement of Selenium with Playwright
   - Updated to use uv package manager
   - Added development dependencies for docs and testing
 
@@ -243,7 +259,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release with full feature set
 - GitHub API synchronization method
-- Browser automation fallback method using Selenium
+- Browser automation fallback method using Playwright
 - Incremental update support with SHA-based change detection
 - YAML-based configuration system
 - Command-line interface with Click
@@ -289,7 +305,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Cross-platform compatibility
 
 - **Browser Automation**
-  - Selenium WebDriver-based fallback
+  - Playwright-based fallback
   - Chrome/Chromium browser support
   - Custom browser binary paths
   - ZIP-based file extraction
@@ -305,7 +321,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full type hints and annotations
 
 ### Dependencies
-- Core: requests, selenium, pyyaml, click, tqdm, certifi
+- Core: requests, playwright, pyyaml, click, tqdm, certifi
 - Optional: pypac (PAC support), wincertstore (Windows certificates)
 - Development: pytest, pytest-cov, ruff, mypy
 
@@ -352,8 +368,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
    - Validate proxy URLs before use
 
 2. **Browser Automation:**
-   - Selenium has been completely replaced with Playwright
-   - Update any custom scripts that reference Selenium
+   - Migration to Playwright is complete
+   - Update any custom scripts that referenced Selenium
 
 3. **Type Hints:**
    - All code now has complete type annotations

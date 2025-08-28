@@ -377,7 +377,7 @@ class DirectoryCreateError(FileSystemError):
 class BrowserError(GitBridgeError):
     """Browser automation errors.
 
-    Base class for all Selenium WebDriver and browser automation
+    Base class for all Playwright browser automation
     related errors.
     """
 
@@ -394,7 +394,7 @@ class BrowserError(GitBridgeError):
             message: Browser error description
             browser: Browser type (e.g., 'chrome', 'firefox')
             url: URL that caused the error
-            original_error: Original Selenium exception
+            original_error: Original Playwright exception
         """
         details = {"browser": browser, "url": url}
         super().__init__(message, {k: v for k, v in details.items() if v is not None}, original_error)
@@ -420,7 +420,7 @@ class WebDriverError(BrowserError):
             message: WebDriver error description
             driver_path: Path to WebDriver binary
             browser_binary: Path to browser binary
-            original_error: Original Selenium WebDriver exception
+            original_error: Original Playwright browser exception
         """
         details = {"driver_path": driver_path, "browser_binary": browser_binary}
         super().__init__(message, "chrome", None, original_error)
@@ -447,7 +447,7 @@ class PageLoadError(BrowserError):
             message: Page load error description
             url: URL that failed to load
             timeout: Timeout value in seconds
-            original_error: Original Selenium exception
+            original_error: Original Playwright exception
         """
         super().__init__(message, "chrome", url, original_error)
         if timeout is not None:
