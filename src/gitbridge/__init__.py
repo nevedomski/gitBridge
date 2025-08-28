@@ -7,8 +7,14 @@ __version__ = "0.1.0"
 from .api_client import GitHubAPIClient
 from .api_sync import GitHubAPISync
 
-# Browser sync fallback
-from .browser_sync import GitHubBrowserSync
+# Browser sync fallback - import only if available
+try:
+    from .browser_sync import GitHubBrowserSync
+
+    _BROWSER_SYNC_AVAILABLE = True
+except ImportError:
+    _BROWSER_SYNC_AVAILABLE = False
+    GitHubBrowserSync = None  # type: ignore
 
 # Configuration and utilities
 from .config import Config
@@ -20,7 +26,6 @@ from .utils import SyncStats, parse_github_url
 __all__ = [
     # Main interface
     "GitHubAPISync",
-    "GitHubBrowserSync",
     # Components
     "GitHubAPIClient",
     "RepositoryManager",
@@ -31,3 +36,7 @@ __all__ = [
     "parse_github_url",
     "SyncStats",
 ]
+
+# Add GitHubBrowserSync to __all__ only if available
+if _BROWSER_SYNC_AVAILABLE:
+    __all__.append("GitHubBrowserSync")

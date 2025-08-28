@@ -8,8 +8,15 @@ import click
 import yaml
 
 from .api_sync import GitHubAPISync
-from .browser_sync import GitHubBrowserSync
 from .config import Config
+
+# Import GitHubBrowserSync for type checking and testing
+# At runtime, it's imported lazily when needed
+try:
+    from .browser_sync import GitHubBrowserSync
+except ImportError:
+    GitHubBrowserSync = None  # type: ignore
+
 from .exceptions import (
     AuthenticationError,
     BrowserError,
@@ -122,7 +129,6 @@ def sync(
 
     # Perform sync based on method
     try:
-        syncer: GitHubAPISync | GitHubBrowserSync
         if method == "api":
             syncer = GitHubAPISync(
                 repo_url,
@@ -134,9 +140,17 @@ def sync(
                 auto_cert=auto_cert,
                 config=cfg.config,  # Pass full config for download limits
             )
-            success = syncer.sync(ref=ref, show_progress=not no_progress)
+            success = syncer.sync(ref=ref or "main", show_progress=not no_progress)
         elif method == "browser":
-            syncer = GitHubBrowserSync(
+            # Check if GitHubBrowserSync is available (playwright installed)
+            if GitHubBrowserSync is None:
+                click.echo(
+                    "✗ Browser sync requires playwright. Install with: pip install 'gitbridge[browser]'",
+                    err=True,
+                )
+                sys.exit(1)
+
+            browser_syncer = GitHubBrowserSync(
                 repo_url,
                 local_path,
                 token,
@@ -145,7 +159,7 @@ def sync(
                 auto_proxy=auto_proxy,
                 auto_cert=auto_cert,
             )
-            success = syncer.sync(ref=ref, show_progress=not no_progress)
+            success = browser_syncer.sync(ref=ref or "main", show_progress=not no_progress)
         else:
             click.echo(f"Unknown sync method: {method}", err=True)
             sys.exit(1)

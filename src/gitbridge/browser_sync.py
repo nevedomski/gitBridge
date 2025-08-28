@@ -7,10 +7,24 @@ import zipfile
 from pathlib import Path
 from typing import Any
 
-from playwright._impl._errors import Error as PlaywrightError
-from playwright._impl._errors import TimeoutError as PlaywrightTimeoutError
-from playwright.sync_api import Browser, BrowserContext, Page, Playwright, sync_playwright
 from tqdm import tqdm
+
+# Try to import playwright - it's optional
+try:
+    from playwright._impl._errors import Error as PlaywrightError
+    from playwright._impl._errors import TimeoutError as PlaywrightTimeoutError
+    from playwright.sync_api import Browser, BrowserContext, Page, Playwright, sync_playwright
+
+    PLAYWRIGHT_AVAILABLE = True
+except ImportError:
+    PLAYWRIGHT_AVAILABLE = False
+    # Define dummy classes for type hints when playwright is not available
+    PlaywrightError = Exception  # type: ignore
+    PlaywrightTimeoutError = Exception  # type: ignore
+    Browser = Any  # type: ignore
+    BrowserContext = Any  # type: ignore
+    Page = Any  # type: ignore
+    Playwright = Any  # type: ignore
 
 from .interfaces import SyncProvider
 from .utils import (
@@ -55,6 +69,12 @@ class GitHubBrowserSync(SyncProvider):
             browser_binary: Path to Chrome/Chromium binary
             driver_path: Path to ChromeDriver binary (unused in Playwright, kept for compatibility)
         """
+        # Check if playwright is available
+        if not PLAYWRIGHT_AVAILABLE:
+            raise ImportError(
+                "Playwright is not installed. Please install it with: pip install 'gitbridge[browser]' or pip install playwright"
+            )
+
         self.owner, self.repo = parse_github_url(repo_url)
         self.local_path = Path(local_path)
         self.token = token
