@@ -9,7 +9,7 @@
 **Synchronize GitHub repositories when direct git access is blocked**
 
 [![Python Version](https://img.shields.io/pypi/pyversions/gitbridge)](https://pypi.org/project/gitbridge/)
-[![License](https://img.shields.io/github/license/nevedomski/gitbridge)](./LICENSE)
+[![License](https://img.shields.io/github/license/nevedomski/gitbridge)](license.md)
 [![Documentation](https://img.shields.io/badge/docs-mkdocs-brightgreen)](index.md)
 [![codecov](https://codecov.io/gh/nevedomski/gitBridge/branch/main/graph/badge.svg)](https://codecov.io/gh/nevedomski/gitBridge)
 
