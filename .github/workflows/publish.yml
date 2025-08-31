@@ -121,9 +121,9 @@ jobs:
           
           ## Documentation
           
-          - [Getting Started](https://nevedomski.github.io/gitbridge/getting-started/)
-          - [User Guide](https://nevedomski.github.io/gitbridge/user-guide/)
-          - [API Reference](https://nevedomski.github.io/gitbridge/api/)
+          - [Getting Started](https://nevedomski.github.io/gitBridge/getting-started/)
+          - [User Guide](https://nevedomski.github.io/gitBridge/user-guide/)
+          - [API Reference](https://nevedomski.github.io/gitBridge/api/)
           EOF
           fi
           
