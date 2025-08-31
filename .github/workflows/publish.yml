@@ -43,9 +43,15 @@ jobs:
         with:
           version: "latest"
       
+      - name: Clean old artifacts
+        run: |
+          # Clean any existing dist directory to ensure fresh build
+          rm -rf dist/
+          echo "Cleaned old artifacts"
+      
       - name: Build distribution
         run: |
-          echo "Building distribution packages..."
+          echo "Building fresh distribution packages for release..."
           uv build
           
           echo ""
